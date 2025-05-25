@@ -44,7 +44,7 @@ public class MeshController : MonoBehaviour
 
     private int mode = 0;
 
-    private const string serverUrl = "http://123.57.25.77:7005/media_app/"; 
+    private const string serverUrl = "http://123.57.25.77:7005/media_app/";
 
     public Button buttonGetPose;
     public Button buttonSummonAtCamera;
@@ -65,6 +65,8 @@ public class MeshController : MonoBehaviour
 
     private bool isMeshVisible = true;
 
+    public Text ARCameraPoseText;
+    public Text BackEndPoseText;
     void Start()
     {
         modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
@@ -222,6 +224,9 @@ public class MeshController : MonoBehaviour
         Debug.Log(res.ToString());
 
         Pose pose = TransferMatrix2Pose(res); //怎么获取返回值  
+
+        UpdateBackEndPoseToText(res);
+        UpdateARCameraPoseToText();
 
         return pose;
     }
@@ -430,7 +435,7 @@ public class MeshController : MonoBehaviour
 
         scene.transform.Rotate(new Vector3(180, 0, 0));
 
-       // modelInstance.transform.rotation = Quaternion.Euler(modelInstance.transform.rotation.x, modelInstance.transform.rotation.y + 180, modelInstance.transform.rotation.z);
+        // modelInstance.transform.rotation = Quaternion.Euler(modelInstance.transform.rotation.x, modelInstance.transform.rotation.y + 180, modelInstance.transform.rotation.z);
 
         arCamera.transform.DetachChildren();
 
@@ -531,7 +536,7 @@ public class MeshController : MonoBehaviour
         MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
         Material targetMat = Resources.Load<Material>("Materials/GXL_Material");
         sceneMeshRenderer.material = targetMat;
-        
+
         buttonShowMesh.gameObject.SetActive(false);
         buttonHideMesh.gameObject.SetActive(true);
     }
@@ -556,18 +561,19 @@ public class MeshController : MonoBehaviour
 
     void Update()
     {
+        UpdateARCameraPoseToText();
         if (modelInstance)
         {
             //UpdateGraphTransform(modelInstance);
         }
         //make graph follow scene
-        
+
 
         if (Input.touchCount == 0)
         {
             return;
         }
-        
+
         if (mode == 平移)
         {
             if (Input.touchCount == 1)
@@ -656,4 +662,34 @@ public class MeshController : MonoBehaviour
         //}
     }
 
+    void UpdateARCameraPoseToText()
+    {
+        if (arCamera != null && ARCameraPoseText != null)
+        {
+            Matrix4x4 matrix = arCamera.transform.localToWorldMatrix;
+
+            string matrixStr = "";
+            for (int i = 0; i < 4; i++)
+            {
+                matrixStr += $"{matrix[i, 0],8:F4}  {matrix[i, 1],8:F4}  {matrix[i, 2],8:F4}  {matrix[i, 3],8:F4}\n";
+            }
+
+            ARCameraPoseText.text = "AR Camera Pose (4x4 Matrix):\n" + matrixStr;
+        }
+    }
+    
+    void UpdateBackEndPoseToText(Matrix4x4 mtx)
+    {
+        if(BackEndPoseText != null)
+        {
+            Matrix4x4 matrix = mtx;
+            string matrixStr = "";
+            for (int i = 0; i < 4; i++)
+            {
+                matrixStr += $"{matrix[i, 0],8:F4}  {matrix[i, 1],8:F4}  {matrix[i, 2],8:F4}  {matrix[i, 3],8:F4}\n";
+            }
+
+            BackEndPoseText.text = "Back End Pose (4x4 Matrix):\n" + matrixStr;
+        }
+    }
 }
