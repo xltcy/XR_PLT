@@ -1,3 +1,4 @@
+GXL Scene
 Intro
 This is a Unity project. Aiming to design and develop a XR platform, this project will be used by everyone in G717, BHU. More info can be found in related metting records on Notion.
 
