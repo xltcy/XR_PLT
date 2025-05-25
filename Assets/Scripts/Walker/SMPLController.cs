@@ -139,7 +139,7 @@ public class SMPLController : MonoBehaviour
                     if (!hasSpoken)
                     {
                         SpeechManager.SayFromStr(toSpeak);
-                        talkAnim.SetTrigger("introduce");
+                        //talkAnim.SetTrigger("introduce");
                         UnityEngine.Debug.Log("Msg in Update:" + toSpeak);
                         hasSpoken = true;
                     }
@@ -183,8 +183,6 @@ public class SMPLController : MonoBehaviour
 
     private void LookAtMe(bool isSmooth = false)
     {
-        // ��ʱ������
-        //isSmooth = false;
         if (!isSmooth)
         {
             walkingModel.transform.LookAt(new Vector3(arCamera.transform.position.x, walkingModel.transform.position.y, arCamera.transform.position.z));
@@ -192,7 +190,6 @@ public class SMPLController : MonoBehaviour
         }
         else
         {
-            //Vector3 targetPos = walkingModel.transform.position - arCamera.transform.position;
             Vector3 targetPos = arCamera.transform.position - walkingModel.transform.position;
             targetPos.y = 0;
             desRotation = Quaternion.LookRotation(targetPos);
@@ -202,8 +199,6 @@ public class SMPLController : MonoBehaviour
     }
     private void CopyTransformState(Transform from, Transform to) // walkģ�ͺ�talkģ�͵ĳ���ͬ�������Ҫת���������0.213������Դ��ϵǰ��ʺɽ��
     {
-        //to.position = from.position + from.forward.normalized * 0.213f;
-        //to.forward = -from.forward;
         to.position = from.position;
         to.localRotation = from.localRotation;
     }
@@ -324,6 +319,9 @@ public class SMPLController : MonoBehaviour
         videoScreen.transform.rotation = target.transform.rotation;
         videoScreen.SetActive(true);
         FindObjectOfType<VideoManager>().PlayVideo("shengna");
+
+        talkAnim.SetTrigger("introduce");
+        SpeechManager.SayFromStr("在浩瀚无垠的蓝色领域,隐藏着无数未知的奥秘,若光线无法穿过这片昏暗,就让声波破水而行,汉界科技新一代 C 750 D 双屏图像声纳,重磅登场,最远可下潜至500米深度进行专业探测,实时动态成像,看见肉眼不可及之处");
     }
 
     public void SummonSonar()
@@ -332,6 +330,9 @@ public class SMPLController : MonoBehaviour
         sonar.transform.position = target.transform.position;
         sonar.transform.rotation = target.transform.rotation;
         sonar.SetActive(true);
+
+        talkAnim.SetTrigger("HandForward");
+        SpeechManager.SayFromStr("各位游客，大家好！现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
     }
 
     private void UpdateGraphTransform()
