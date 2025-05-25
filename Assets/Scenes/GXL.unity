@@ -4210,12 +4210,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   version: 1
-  radius: 0.5
-  height: 2
+  radius: 0.26
+  height: 1.7
   repathRate: 0.5
   canSearch: 1
   canMove: 1
-  maxSpeed: 1
+  maxSpeed: 0.3
   gravity: {x: NaN, y: NaN, z: NaN}
   groundMask:
     serializedVersion: 2
@@ -4224,7 +4224,7 @@ MonoBehaviour:
   orientation: 0
   enableRotation: 1
   targetCompatibility: {fileID: 0}
-  acceleration: 5
+  acceleration: 1
   rotationSpeed: 360
   slowdownTime: 0.5
   endReachedDistance: 0.01
