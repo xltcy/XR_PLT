@@ -34,6 +34,7 @@ public class SMPLController : MonoBehaviour
     private bool isInitPos; //���������ó�ʼλ��
     private Quaternion desRotation;
 
+    private bool hasRemind = false;
     private bool hasSpoken = false;
     private string toSpeak = "";
 
@@ -45,6 +46,14 @@ public class SMPLController : MonoBehaviour
     private List<Material> materials;
 
     private static Vector3 consPos;
+
+    // To Storage Target Position
+    private Vector3 tempTarget;
+    private Vector3 finalTarget;
+
+    // The diastance whether virtualHuman wallking
+    private float minDistance = 0.5f;
+    private float maxDistance = 10.0f;
 
     public static void SetConsPos(Vector3 pos)
     {
@@ -121,6 +130,11 @@ public class SMPLController : MonoBehaviour
                     StopWalking();
                     SwitchToTalkMode();
                 }
+                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                {
+                    StopWalking();
+                    SwitchToTalkMode();
+                }
                 else
                 {
                     StartWalking(0.7f);
@@ -128,12 +142,7 @@ public class SMPLController : MonoBehaviour
             }
             else
             {
-                if (!NearEnough(destination.transform.position, walkingModel.transform.position))
-                {
-                    SwitchToWalkMode();
-                    hasSpoken = false;
-                }
-                else
+                if (NearEnough(destination.transform.position, walkingModel.transform.position))
                 {
                     LookAtMe(true);
                     if (!hasSpoken)
@@ -144,6 +153,22 @@ public class SMPLController : MonoBehaviour
                         hasSpoken = true;
                     }
                 }
+                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                {
+                    //SwitchToWalkMode();
+                    LookAtMe(true);
+                    if (!hasRemind)
+                    {
+                        SpeechManager.SayFromStr("请跟上我");
+                        hasRemind = true;
+                    }
+
+                }
+                else
+                {
+                    SwitchToWalkMode();
+                    hasSpoken = false;
+                }
             }
         }
 
@@ -153,9 +178,17 @@ public class SMPLController : MonoBehaviour
     bool NearEnough(Vector3 a, Vector3 b)
     {
         //Debug.Log((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z));
-        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < 0.1;
+        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < minDistance;
 
     }
+
+    bool FarAway(Vector3 a, Vector3 b)
+    {
+        //Debug.Log((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z));
+        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) > maxDistance;
+
+    }
+
 
     public void HideMeshRender()
     {

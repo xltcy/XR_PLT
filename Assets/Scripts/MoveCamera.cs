@@ -23,7 +23,6 @@ public class MoveCamera : MonoBehaviour
     {
         // 键盘控制相机移动
         Vector3 move = Vector3.zero;
-        Debug.Log("Msg in CameraMoving: " + move.ToString());
 
         // WSAD 控制前后左右
         if (Input.GetKey(KeyCode.W)) move += camera.transform.forward;
