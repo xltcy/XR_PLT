@@ -38,7 +38,7 @@ public class SMPLController : MonoBehaviour
     private bool hasSpoken = false;
     private string toSpeak = "";
 
-    public Dropdown dropDown;
+    public GameObject buttons;
     public Camera arCamera;
 
     public Material occlusionMaterial;
@@ -53,7 +53,7 @@ public class SMPLController : MonoBehaviour
 
     // The diastance whether virtualHuman wallking
     private float minDistance = 0.5f;
-    private float maxDistance = 10.0f;
+    private float maxDistance = 15.0f;
 
     public static void SetConsPos(Vector3 pos)
     {
@@ -83,7 +83,6 @@ public class SMPLController : MonoBehaviour
         walkAnim = walkingModel.GetComponent<Animator>();
         talkAnim = talkingModel.GetComponent<Animator>();
 
-        dropDown.value = 4;
         hasSpoken = false;
         isWalking = false;
         isInitPos = true;
@@ -321,14 +320,14 @@ public class SMPLController : MonoBehaviour
         }
     }
 
-    public void HideDropDown()
+    public void HideButton()
     {
-        dropDown.gameObject.SetActive(false);
+        buttons.gameObject.SetActive(false);
     }
 
-    public void ShowDropDown()
+    public void ShowButton()
     {
-        dropDown.gameObject.SetActive(true);
+        buttons.gameObject.SetActive(true);
     }
 
     public void StartToNav()
@@ -343,6 +342,7 @@ public class SMPLController : MonoBehaviour
     };
 
     public GameObject videoScreen;
+    public GameObject prefabSonar;
     public GameObject sonar;
 
     public void SummonScreen()
@@ -354,18 +354,22 @@ public class SMPLController : MonoBehaviour
         FindObjectOfType<VideoManager>().PlayVideo("shengna");
 
         talkAnim.SetTrigger("introduce");
-        SpeechManager.SayFromStr("在浩瀚无垠的蓝色领域,隐藏着无数未知的奥秘,若光线无法穿过这片昏暗,就让声波破水而行,汉界科技新一代 C 750 D 双屏图像声纳,重磅登场,最远可下潜至500米深度进行专业探测,实时动态成像,看见肉眼不可及之处");
+        SpeechManager.SayFromStr("各位游客，大家好！现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。最远可下潜至500米深度进行专业探测,实时动态成像,看见肉眼不可及之处。");
+
+        Invoke("SummonSonar", 5);
     }
 
     public void SummonSonar()
     {
         target.transform.localPosition = meshLocalPosition["Sonar"];
-        sonar.transform.position = target.transform.position;
-        sonar.transform.rotation = target.transform.rotation;
-        sonar.SetActive(true);
+        prefabSonar.transform.position = target.transform.position;
+        prefabSonar.transform.rotation = target.transform.rotation;
+        prefabSonar.SetActive(true);
 
         talkAnim.SetTrigger("HandForward");
         SpeechManager.SayFromStr("各位游客，大家好！现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
+
+        Invoke("SeparateSonar", 5);
     }
 
     private void UpdateGraphTransform()
@@ -380,5 +384,22 @@ public class SMPLController : MonoBehaviour
             graph.rotation = boundrotate;
             graph.RelocateNodes(graph.CalculateTransform());
         });
+    }
+
+    public void SeparateSonar()
+    {
+        ModelTreeNode.OneDofExplosion(sonar);
+        Invoke("RecoverSonar", 5);
+    }
+
+    public void RecoverSonar()
+    {
+        ModelTreeNode.OneDofRecovery(sonar);
+        Invoke("HideSonar", 3);
+    }
+
+    private void HideSonar()
+    {
+        prefabSonar.SetActive(false);
     }
 }

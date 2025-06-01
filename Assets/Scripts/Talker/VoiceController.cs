@@ -8,16 +8,10 @@ public class VoiceController : MonoBehaviour
 {
     // Start is called before the first frame update
     XunFeiYuYin xunfei;
-    public Text text;
+    public Text debugText;
     public VoiceActiveButton voiceActiveButton;
     //public TrackingImageManager trackingImageManager;
     public SMPLController smplController;
-    public GameObject target;
-    public GameObject door;
-    public GameObject sandwish;
-    public GameObject gate;
-    public GameObject ship;
-    public GameObject chair;
     [Header("Prefabs")]
     public GameObject _prefabOfPlane;
 
@@ -61,10 +55,10 @@ public class VoiceController : MonoBehaviour
         llmGenerator = LLMGenerator.Init();
 
         // Registe commands
-        voiceRecCommands.AddRange(IRVVoiceRecCommand.GetAllCommands());
+        //voiceRecCommands.AddRange(IRVVoiceRecCommand.GetAllCommands());
         voiceRecCommands.AddRange(VirHumanVoiceRecCommand.GetAllCommands());
         voiceRecCommands.AddRange(SceneVoiceRecCommand.GetAllCommands());
-        voiceRecCommands.AddRange(PlaneRelatedCommand.GetAllCommands());
+        //voiceRecCommands.AddRange(PlaneRelatedCommand.GetAllCommands());
     }
 
     // Update is called once per frame
@@ -101,7 +95,7 @@ public class VoiceController : MonoBehaviour
 
     public void 清空文字()
     {
-        text.text = "";
+        debugText.text = "";
     }
 
     public void 语音识别结果(string result)
@@ -111,7 +105,7 @@ public class VoiceController : MonoBehaviour
             CommandFail();
             return;
         }
-        text.text += "\n语音识别结束，结果:" + result;
+        debugText.text += "\n语音识别结束，结果:" + result;
         VoiceRecCommand resCommand = new VoiceRecCommand("");
         foreach (var command in voiceRecCommands)
         {
@@ -142,7 +136,7 @@ public class VoiceController : MonoBehaviour
                 //    break;
                 default:
                     matchFail = true;
-                    RemoteChat("你好");
+                    RemoteChat($"现在面前的是一个声呐，用户提问的问题是{result},请以一个精通声呐的专家身份回答");
                     break;
             }
         }
@@ -200,10 +194,18 @@ public class VoiceController : MonoBehaviour
                 smplController.HideMeshRender(); break;
             case SceneVoiceRecCommand.SceneCommandType.showScene:
                 smplController.ShowMeshRender(); break;
-            case SceneVoiceRecCommand.SceneCommandType.hideDropDown:
-                smplController.HideDropDown(); break;
-            case SceneVoiceRecCommand.SceneCommandType.showDropDown:
-                smplController.ShowDropDown(); break;
+            case SceneVoiceRecCommand.SceneCommandType.hideButton:
+                smplController.HideButton(); break;
+            case SceneVoiceRecCommand.SceneCommandType.showButton:
+                smplController.ShowButton(); break;
+            case SceneVoiceRecCommand.SceneCommandType.screen:
+                smplController.SummonScreen(); break;
+            case SceneVoiceRecCommand.SceneCommandType.sonar:
+                smplController.SummonSonar(); break;
+            case SceneVoiceRecCommand.SceneCommandType.separateSonar:
+                smplController.SeparateSonar(); break;
+            case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
+                smplController.RecoverSonar(); break;
             default: ReconizeFail(); break;
         }
     }

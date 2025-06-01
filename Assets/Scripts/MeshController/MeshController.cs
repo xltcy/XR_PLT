@@ -65,8 +65,6 @@ public class MeshController : MonoBehaviour
 
     private bool isMeshVisible = true;
 
-    public Text ARCameraPoseText;
-    public Text BackEndPoseText;
     void Start()
     {
         modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
@@ -224,9 +222,6 @@ public class MeshController : MonoBehaviour
         Debug.Log(res.ToString());
 
         Pose pose = TransferMatrix2Pose(res); //怎么获取返回值  
-
-        UpdateBackEndPoseToText(res);
-        UpdateARCameraPoseToText();
 
         return pose;
     }
@@ -561,7 +556,6 @@ public class MeshController : MonoBehaviour
 
     void Update()
     {
-        UpdateARCameraPoseToText();
         if (modelInstance)
         {
             //UpdateGraphTransform(modelInstance);
@@ -660,36 +654,5 @@ public class MeshController : MonoBehaviour
         //    // MySceneManager.instance.ChangeToVirtualManExhibition();
         //    MySceneManager.instance.ChangeTo1818();
         //}
-    }
-
-    void UpdateARCameraPoseToText()
-    {
-        if (arCamera != null && ARCameraPoseText != null)
-        {
-            Matrix4x4 matrix = arCamera.transform.localToWorldMatrix;
-
-            string matrixStr = "";
-            for (int i = 0; i < 4; i++)
-            {
-                matrixStr += $"{matrix[i, 0],8:F4}  {matrix[i, 1],8:F4}  {matrix[i, 2],8:F4}  {matrix[i, 3],8:F4}\n";
-            }
-
-            ARCameraPoseText.text = "AR Camera Pose (4x4 Matrix):\n" + matrixStr;
-        }
-    }
-    
-    void UpdateBackEndPoseToText(Matrix4x4 mtx)
-    {
-        if(BackEndPoseText != null)
-        {
-            Matrix4x4 matrix = mtx;
-            string matrixStr = "";
-            for (int i = 0; i < 4; i++)
-            {
-                matrixStr += $"{matrix[i, 0],8:F4}  {matrix[i, 1],8:F4}  {matrix[i, 2],8:F4}  {matrix[i, 3],8:F4}\n";
-            }
-
-            BackEndPoseText.text = "Back End Pose (4x4 Matrix):\n" + matrixStr;
-        }
     }
 }
