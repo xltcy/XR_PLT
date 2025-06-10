@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -11,7 +13,7 @@ using UnityEngine.UI;
 /// 2. pressed: is being pressed by user.
 /// 3. consoling: disable, unclickable.
 /// </summary>
-public class VoiceActiveButton : Button
+public class VoiceActiveButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     // 将枚举移到类定义的开始处
     public enum State
@@ -24,26 +26,43 @@ public class VoiceActiveButton : Button
     public State state = State.NORMAL;
     public UnityEvent onPointerDown;
     public UnityEvent onPointerUp;
+
+    public Sprite spriteNormal;
+
+    public Sprite[] spritePressing;
+    public Sprite spriteLoading;
+
+    [Header("动画参数")]
+    public float recordingFrameRate = 0.1f; // 录音动画帧间隔
+    public float loadingRotationSpeed = 200f; // 加载旋转速度
+
     private bool errorHasOccur = false;
 
-    public override void OnPointerDown(PointerEventData eventData)
+    private Coroutine mockImageAnimateCoroutine;
+
+    private SVGImage svgImage {
+        get
+        {
+            return gameObject.GetComponentInChildren<SVGImage>();
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
     {
-        if (!IsActive() || !IsInteractable())
+        if (!gameObject.activeSelf)
             return;
 
-        base.OnPointerDown(eventData);
         state = State.PRESSED;
         errorHasOccur = false;
         UIFixByState();
         onPointerDown?.Invoke();
     }
 
-    public override void OnPointerUp(PointerEventData eventData)
+    public void OnPointerUp(PointerEventData eventData)
     {
-        if (!IsActive() || !IsInteractable())
+        if (!gameObject.activeSelf)
             return;
 
-        base.OnPointerUp(eventData);
         if (!errorHasOccur)
         {
             state = State.CONSOLING;
@@ -79,22 +98,38 @@ public class VoiceActiveButton : Button
         };
 
         GetComponentInChildren<Text>().text = text;
-        GetComponent<Image>().color = color;
+        // GetComponent<Image>().color = color;
+
+        if (state != State.NORMAL && mockImageAnimateCoroutine == null)
+        {
+            mockImageAnimateCoroutine = StartCoroutine(MockIconAnimate());
+        }
     }
 
-    // 如果不需要这些方法，可以移除它们
-    public override void OnPointerClick(PointerEventData eventData)
+    private IEnumerator MockIconAnimate()
     {
-        base.OnPointerClick(eventData);
-    }
+        // 录音动画
+        int currentFrame = 0;
+        while (state == State.PRESSED)
+        {
+            // 循环播放动画帧
+            svgImage.sprite = spritePressing[currentFrame];
+            currentFrame = (currentFrame + 1) % spritePressing.Length;
 
-    public override void OnPointerEnter(PointerEventData eventData)
-    {
-        base.OnPointerEnter(eventData);
-    }
+            yield return new WaitForSeconds(recordingFrameRate);
+        }
 
-    public override void OnPointerExit(PointerEventData eventData)
-    {
-        base.OnPointerExit(eventData);
+        // 加载旋转动画
+        svgImage.sprite = spriteLoading;
+        svgImage.transform.localRotation = Quaternion.identity;
+        while (state == State.CONSOLING)
+        {
+            svgImage.transform.Rotate(0, 0, -loadingRotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        svgImage.sprite = spriteNormal;
+        svgImage.transform.localRotation = Quaternion.identity;
+        mockImageAnimateCoroutine = null;
     }
 }
