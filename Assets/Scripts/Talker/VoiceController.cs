@@ -15,6 +15,9 @@ public class VoiceController : MonoBehaviour
     [Header("Prefabs")]
     public GameObject _prefabOfPlane;
 
+    [Header("模拟语音识别结果")]
+    public Text fakeVoiceText;
+
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
     private LLMGenerator llmGenerator;
 
@@ -118,6 +121,56 @@ public class VoiceController : MonoBehaviour
         }
         bool matchFail = false;
         
+        try
+        {
+            switch (resCommand)
+            {
+                //case IRVVoiceRecCommand iRVCommand:
+                //    IamgeTrackConsole(iRVCommand);
+                //    break;
+                case VirHumanVoiceRecCommand virHumanCommand:
+                    VirHumanAction(virHumanCommand);
+                    break;
+                case SceneVoiceRecCommand sceneCommand:
+                    SceneAction(sceneCommand);
+                    break;
+                //case PlaneRelatedCommand planeRelatedCommand:
+                //    PlaneRelatedAction(planeRelatedCommand);
+                //    break;
+                default:
+                    matchFail = true;
+                    RemoteChat($"现在面前的是一个声呐，用户提问的问题是{result},请以一个精通声呐的专家身份回答");
+                    break;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log("command exec error");
+            CommandFail();
+            throw;
+        }
+        if (!matchFail)
+        {
+            voiceActiveButton.ResetBtn();
+        }
+    }
+
+    public void FakeGetVoiceResult(string result)
+    {
+        result = fakeVoiceText.text.ToString();
+        debugText.text += "\n语音识别结束，结果:" + result;
+        VoiceRecCommand resCommand = new VoiceRecCommand("");
+        foreach (var command in voiceRecCommands)
+        {
+            Regex regex = new Regex(command.matchPattern);
+            if (regex.IsMatch(result))
+            {
+                resCommand = command;
+                break;
+            }
+        }
+        bool matchFail = false;
+
         try
         {
             switch (resCommand)

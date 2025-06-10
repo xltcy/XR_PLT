@@ -354,9 +354,9 @@ public class SMPLController : MonoBehaviour
         FindObjectOfType<VideoManager>().PlayVideo("shengna");
 
         talkAnim.SetTrigger("introduce");
-        SpeechManager.SayFromStr("各位游客，大家好！现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。最远可下潜至500米深度进行专业探测,实时动态成像,看见肉眼不可及之处。");
+        SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态的水下探测装置。根据是否发射声波，可分为主动式声呐和被动式声呐两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
 
-        Invoke("SummonSonar", 5);
+        Invoke("SummonSonar", 20);
     }
 
     public void SummonSonar()
@@ -367,9 +367,9 @@ public class SMPLController : MonoBehaviour
         prefabSonar.SetActive(true);
 
         talkAnim.SetTrigger("HandForward");
-        SpeechManager.SayFromStr("各位游客，大家好！现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
+        SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
 
-        Invoke("SeparateSonar", 5);
+        Invoke("SeparateSonar", 15);
     }
 
     private void UpdateGraphTransform()
