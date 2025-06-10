@@ -17,7 +17,7 @@ public class SelectDesController : MonoBehaviour
     public bool useResources = false;
 
     private string resourceFolder = "SelectDesCoverImages";
-    private string hintString = "请选择想要参观的区域\n点击屏幕上的选项或说“请带我参观某区域”";
+    private string hintString = "欢迎来到OW，请选择想要参观的区域\n点击屏幕上的选项";
 
     // Start is called before the first frame update
     void Start()

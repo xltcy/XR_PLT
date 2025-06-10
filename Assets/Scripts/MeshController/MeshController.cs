@@ -44,7 +44,7 @@ public class MeshController : MonoBehaviour
 
     private int mode = 0;
 
-    private const string serverUrl = "http://123.57.25.77:7005/media_app/"; 
+    private const string serverUrl = "http://123.57.25.77:7005/media_app/";
 
     public Button buttonGetPose;
     public Button buttonSummonAtCamera;
@@ -430,7 +430,7 @@ public class MeshController : MonoBehaviour
 
         scene.transform.Rotate(new Vector3(180, 0, 0));
 
-       // modelInstance.transform.rotation = Quaternion.Euler(modelInstance.transform.rotation.x, modelInstance.transform.rotation.y + 180, modelInstance.transform.rotation.z);
+        // modelInstance.transform.rotation = Quaternion.Euler(modelInstance.transform.rotation.x, modelInstance.transform.rotation.y + 180, modelInstance.transform.rotation.z);
 
         arCamera.transform.DetachChildren();
 
@@ -531,7 +531,7 @@ public class MeshController : MonoBehaviour
         MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
         Material targetMat = Resources.Load<Material>("Materials/GXL_Material");
         sceneMeshRenderer.material = targetMat;
-        
+
         buttonShowMesh.gameObject.SetActive(false);
         buttonHideMesh.gameObject.SetActive(true);
     }
@@ -561,13 +561,13 @@ public class MeshController : MonoBehaviour
             //UpdateGraphTransform(modelInstance);
         }
         //make graph follow scene
-        
+
 
         if (Input.touchCount == 0)
         {
             return;
         }
-        
+
         if (mode == 平移)
         {
             if (Input.touchCount == 1)
@@ -655,5 +655,4 @@ public class MeshController : MonoBehaviour
         //    MySceneManager.instance.ChangeTo1818();
         //}
     }
-
 }

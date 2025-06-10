@@ -35,11 +35,6 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     public void TransToSelectDesUI()
     {
         SwitchRunState(RunState.SelectDestination);
-    }
-
-    public void TansToVirtualManIntroUI()
-    {
-        SwitchRunState(RunState.VirtualManIntro);
 
         if(!initPos)
         {
@@ -47,7 +42,12 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
-       
+
+    }
+
+    public void TansToVirtualManIntroUI()
+    {
+        SwitchRunState(RunState.VirtualManIntro);
     }
 
     private void SwitchRunState(RunState newState)

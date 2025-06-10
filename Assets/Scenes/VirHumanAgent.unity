@@ -203,7 +203,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &78094211
 GameObject:
@@ -546,7 +546,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &265788863
 GameObject:
@@ -818,12 +818,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248896e16adcb0b4fac5d7279c6dba30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  destination: {fileID: 0}
+  walkingModel: {fileID: 0}
+  talkingModel: {fileID: 0}
   dropDown: {fileID: 145903415}
   arCamera: {fileID: 1354141926}
-  target: {fileID: 0}
-  human: {fileID: 0}
   occlusionMaterial: {fileID: 0}
   texturedMaterial: {fileID: 0}
+  videoScreen: {fileID: 0}
+  sonar: {fileID: 0}
 --- !u!1 &327270683
 GameObject:
   m_ObjectHideFlags: 0
@@ -2478,12 +2481,6 @@ MonoBehaviour:
   text: {fileID: 0}
   voiceActiveButton: {fileID: 1902517708}
   smplController: {fileID: 314347551}
-  target: {fileID: 0}
-  door: {fileID: 0}
-  sandwish: {fileID: 0}
-  gate: {fileID: 0}
-  ship: {fileID: 0}
-  chair: {fileID: 0}
   _prefabOfPlane: {fileID: 0}
 --- !u!4 &1372484372
 Transform:
@@ -2497,7 +2494,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1446238543
 GameObject:
@@ -3334,96 +3331,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1001 &1937956048
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1438330214265417772, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_Avatar
-      value: 
-      objectReference: {fileID: 9000000, guid: 9ebdbafc094a58b4aa66c2ac5cfe199a, type: 3}
-    - target: {fileID: 1438330214265417772, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: 507401c4f3c173a4b92436cba14a711a, type: 2}
-    - target: {fileID: 1438330214265417772, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'jaw'\n\tTransform 'left_ankle'\n\tTransform
-        'left_ring1'\n\tTransform 'left_hip'\n\tTransform 'right_pinky3'\n\tTransform
-        'spine2'\n\tTransform 'right_ring3'\n\tTransform 'right_collar'\n\tTransform
-        'right_thumb3'\n\tTransform 'right_pinky2'\n\tand more ...\n\tFrom animation
-        clip 'SMPLX-male|SMPLX-maleAction'"
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261057, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_Name
-      value: Prefab-SJS-1226
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4689671230300261058, guid: bc56a247455fb7048a716952ae9f0c89,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: bc56a247455fb7048a716952ae9f0c89, type: 3}
 --- !u!1 &2044841792
 GameObject:
   m_ObjectHideFlags: 0
@@ -3466,7 +3373,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2068609478
 GameObject:

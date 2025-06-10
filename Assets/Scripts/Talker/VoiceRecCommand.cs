@@ -97,8 +97,8 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
                 break;
             case VirHumanCommandType.shengNa:
                 matchPattern = "声呐";
-                desLocalPosition = new Vector3(-1f, -1f, 2.2f);
-                introduction = "声呐是阿巴阿巴阿巴阿巴";
+                desLocalPosition = new Vector3(0.25f, -1f, 5f);
+                introduction = "我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
                 break;
 
         }
@@ -137,7 +137,6 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
 public class SceneVoiceRecCommand : VoiceRecCommand
 {
     public SceneCommandType commandType;
-    public Vector3 desLocalPosition = Vector3.zero;
     public SceneVoiceRecCommand(string info, SceneCommandType type) : base(info)
     {
         switch (type)
@@ -146,16 +145,18 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "隐藏模型"; break;
             case SceneCommandType.showScene:
                 matchPattern = "显示模型"; break;
-            case SceneCommandType.hideDropDown:
-                matchPattern = "隐藏位置"; break;
-            case SceneCommandType.showDropDown:
-                matchPattern = "显示位置"; break;
+            case SceneCommandType.hideButton:
+                matchPattern = "隐藏按钮"; break;
+            case SceneCommandType.showButton:
+                matchPattern = "显示按钮"; break;
             case SceneCommandType.screen:
-                matchPattern = "播放视频";
-                desLocalPosition = new Vector3(3.205f, 0.55f, -2.49f);
-                break;
+                matchPattern = "播放视频"; break;
             case SceneCommandType.sonar:
-                matchPattern = "声呐展示"; break;
+                matchPattern = "展示模型"; break;
+            case SceneCommandType.separateSonar:
+                matchPattern = "模型分解"; break;
+            case SceneCommandType.recoverSonar:
+                matchPattern = "模型恢复"; break;
         }
         commandType = type;
     }
@@ -163,23 +164,29 @@ public class SceneVoiceRecCommand : VoiceRecCommand
     public static List<SceneVoiceRecCommand> GetAllCommands()
     {
         List<SceneVoiceRecCommand> res = new List<SceneVoiceRecCommand>();
+        // res.Add(new SceneVoiceRecCommand("", SceneCommandType.takeMeTo));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showScene));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideDropDown));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showDropDown));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideButton));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showButton));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.screen));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
         return res;
     }
 
     public enum SceneCommandType
     {
+        takeMeTo,
         hideScene,
         showScene,
-        hideDropDown,
-        showDropDown,
+        hideButton,
+        showButton,
         screen,
-        sonar
+        sonar,
+        separateSonar,
+        recoverSonar
     }
 }
 

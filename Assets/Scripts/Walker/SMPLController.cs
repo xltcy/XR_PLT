@@ -34,10 +34,11 @@ public class SMPLController : MonoBehaviour
     private bool isInitPos; //���������ó�ʼλ��
     private Quaternion desRotation;
 
+    private bool hasRemind = false;
     private bool hasSpoken = false;
     private string toSpeak = "";
 
-    public Dropdown dropDown;
+    public GameObject buttons;
     public Camera arCamera;
 
     public Material occlusionMaterial;
@@ -45,6 +46,14 @@ public class SMPLController : MonoBehaviour
     private List<Material> materials;
 
     private static Vector3 consPos;
+
+    // To Storage Target Position
+    private Vector3 tempTarget;
+    private Vector3 finalTarget;
+
+    // The diastance whether virtualHuman wallking
+    private float minDistance = 0.5f;
+    private float maxDistance = 15.0f;
 
     public static void SetConsPos(Vector3 pos)
     {
@@ -74,7 +83,6 @@ public class SMPLController : MonoBehaviour
         walkAnim = walkingModel.GetComponent<Animator>();
         talkAnim = talkingModel.GetComponent<Animator>();
 
-        dropDown.value = 4;
         hasSpoken = false;
         isWalking = false;
         isInitPos = true;
@@ -121,6 +129,11 @@ public class SMPLController : MonoBehaviour
                     StopWalking();
                     SwitchToTalkMode();
                 }
+                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                {
+                    StopWalking();
+                    SwitchToTalkMode();
+                }
                 else
                 {
                     StartWalking(0.7f);
@@ -128,21 +141,32 @@ public class SMPLController : MonoBehaviour
             }
             else
             {
-                if (!NearEnough(destination.transform.position, walkingModel.transform.position))
-                {
-                    SwitchToWalkMode();
-                    hasSpoken = false;
-                }
-                else
+                if (NearEnough(destination.transform.position, walkingModel.transform.position))
                 {
                     LookAtMe(true);
                     if (!hasSpoken)
                     {
                         SpeechManager.SayFromStr(toSpeak);
-                        talkAnim.SetTrigger("introduce");
+                        //talkAnim.SetTrigger("introduce");
                         UnityEngine.Debug.Log("Msg in Update:" + toSpeak);
                         hasSpoken = true;
                     }
+                }
+                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                {
+                    //SwitchToWalkMode();
+                    LookAtMe(true);
+                    if (!hasRemind)
+                    {
+                        SpeechManager.SayFromStr("请跟上我");
+                        hasRemind = true;
+                    }
+
+                }
+                else
+                {
+                    SwitchToWalkMode();
+                    hasSpoken = false;
                 }
             }
         }
@@ -153,9 +177,17 @@ public class SMPLController : MonoBehaviour
     bool NearEnough(Vector3 a, Vector3 b)
     {
         //Debug.Log((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z));
-        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < 0.1;
+        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < minDistance;
 
     }
+
+    bool FarAway(Vector3 a, Vector3 b)
+    {
+        //Debug.Log((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z));
+        return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) > maxDistance;
+
+    }
+
 
     public void HideMeshRender()
     {
@@ -183,8 +215,6 @@ public class SMPLController : MonoBehaviour
 
     private void LookAtMe(bool isSmooth = false)
     {
-        // ��ʱ������
-        //isSmooth = false;
         if (!isSmooth)
         {
             walkingModel.transform.LookAt(new Vector3(arCamera.transform.position.x, walkingModel.transform.position.y, arCamera.transform.position.z));
@@ -192,7 +222,6 @@ public class SMPLController : MonoBehaviour
         }
         else
         {
-            //Vector3 targetPos = walkingModel.transform.position - arCamera.transform.position;
             Vector3 targetPos = arCamera.transform.position - walkingModel.transform.position;
             targetPos.y = 0;
             desRotation = Quaternion.LookRotation(targetPos);
@@ -202,8 +231,6 @@ public class SMPLController : MonoBehaviour
     }
     private void CopyTransformState(Transform from, Transform to) // walkģ�ͺ�talkģ�͵ĳ���ͬ�������Ҫת���������0.213������Դ��ϵǰ��ʺɽ��
     {
-        //to.position = from.position + from.forward.normalized * 0.213f;
-        //to.forward = -from.forward;
         to.position = from.position;
         to.localRotation = from.localRotation;
     }
@@ -293,14 +320,14 @@ public class SMPLController : MonoBehaviour
         }
     }
 
-    public void HideDropDown()
+    public void HideButton()
     {
-        dropDown.gameObject.SetActive(false);
+        buttons.gameObject.SetActive(false);
     }
 
-    public void ShowDropDown()
+    public void ShowButton()
     {
-        dropDown.gameObject.SetActive(true);
+        buttons.gameObject.SetActive(true);
     }
 
     public void StartToNav()
@@ -315,6 +342,7 @@ public class SMPLController : MonoBehaviour
     };
 
     public GameObject videoScreen;
+    public GameObject prefabSonar;
     public GameObject sonar;
 
     public void SummonScreen()
@@ -324,14 +352,24 @@ public class SMPLController : MonoBehaviour
         videoScreen.transform.rotation = target.transform.rotation;
         videoScreen.SetActive(true);
         FindObjectOfType<VideoManager>().PlayVideo("shengna");
+
+        talkAnim.SetTrigger("introduce");
+        SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态的水下探测装置。根据是否发射声波，可分为主动式声呐和被动式声呐两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
+
+        Invoke("SummonSonar", 20);
     }
 
     public void SummonSonar()
     {
         target.transform.localPosition = meshLocalPosition["Sonar"];
-        sonar.transform.position = target.transform.position;
-        sonar.transform.rotation = target.transform.rotation;
-        sonar.SetActive(true);
+        prefabSonar.transform.position = target.transform.position;
+        prefabSonar.transform.rotation = target.transform.rotation;
+        prefabSonar.SetActive(true);
+
+        talkAnim.SetTrigger("HandForward");
+        SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
+
+        Invoke("SeparateSonar", 15);
     }
 
     private void UpdateGraphTransform()
@@ -346,5 +384,22 @@ public class SMPLController : MonoBehaviour
             graph.rotation = boundrotate;
             graph.RelocateNodes(graph.CalculateTransform());
         });
+    }
+
+    public void SeparateSonar()
+    {
+        ModelTreeNode.OneDofExplosion(sonar);
+        Invoke("RecoverSonar", 5);
+    }
+
+    public void RecoverSonar()
+    {
+        ModelTreeNode.OneDofRecovery(sonar);
+        Invoke("HideSonar", 3);
+    }
+
+    private void HideSonar()
+    {
+        prefabSonar.SetActive(false);
     }
 }
