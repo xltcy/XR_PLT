@@ -7,7 +7,7 @@ Editor Version
 
 Branches
 main
-This branch is used to reserve the resent robust and stable project version.
+This branch is used to reserve the resent robust and stable project version. It is updated for new demo.
 
 GXL
 This branch is used to develop GXL scene. Please work on this branch.
