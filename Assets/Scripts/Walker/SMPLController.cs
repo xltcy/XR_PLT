@@ -338,7 +338,8 @@ public class SMPLController : MonoBehaviour
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
         {"Screen", new Vector3(-1.11f, 0.47f, 4.037f) },
-        {"Sonar", new Vector3(-0.2f, 0f, 3.3f) }
+        //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
+        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) }
     };
 
     public GameObject videoScreen;
@@ -389,13 +390,13 @@ public class SMPLController : MonoBehaviour
     public void SeparateSonar()
     {
         ModelTreeNode.OneDofExplosion(sonar);
-        Invoke("RecoverSonar", 5);
+        Invoke("RecoverSonar", 6);
     }
 
     public void RecoverSonar()
     {
         ModelTreeNode.OneDofRecovery(sonar);
-        Invoke("HideSonar", 3);
+        Invoke("HideSonar", 6);
     }
 
     private void HideSonar()
