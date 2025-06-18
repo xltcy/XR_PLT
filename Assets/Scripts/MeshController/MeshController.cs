@@ -65,6 +65,8 @@ public class MeshController : MonoBehaviour
 
     private bool isMeshVisible = true;
 
+    private Matrix4x4 camPoseT0, camPoseT1;
+
     void Start()
     {
         modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
@@ -89,6 +91,21 @@ public class MeshController : MonoBehaviour
             material.shader = newShader;
         }
         isMeshVisible = !isMeshVisible;
+    }
+
+    public void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
+    {
+        // 提取位置
+        position = pose.GetColumn(3);
+
+        // 提取缩放
+        scale.x = new Vector4(pose.m00, pose.m01, pose.m02, 0).magnitude;
+        scale.y = new Vector4(pose.m10, pose.m11, pose.m12, 0).magnitude;
+        scale.z = new Vector4(pose.m20, pose.m21, pose.m22, 0).magnitude;
+
+        // 提取旋转
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, scale).inverse * pose;
+        rotation = rotationMatrix.rotation;
     }
 
     public void ClickToSummonAtCamera()
@@ -119,6 +136,21 @@ public class MeshController : MonoBehaviour
         modelInstance.transform.Rotate(new Vector3(180, 0, 0));
 
         arCamera.transform.DetachChildren();
+
+        // Record Camera Pose
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        camPoseT1 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+
+        // fix jitter error
+        Matrix4x4 deltaP = camPoseT1 * camPoseT0.inverse;
+        Matrix4x4 modelPose = Matrix4x4.TRS(modelInstance.transform.position, modelInstance.transform.rotation ,modelInstance.transform.localScale);
+        modelPose = deltaP.inverse * modelPose;
+        Vector3 modelPosition, modelScale;
+        Quaternion modelRotation;
+        DecomposePoseMatrix(modelPose, out modelPosition, out modelRotation, out modelScale);
+        modelInstance.transform.position = modelPosition;
+        modelInstance.transform.rotation = modelRotation;
 
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
@@ -151,6 +183,11 @@ public class MeshController : MonoBehaviour
         buttonSummonAtCamera.gameObject.SetActive(false);
 
         string url = serverUrl;
+
+        // Record Camera Pose
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
 
         arCamera.GetComponent<ARCameraManager>().TryAcquireLatestCpuImage(out XRCpuImage image);
 
@@ -192,7 +229,12 @@ public class MeshController : MonoBehaviour
 
         string url = serverUrl;
 
-        string imagePath = "F:\\UnityProjects\\Z_apks\\image1.jpg";
+        // Record Camera Pose
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+
+        string imagePath = "D:\\0-Desktop\\zwr\\test\\test.jpg";
         byte[] rawData = ReadImageBytes(imagePath);
 
         Debug.Log(imagePath.ToString());
