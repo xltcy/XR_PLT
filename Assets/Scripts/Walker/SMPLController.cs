@@ -339,11 +339,13 @@ public class SMPLController : MonoBehaviour
     {
         {"Screen", new Vector3(-1.11f, 0.47f, 4.037f) },
         //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
-        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) }
+        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) },
+        {"Curtain", new Vector3(-1.054f, 1.178f, 4.15f) }
     };
 
     public GameObject videoScreen;
     public GameObject prefabSonar;
+    public GameObject prefabCurtain;
     public GameObject sonar;
 
     public void SummonScreen()
@@ -371,6 +373,14 @@ public class SMPLController : MonoBehaviour
         SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
 
         Invoke("SeparateSonar", 15);
+    }
+
+    public void SummonCurtain()
+    {
+        target.transform.localPosition = meshLocalPosition["Curtain"];
+        prefabCurtain.transform.position = target.transform.position;
+        prefabCurtain.transform.rotation = target.transform.rotation;
+        prefabCurtain.SetActive(true);
     }
 
     private void UpdateGraphTransform()
