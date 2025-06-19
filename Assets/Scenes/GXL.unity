@@ -5667,7 +5667,7 @@ MonoBehaviour:
   texturedMaterial: {fileID: 2100000, guid: 2475351e2d0b40c4cb70b594dc7ed761, type: 2}
   videoScreen: {fileID: 4944859873600731105}
   prefabSonar: {fileID: 1235368464291091946}
-  prefabCurtain: {fileID: 0}
+  prefabCurtain: {fileID: 312829312}
   sonar: {fileID: 7810060958791012311}
 --- !u!4 &1914045659
 Transform:
