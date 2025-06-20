@@ -252,7 +252,9 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
-                smplController.SummonScreen(); break;
+                smplController.SummonScreen();
+                smplController.SummonCurtain();
+                break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
                 smplController.SummonSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
