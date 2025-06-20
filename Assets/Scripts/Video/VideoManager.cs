@@ -27,12 +27,12 @@ public class VideoManager : MonoBehaviour
     public void PlayShengnaVideo()
     {
         //FindObjectOfType<MeshController>().SummonScreen();
-        PlayVideo("shengna");
+        PlayVideo("test");
     }
 
     public void TestPlayVideo()
     {
-        PlayVideo("shengna");
+        PlayVideo("test");
     }
 
     public void PlayVideo(string name)
@@ -48,6 +48,7 @@ public class VideoManager : MonoBehaviour
                 //videoPlayer.prepareCompleted += OnVideoPrepare;
                 videoPlayer.loopPointReached += OnVideoFinish;
                 videoPlayer.clip = clip;
+                videoPlayer.Play();
                 break;
             }
         }

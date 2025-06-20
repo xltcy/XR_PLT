@@ -60,8 +60,12 @@ public class ArcSegmentGenerator : MonoBehaviour
                         {
                             Debug.Log(11);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
-                            waveReflectorScript.is_on = 1;
-                            waveReflectorScript.wave_generator = wave_generator;
+                            if (waveReflectorScript != null)
+                            {
+                                waveReflectorScript.is_on = 1;
+                                waveReflectorScript.wave_generator = wave_generator;
+                            }
+                            
                             in_object = 1;
                             break;
                         }
