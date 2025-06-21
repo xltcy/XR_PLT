@@ -155,7 +155,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.tcluanTest.GXL
-    Standalone: com.DefaultCompany.GXL
+    Standalone: com.tcluanTest.GXL
   buildNumber:
     Standalone: 0
     iPhone: 0
