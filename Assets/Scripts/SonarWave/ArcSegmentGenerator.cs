@@ -8,6 +8,7 @@ public class ArcSegmentGenerator : MonoBehaviour
     public float thickness = 0.03f;
     public float distance = 0.5f;
     public int count = 4;
+    Vector3 emission_position = new Vector3();
     float radius;
     float angle = 60.0f;
     float startAngle = 0f;
@@ -33,6 +34,7 @@ public class ArcSegmentGenerator : MonoBehaviour
         {
             float angle = Mathf.Deg2Rad * (startAngle + i * angleStep);
             Vector3 point = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+            point += emission_position;
             Matrix4x4 matrix = Matrix4x4.TRS(parentTransform.position, parentTransform.rotation, Vector3.one);
             point =  matrix.MultiplyPoint3x4(point);
             lr.SetPosition(i, point);
@@ -50,9 +52,10 @@ public class ArcSegmentGenerator : MonoBehaviour
             {
                 float angle = Mathf.Deg2Rad * (startAngle + i * angleStep);
                 Vector3 point = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+                point += emission_position;
                 Matrix4x4 matrix = Matrix4x4.TRS(parentTransform.position, parentTransform.rotation, Vector3.one);
                 point = matrix.MultiplyPoint3x4(point);
-                if(in_object == 0)
+                if (in_object == 0)
                 {
                     foreach (var col in allColliders)
                     {
@@ -60,8 +63,13 @@ public class ArcSegmentGenerator : MonoBehaviour
                         {
                             Debug.Log(11);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
-                            waveReflectorScript.is_on = 1;
-                            waveReflectorScript.wave_generator = wave_generator;
+                            if (waveReflectorScript != null)
+                            {
+                                waveReflectorScript.wave_generator = wave_generator;
+                                waveReflectorScript.emission_position = point - col.gameObject.transform.position;
+                                waveReflectorScript.is_on = 1;
+                            }
+                            
                             in_object = 1;
                             break;
                         }
@@ -78,6 +86,10 @@ public class ArcSegmentGenerator : MonoBehaviour
     public void SetWaveGenerator(GameObject v)
     {
         wave_generator = v;
+    }
+    public void SetEmissionPosition(Vector3 v)
+    {
+        emission_position = v;
     }
 }
 

@@ -337,15 +337,17 @@ public class SMPLController : MonoBehaviour
 
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
-        {"Screen", new Vector3(-1.11f, 0.47f, 4.037f) },
+        {"Screen", new Vector3(-1.09f, 0.47f, 4.037f) },
         //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
         {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) },
-        {"Curtain", new Vector3(-1.054f, 1.178f, 4.15f) }
+        {"Curtain", new Vector3(-1.054f, 1.178f, 4.15f) },
+        {"Wall",new Vector3(1.6229f,0.3723f,2.8281f) }
     };
 
     public GameObject videoScreen;
     public GameObject prefabSonar;
     public GameObject prefabCurtain;
+    public GameObject prefabWall;
     public GameObject sonar;
 
     public void SummonScreen()
@@ -354,7 +356,7 @@ public class SMPLController : MonoBehaviour
         videoScreen.transform.position = target.transform.position;
         videoScreen.transform.rotation = target.transform.rotation;
         videoScreen.SetActive(true);
-        FindObjectOfType<VideoManager>().PlayVideo("shengna");
+        FindObjectOfType<VideoManager>().PlayVideo("test");
 
         talkAnim.SetTrigger("introduce");
         SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态的水下探测装置。根据是否发射声波，可分为主动式声呐和被动式声呐两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
@@ -378,6 +380,15 @@ public class SMPLController : MonoBehaviour
     public void SummonCurtain()
     {
         target.transform.localPosition = meshLocalPosition["Curtain"];
+        prefabCurtain.transform.position = target.transform.position;
+        prefabCurtain.transform.rotation = target.transform.rotation;
+        prefabCurtain.SetActive(true);
+
+        Invoke("SummonScreen", 5);
+    }
+    public void SummonWall()
+    {
+        target.transform.localPosition = meshLocalPosition["Wall"];
         prefabCurtain.transform.position = target.transform.position;
         prefabCurtain.transform.rotation = target.transform.rotation;
         prefabCurtain.SetActive(true);
