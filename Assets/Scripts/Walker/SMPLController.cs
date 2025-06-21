@@ -389,9 +389,9 @@ public class SMPLController : MonoBehaviour
     public void SummonWall()
     {
         target.transform.localPosition = meshLocalPosition["Wall"];
-        prefabCurtain.transform.position = target.transform.position;
-        prefabCurtain.transform.rotation = target.transform.rotation;
-        prefabCurtain.SetActive(true);
+        prefabWall.transform.position = target.transform.position;
+        prefabWall.transform.rotation = target.transform.rotation;
+        prefabWall.SetActive(true);
     }
 
     private void UpdateGraphTransform()

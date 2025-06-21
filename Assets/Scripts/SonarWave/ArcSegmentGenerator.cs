@@ -17,7 +17,7 @@ public class ArcSegmentGenerator : MonoBehaviour
     float timer = 0f;
     float timeRound = 2.0f;
     float angleStep;
-    int in_object = 0;
+    public int in_object = 0;
     Collider[] allColliders;
     Transform parentTransform;
     LineRenderer lr;
@@ -42,7 +42,7 @@ public class ArcSegmentGenerator : MonoBehaviour
     }
     void Update()
     {
-        allColliders = FindObjectsOfType<Collider>();
+        allColliders = FindObjectsOfType<BoxCollider>();
         if (timer <= timeRound * count)
         {
             timer += Time.deltaTime;
@@ -61,16 +61,18 @@ public class ArcSegmentGenerator : MonoBehaviour
                     {
                         if (col.ClosestPoint(point) == point)
                         {
-                            Debug.Log(11);
+                            Debug.Log(col.gameObject);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
                             if (waveReflectorScript != null)
                             {
                                 waveReflectorScript.wave_generator = wave_generator;
                                 waveReflectorScript.emission_position = point - col.gameObject.transform.position;
+                                Debug.Log(point);
+                                Debug.Log(col.gameObject.transform.position);
                                 waveReflectorScript.is_on = 1;
+                                waveReflectorScript.received_wave = gameObject;
                             }
-                            
-                            in_object = 1;
+                      
                             break;
                         }
                     }

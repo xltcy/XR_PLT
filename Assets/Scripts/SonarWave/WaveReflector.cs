@@ -12,6 +12,7 @@ public class WaveReflector : MonoBehaviour
     public float ori_radius = 0.1f;
     public float centerAngle = 0.0f;
     public GameObject wave_generator;
+    public GameObject received_wave;
     public int count = 5;
     public Vector3 emission_position = new Vector3();
     int index = 0;
@@ -26,7 +27,8 @@ public class WaveReflector : MonoBehaviour
         if (index >= count) index = 0;
         if (is_on == 1)
         {
-            
+            ArcSegmentGenerator receivedWaveScript = received_wave.GetComponent<ArcSegmentGenerator>();
+            receivedWaveScript.in_object = 1;
             Vector3 aPos = transform.position + emission_position; 
             Vector3 bPos = wave_generator.transform.position;
             Vector3 dirA = new Vector3(aPos.x, 0, aPos.z);
@@ -38,9 +40,10 @@ public class WaveReflector : MonoBehaviour
             Debug.Log(wave_generator);
             GameObject child = Instantiate(wave);
             ArcSegmentGenerator waveScript = child.GetComponent<ArcSegmentGenerator>();
+            WaveGenerator waveGeneratorScript = wave_generator.GetComponent<WaveGenerator>();
             waveScript.ori_radius = ori_radius;
             waveScript.distance = distance;
-            waveScript.count = count;
+            waveScript.count = waveGeneratorScript.count;
             waveScript.centerAngle = angle;
             waveScript.SetEmissionPosition(emission_position);
             child.transform.SetParent(transform);
