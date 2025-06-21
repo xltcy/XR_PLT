@@ -147,3 +147,4 @@ MonoBehaviour:
   distance: 0.3
   count: 4
   centerAngle: 0
+  in_object: 0
