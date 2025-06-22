@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44729424, g: 0.49263388, b: 0.5505054, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1878,75 +1878,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266939816}
   m_CullTransparentMesh: 1
---- !u!1001 &268618450
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2971236035030716561, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_Name
-      value: Prefab-GXL
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2971236035030716574, guid: dacdc0636f848bf48b013fc426520a85,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: dacdc0636f848bf48b013fc426520a85, type: 3}
 --- !u!1 &312112174
 GameObject:
   m_ObjectHideFlags: 0
@@ -9742,6 +9673,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 112adac65c22f2c4aa7ea287cc0e4082,
         type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 19f2a6dbfdacd6141856b933a1a854f3, type: 3}
+    - target: {fileID: 5866666021909216657, guid: 112adac65c22f2c4aa7ea287cc0e4082,
+        type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 49eed72403887be4bbf583abe54700cb, type: 2}
@@ -9992,8 +9928,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destination: {fileID: 483724391}
-  walkingModel: {fileID: 2044626878}
-  talkingModel: {fileID: 1891396014}
+  walkingModel: {fileID: 190015106}
+  talkingModel: {fileID: 5835312896867757955}
   buttons: {fileID: 8754343719761799212}
   arCamera: {fileID: 73739826}
   occlusionMaterial: {fileID: 2100000, guid: 58300a8f36fe58a479616dccc09a7761, type: 2}

@@ -426,7 +426,7 @@ public class SMPLController : MonoBehaviour
     public void RecoverSonar()
     {
         ModelTreeNode.OneDofRecovery(sonar);
-        Invoke("HideSonar", 6);
+        Invoke("HideSonar", 12);
     }
 
     private void HideSonar()
