@@ -25,6 +25,7 @@ public class SpeechManager : MonoBehaviour
     //Is virHuman speaking
     private static bool isSpeaking;
     public static bool IsSpeaking => isSpeaking;
+    public Speech2Blendshape speech2Blendshape;
 
 private bool IsRecognizing;
     // Start is called before the first frame update
@@ -57,6 +58,19 @@ private bool IsRecognizing;
         {
             Debug.Log("text SynthesisCanceled: Synthesis completed: " + args.Result.Reason);
             isSpeaking = false;
+        };
+
+        synthesizer.VisemeReceived += (sender, e) =>
+        {
+
+            Debug.Log($"[Viseme] ID: {e.VisemeId}, Time: {e.AudioOffset / 10000} ms, Animation Length: {e.Animation.Length}");
+            string animationJson = e.Animation;
+
+            // 必须在主线程设置 BlendShape（Unity 限制）
+            MainThreadDispatcher.InvokeOnMainThread(() =>
+            {
+                speech2Blendshape.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
+            });
         };
     }
 
