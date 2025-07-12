@@ -87,8 +87,8 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     {
         // todo set new des & trans UI run state.
         Debug.Log($"UIManager SelectDesActionInterface OnSelectDesAt {item.title}");
+        FindObjectOfType<SceneController>().SetSelectedExplainationPoint(item.pointId);
         TansToVirtualManIntroUI();
-        FindObjectOfType<SMPLController>().SetDestination("ShengNa"); 
     }
 
     public enum RunState

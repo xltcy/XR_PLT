@@ -37,7 +37,9 @@ public class SelectDesController : MonoBehaviour
             hintText.text = hintString;
         }
         SpeechManager.SayFromStr(hintString);
-        GenerateFakeData();
+        // GenerateFakeData();
+        // Use RegisterList before generate views.
+        GenerateDesList();
         GenerateSelectList();
     }
 
@@ -153,5 +155,34 @@ public class SelectDesController : MonoBehaviour
     public interface SelectDesActionInterface
     {
         void OnSelectDesAt(SelectDesModel item);
+    }
+
+    public void GenerateDesList()
+    {
+        var sceneData = FindObjectOfType<SceneController>().sceneData;
+        // generate hint string
+        hintString = "欢迎来到" + sceneData.sceneName +"，请选择想要参观的区域\n点击屏幕上的选项";
+
+        // generate list
+        var points = sceneData.explanationPoints;
+        desList = new List<SelectDesModel>();
+        // todo load from "thumb" for each model.
+        List<Sprite> imageList = LoadAllSpritesFromFolder();
+        foreach(var p in points)
+        {
+            int index = points.IndexOf(p); // 捕获循环变量
+            SelectDesModel item = new SelectDesModel
+            {
+                //title = $"选项 {i + 1}",
+                pointId = p.id,
+                title = p.title,
+                image = imageList[index % imageList.Count],
+            };
+            item.onClickAction = () =>
+            {
+                ListItemClickAction(item);
+            };
+            desList.Add(item);
+        }
     }
 }

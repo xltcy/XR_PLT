@@ -169,7 +169,7 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideButton));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showButton));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.screen));
+        //res.Add(new SceneVoiceRecCommand("", SceneCommandType.screen));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
@@ -259,5 +259,15 @@ public class PlaneRelatedCommand : VoiceRecCommand
         //explodeWingRight
         explodWing,
         //debug
+    }
+}
+
+public class ActionTriggerCommand: VoiceRecCommand
+{
+    public int actionId;
+    public ActionTriggerCommand(string info, int actionId, ActionTriggerData trigger) : base(info)
+    {
+        this.actionId = actionId;
+        matchPattern = trigger.matchPattern;
     }
 }

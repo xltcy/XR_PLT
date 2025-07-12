@@ -8,12 +8,8 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using Pathfinding;
 using System.Text.RegularExpressions;
 using UnityEngine.Events;
-using static VirHumanVoiceRecCommand;
-using static UnityEngine.GraphicsBuffer;
-using System.Globalization;
 
 public class MeshController : MonoBehaviour
 {

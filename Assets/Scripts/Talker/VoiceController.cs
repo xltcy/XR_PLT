@@ -80,6 +80,11 @@ public class VoiceController : MonoBehaviour
         voiceRecCommands.AddRange(commands);
     }
 
+    public void RemoveVoiceRecCommands(List<VoiceRecCommand> commands)
+    {
+        voiceRecCommands.RemoveAll(item => commands.Contains(item));
+    }
+
     public void ResetVoiceRecCommands()
     {
         voiceRecCommands.Clear();
@@ -137,6 +142,9 @@ public class VoiceController : MonoBehaviour
                 //case PlaneRelatedCommand planeRelatedCommand:
                 //    PlaneRelatedAction(planeRelatedCommand);
                 //    break;
+                case ActionTriggerCommand triggerCommand:
+                    FindObjectOfType<SceneController>().ConsoleVoiceTrigger(triggerCommand);
+                    break;
                 default:
                     matchFail = true;
                     RemoteChat($"现在面前的是一个声呐，用户提问的问题是{result},请以一个精通声呐的专家身份回答");
@@ -252,8 +260,8 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
-                smplController.SummonCurtain();
-                smplController.SummonWall();
+                //smplController.SummonCurtain();
+                //smplController.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
                 smplController.SummonSonar(); break;

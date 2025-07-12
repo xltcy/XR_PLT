@@ -1,13 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using System;
-using Pathfinding;
-using System.Diagnostics;
 using static VirHumanVoiceRecCommand;
-using static UnityEngine.EventSystems.EventTrigger;
-using Pathfinding.Util;
 
 public class SMPLController : MonoBehaviour
 {
@@ -21,7 +16,6 @@ public class SMPLController : MonoBehaviour
     private Animator talkAnim;
     private GameObject target;
     private GameObject initPos;
-    private GameObject graphCenter;
 
     public GameObject destination;
     public GameObject walkingModel;
@@ -37,6 +31,7 @@ public class SMPLController : MonoBehaviour
     private bool hasRemind = false;
     private bool hasSpoken = false;
     private string toSpeak = "";
+    private string arriveIntroduction = "";
 
     public GameObject buttons;
     public Camera arCamera;
@@ -66,19 +61,17 @@ public class SMPLController : MonoBehaviour
         scene = GameObject.FindGameObjectWithTag("Mesh");
         target = GameObject.FindGameObjectWithTag("Target");
         initPos = GameObject.FindGameObjectWithTag("initPos");
-        graphCenter = GameObject.FindGameObjectWithTag("GraphCenter");
     }
 
     public void SetDestination(string desName)
     {
-        target.transform.localPosition = desCommand[desName].desLocalPosition;
-        destination.transform.position = target.transform.position;
+        destination.transform.position = scene.transform.TransformPoint(desCommand[desName].desLocalPosition);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        InitilizeObjectWithTag();
+        // InitilizeObjectWithTag();
 
         walkAnim = walkingModel.GetComponent<Animator>();
         talkAnim = talkingModel.GetComponent<Animator>();
@@ -101,6 +94,19 @@ public class SMPLController : MonoBehaviour
             animState = talkAnim.GetCurrentAnimatorStateInfo(0);
         }
 
+        if (initPos != null && destination != null)
+        {
+            WalkCheck();
+        }
+        
+        if (scene != null)
+        {
+            UpdateGraphTransform();
+        }
+    }
+
+    private void WalkCheck()
+    {
         //������߼�
         if (!isInitPos)
         {
@@ -113,7 +119,7 @@ public class SMPLController : MonoBehaviour
             }
         }
 
-        if(initPos.transform.position != destination.transform.position)
+        if (initPos.transform.position != destination.transform.position)
         {
             isInitPos = false;
         }
@@ -129,7 +135,7 @@ public class SMPLController : MonoBehaviour
                     StopWalking();
                     SwitchToTalkMode();
                 }
-                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                else if (FarAway(arCamera.transform.position, walkingModel.transform.position))
                 {
                     StopWalking();
                     SwitchToTalkMode();
@@ -146,13 +152,14 @@ public class SMPLController : MonoBehaviour
                     LookAtMe(true);
                     if (!hasSpoken)
                     {
-                        SpeechManager.SayFromStr(toSpeak);
+                        String str = arriveIntroduction.Length == 0 ? toSpeak : arriveIntroduction;
+                        SpeechManager.SayFromStr(str);
                         //talkAnim.SetTrigger("introduce");
-                        UnityEngine.Debug.Log("Msg in Update:" + toSpeak);
+                        UnityEngine.Debug.Log("Msg in Update:" + str);
                         hasSpoken = true;
                     }
                 }
-                else if(FarAway(arCamera.transform.position, walkingModel.transform.position))
+                else if (FarAway(arCamera.transform.position, walkingModel.transform.position))
                 {
                     //SwitchToWalkMode();
                     LookAtMe(true);
@@ -170,8 +177,6 @@ public class SMPLController : MonoBehaviour
                 }
             }
         }
-
-        UpdateGraphTransform();
     }
 
     bool NearEnough(Vector3 a, Vector3 b)
@@ -265,16 +270,26 @@ public class SMPLController : MonoBehaviour
         walkAnim.SetFloat("Speed", speed);
     }
 
-    public void SetDestination(Vector3 des)
+    /**
+     * do nothing
+     */
+    public void SetDestination(Vector3 des, String arriveIntro = "")
     {
-        destination.transform.position = des;
+        destination.transform.position = scene.transform.TransformPoint(des);
+        arriveIntroduction = arriveIntro;
     }
 
+    /**
+    * do nothing
+    */
     public Vector3 GetDesPosition(string name)
     {
         return desCommand[name].desLocalPosition;
     }
 
+    /**
+    * do nothing
+    */
     public IEnumerator moveToDestination1(Vector3 des)
     {
         SwitchToWalkMode();
@@ -297,6 +312,9 @@ public class SMPLController : MonoBehaviour
         }
     }
 
+    /**
+    * do nothing
+    */
     public IEnumerator moveToDestination(VirHumanVoiceRecCommand desCmd)
     {
         SwitchToWalkMode();
@@ -330,6 +348,9 @@ public class SMPLController : MonoBehaviour
         buttons.gameObject.SetActive(true);
     }
 
+    /**
+    * do nothing
+    */
     public void StartToNav()
     {
         InitializeSmplPosition();
@@ -350,29 +371,15 @@ public class SMPLController : MonoBehaviour
     public GameObject prefabWall;
     public GameObject sonar;
 
-    public void SummonScreen()
-    {
-        target.transform.localPosition = meshLocalPosition["Screen"];
-        videoScreen.transform.position = target.transform.position;
-        videoScreen.transform.rotation = target.transform.rotation;
-        videoScreen.SetActive(true);
-        FindObjectOfType<VideoManager>().PlayVideo("test");
-        Invoke("Introduce", 1.9f);
-        
-    }
-
-    public void Introduce()
+    public void IntroduceString(String introduction)
     {
         talkAnim.SetTrigger("introduce");
-        //SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态的水下探测装置。根据是否发射声波，可分为主动式声呐和被动式声呐两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
-        SpeechManager.SayFromStr("声呐作为先进的水下探测技术，正改变着我们对海洋的认知。声呐在工作时，会向海底发射宽扇区覆盖的声波。当声波接触到海底或障碍物时，就会产生反射和散射回波信号，此时接收换能器迅速捕捉这些回波，并将其转化为数据，通过线缆快速传输到船上的数据处理系统，最终生成直观的三维影像。在海洋牧场智能化监测、核电站冷源水口生物监测、城市管网污水井监测、海洋工程、科研等领域能够发挥重要作用。" +
-            "2025年中央进一步强调“建设海上牧场”，并将海洋牧场与生物农业、智慧农业结合，拓展全产业链。声呐在海洋牧场中扮演“水下之眼”的角色，结合AI算法和无人平台，对养殖区进行多角度观测，通过深度学习实时监测分析数据，实现鱼群数量统计、生长监测和健康监控等功能，在饲料成本优化、病害防控与鱼群成活率提升、人力与运维成本优化方面有着显著作用。" +
-            "核电站冷源水通常用于冷却反应堆。水口的生物监测是连接核安全、生态保护与经济效益的核心纽带，为填补网兜海生物量监测的技术空缺，保障电厂的安全取水，实现了一套基于声纳传感器的智能监测系统。该系统融合图像处理技术、人工智能目标检测算法、深度学习算法，以及密度估计网络的综合使用，实现对水下生物的实时监测。当声呐探测到水母群靠近入水口时，其回波信号能清晰显示水母群的位置、数量和大小等信息。一旦达到预警阈值，系统立即发出警报。核电站工作人员收到预警后，会迅速采取相应措施，如启动防护装置或清理网兜设备，有效防止水母堵塞入水口，确保核电站的安全稳定运行。" +
-            "在城市地下排水管网调查中，通过特定算法分析声呐回波信号，精确检测出污水井的井壁。是否存在裂缝、破损、变形等问题以及井底是否有淤积异物堆积等情况。能够快速、高效地获取污水井内部的详细信息，有助于准确判断污水井的状况制定合理的维护和修复方案." +
-            "声呐，以其独特的工作原理，在海洋牧场、核电站、城市管网污水井检测、海底管道检测、海洋科研、海洋工程等众多领域发挥着重要作用，未来也将继续助力人类探索海洋奥秘。");
-        Invoke("SummonSonar", 1);
+        SpeechManager.SayFromStr(introduction);
     }
 
+    /**
+     * TODO delete
+     */
     public void SummonSonar()
     {
         target.transform.localPosition = meshLocalPosition["Sonar"];
@@ -386,51 +393,36 @@ public class SMPLController : MonoBehaviour
         Invoke("SeparateSonar", 15);
     }
 
-    public void SummonCurtain()
-    {
-        target.transform.localPosition = meshLocalPosition["Curtain"];
-        prefabCurtain.transform.position = target.transform.position;
-        prefabCurtain.transform.rotation = target.transform.rotation;
-        prefabCurtain.SetActive(true);
-
-        Invoke("SummonScreen", 5);
-    }
-    public void SummonWall()
-    {
-        target.transform.localPosition = meshLocalPosition["Wall"];
-        prefabWall.transform.position = target.transform.position;
-        prefabWall.transform.rotation = target.transform.rotation;
-        prefabWall.SetActive(true);
-    }
-
+    /**
+     * Keep Graph with scene's transform.
+     */
     private void UpdateGraphTransform()
     {
 
         AstarPath.active.AddWorkItem(() => {
             var graph = AstarPath.active.data.recastGraph;
             graph.forcedBoundsCenter = scene.transform.TransformPoint(consPos);
-            //graph.forcedBoundsCenter = graphCenter.transform.position;
             Vector3 boundrotate = new Vector3(scene.transform.rotation.eulerAngles.x, scene.transform.rotation.eulerAngles.y, scene.transform.rotation.eulerAngles.z);
-            //UnityEngine.Debug.Log($"new rotate: {scene.transform.rotation.eulerAngles} new pos: {graphCenter.transform.position}");
             graph.rotation = boundrotate;
             graph.RelocateNodes(graph.CalculateTransform());
         });
     }
 
+    /**
+     *  TODO delete
+     */
     public void SeparateSonar()
     {
         ModelTreeNode.OneDofExplosion(sonar);
         Invoke("RecoverSonar", 6);
     }
 
+    /**
+     *  TODO delete
+     */
     public void RecoverSonar()
     {
         ModelTreeNode.OneDofRecovery(sonar);
         Invoke("HideSonar", 12);
-    }
-
-    private void HideSonar()
-    {
-        prefabSonar.SetActive(false);
     }
 }
