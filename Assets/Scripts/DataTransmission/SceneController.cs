@@ -10,6 +10,11 @@ using UnityEngine;
  */
 public class SceneController : MonoBehaviour
 {
+    public enum GameObjectTag
+    {
+        Mesh,
+        initPos,
+    }
     public SceneData sceneData;
 
     private static string localJsonPath = "E:/Unity Proj/XR_PLT/test.json";
@@ -23,7 +28,6 @@ public class SceneController : MonoBehaviour
     private ExplanationPoint selectedPoint
     {
         get { return sceneData.explanationPoints.FindLast(item => item.id == selectedExplainationPointId); }
-        set { }
     }
 
     private List<ActionBase> allActions
@@ -94,7 +98,6 @@ public class SceneController : MonoBehaviour
         // todo read from response or local.
 
         // generate SceneData
-        AnalysisSceneData();
     }
 
     private void GetFakeResources()
@@ -112,47 +115,35 @@ public class SceneController : MonoBehaviour
         SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
         Debug.Log("Load json: Data:" + data);
         sceneData = data;
-        AnalysisSceneData();
     }
 
     /**
      * Preprocess SceneData.
+     * Instantiate SceneModel
      */
-    private void AnalysisSceneData()
+    public GameObject AnalysisSceneData()
     {
         if (sceneData == null)
         {
             // todo error
-            return;
+            Debug.Log("No SceneData found!");
+            return null;
         }
         // init object for SMPLController
 
         // load scene
-        GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + sceneData.sceneModelPath);
-        scene = Instantiate(scenePrefab);
-        scene.transform.SetParent(scene.transform, false);
-        AddObjectAction testData = sceneData.explanationPoints[0].actions[0] as AddObjectAction;
-        scene.transform.localPosition = testData.position;
-        scene.transform.localRotation = testData.GetRotationQuaternion();
-        scene.transform.localScale = new Vector3(1f,1f,1f);
-        scene.tag = "Mesh";
+        if (scene == null)
+        {
+            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + sceneData.sceneModelPath);
+            scene = Instantiate(scenePrefab);
+            scene.tag = GameObjectTag.Mesh.ToString();
+        }
 
         // initPos
         GameObject initPos = new GameObject("initPos");
         initPos.transform.SetParent(scene.transform, false);
         initPos.transform.localPosition = sceneData.initPosition;
-        initPos.tag = "initPos";
-
-        // target
-        GameObject target = new GameObject("target");
-        target.transform.SetParent(scene.transform, false);
-        Vector3 targetPos = sceneData.initPosition;
-        if (sceneData.explanationPoints != null && sceneData.explanationPoints.Count > 0)
-        {
-            targetPos = sceneData.explanationPoints[0].position;
-        }
-        target.transform.localPosition = targetPos;
-        target.tag = "Target";
+        initPos.tag = GameObjectTag.initPos.ToString();
 
         // Generate ObjectDatas
         prefabs.Clear();
@@ -165,6 +156,7 @@ public class SceneController : MonoBehaviour
 
         // Init voice commands
         InitAllTriggerCommands();
+        return scene;
     }
 
     /**
@@ -222,6 +214,33 @@ public class SceneController : MonoBehaviour
                 break;
             case ActionType.Explosion:
                 // TODO
+                var explosionAction = actionData as ExplosionAction;
+                var explosionModel = addedObjects[explosionAction.generateActionId];
+                var nodes = explosionModel.transform.GetComponentsInChildren<ModelTreeNode>();
+                GameObject rootNodeObject = null;
+                foreach(var i in nodes)
+                {
+                    if (i._isRoot)
+                    {
+                        rootNodeObject = i.gameObject;
+                        break;
+                    }
+                }
+                if (isStartAction)
+                {
+                    ModelTreeNode.OneDofExplosion(rootNodeObject);
+                } else
+                {
+                    ModelTreeNode.OneDofRecovery(rootNodeObject);
+                }
+                break;
+            case ActionType.AvatarAnim:
+                var avatarAnimAction = actionData as AvatarAnimAction;
+                var smplCtrl = FindObjectOfType<SMPLController>();
+                if (smplCtrl != null && avatarAnimAction != null)
+                {
+                    smplCtrl.AvatarAnim(avatarAnimAction.animTrigger);
+                }
                 break;
             default:
                 throw new Exception($"Unknown action type: {actionData.type}");

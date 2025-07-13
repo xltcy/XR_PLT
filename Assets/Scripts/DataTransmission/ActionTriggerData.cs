@@ -17,7 +17,7 @@ public class ActionTriggerData
     //-------------Optional------------//
     // AfterAction mode
     public int afterActionId; // 关键字或动作名
-    public bool isWhenActionStart = true; // true follow startTrigger
+    public bool isWhenActionStart = true; // true follow startTrigger;false stopTrigger
     // VoiceKeyword mode
     public string matchPattern;
     // PassbySpot mode

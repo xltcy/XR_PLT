@@ -14,7 +14,6 @@ public class SMPLController : MonoBehaviour
     private GameObject scene;
     private Animator walkAnim;
     private Animator talkAnim;
-    private GameObject target;
     private GameObject initPos;
 
     public GameObject destination;
@@ -42,10 +41,6 @@ public class SMPLController : MonoBehaviour
 
     private static Vector3 consPos;
 
-    // To Storage Target Position
-    private Vector3 tempTarget;
-    private Vector3 finalTarget;
-
     // The diastance whether virtualHuman wallking
     private float minDistance = 0.5f;
     private float maxDistance = 15.0f;
@@ -58,9 +53,8 @@ public class SMPLController : MonoBehaviour
 
     public void InitilizeObjectWithTag()
     {
-        scene = GameObject.FindGameObjectWithTag("Mesh");
-        target = GameObject.FindGameObjectWithTag("Target");
-        initPos = GameObject.FindGameObjectWithTag("initPos");
+        scene = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.Mesh.ToString());
+        initPos = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.initPos.ToString());
     }
 
     public void SetDestination(string desName)
@@ -358,18 +352,9 @@ public class SMPLController : MonoBehaviour
 
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
-        {"Screen", new Vector3(-1.09f, 0.47f, 4.037f) },
         //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
-        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) },
-        {"Curtain", new Vector3(-1.054f, 1.178f, 4.15f) },
-        {"Wall",new Vector3(1.6229f,0.3723f,2.8281f) }
+        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) }
     };
-
-    public GameObject videoScreen;
-    public GameObject prefabSonar;
-    public GameObject prefabCurtain;
-    public GameObject prefabWall;
-    public GameObject sonar;
 
     public void IntroduceString(String introduction)
     {
@@ -378,19 +363,14 @@ public class SMPLController : MonoBehaviour
     }
 
     /**
-     * TODO delete
+     * Set Anim for virtualMan      
      */
-    public void SummonSonar()
+    public void AvatarAnim(string animTrigger)
     {
-        target.transform.localPosition = meshLocalPosition["Sonar"];
-        prefabSonar.transform.position = target.transform.position;
-        prefabSonar.transform.rotation = target.transform.rotation;
-        prefabSonar.SetActive(true);
-
-        talkAnim.SetTrigger("HandForward");
-        //SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
-
-        Invoke("SeparateSonar", 15);
+        if (!isWalking)
+        {
+            talkAnim.SetTrigger(animTrigger);
+        }
     }
 
     /**
@@ -406,23 +386,5 @@ public class SMPLController : MonoBehaviour
             graph.rotation = boundrotate;
             graph.RelocateNodes(graph.CalculateTransform());
         });
-    }
-
-    /**
-     *  TODO delete
-     */
-    public void SeparateSonar()
-    {
-        ModelTreeNode.OneDofExplosion(sonar);
-        Invoke("RecoverSonar", 6);
-    }
-
-    /**
-     *  TODO delete
-     */
-    public void RecoverSonar()
-    {
-        ModelTreeNode.OneDofRecovery(sonar);
-        Invoke("HideSonar", 12);
     }
 }

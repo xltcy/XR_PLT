@@ -13,7 +13,9 @@ public enum ActionType
     PlayVideo,
     MoveObject,
     Introduce,
-    Explosion
+    Explosion,
+    WaveGenerate,
+    AvatarAnim,
 }
 
 [JsonConverter(typeof(ActionConverter))] // ¹Ø¼ü
@@ -100,6 +102,17 @@ public class ExplosionAction: ActionBase
     public int generateActionId;
 }
 
+public class WaveGenerateAction: ActionBase
+{
+    // TODO
+    public int generateActionId;
+}
+
+public class AvatarAnimAction: ActionBase
+{
+    public string animTrigger;
+}
+
 /**
  * Use to Converte Abstract class ActionBase.
  */
@@ -139,6 +152,12 @@ public class ActionConverter : JsonConverter
                 break;
             case ActionType.Explosion:
                 action = new ExplosionAction();
+                break;
+            case ActionType.WaveGenerate:
+                action = new WaveGenerateAction();
+                break;
+            case ActionType.AvatarAnim:
+                action = new AvatarAnimAction();
                 break;
             default:
                 throw new Exception($"Unknown action type: {type}");

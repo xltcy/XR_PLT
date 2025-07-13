@@ -10,42 +10,13 @@ public class VoiceController : MonoBehaviour
     XunFeiYuYin xunfei;
     public Text debugText;
     public VoiceActiveButton voiceActiveButton;
-    //public TrackingImageManager trackingImageManager;
     public SMPLController smplController;
-    [Header("Prefabs")]
-    public GameObject _prefabOfPlane;
 
     [Header("模拟语音识别结果")]
     public Text fakeVoiceText;
 
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
     private LLMGenerator llmGenerator;
-
-    #region PlaneComponent
-    private GameObject _plane;
-    private GameObject _mid;
-    private GameObject _body;
-    private GameObject _wingLeft;
-    private GameObject _wingRight;
-
-    //private BaiduLLMInterface baiduLLM;
-
-    public GameObject Plane
-    {
-        set
-        {
-            _plane = value;
-            _mid = _plane.transform.Find("Mid").gameObject;
-            _body = _mid.transform.Find("Body").gameObject;
-            _wingLeft = _mid.transform.Find("WingLeft").gameObject;
-            _wingRight = _mid.transform.Find("WingRight").gameObject;
-        }
-        get
-        {
-            return _plane;
-        }
-    }
-    #endregion
 
     void Start()
     {
@@ -58,10 +29,8 @@ public class VoiceController : MonoBehaviour
         llmGenerator = LLMGenerator.Init();
 
         // Registe commands
-        //voiceRecCommands.AddRange(IRVVoiceRecCommand.GetAllCommands());
         voiceRecCommands.AddRange(VirHumanVoiceRecCommand.GetAllCommands());
         voiceRecCommands.AddRange(SceneVoiceRecCommand.GetAllCommands());
-        //voiceRecCommands.AddRange(PlaneRelatedCommand.GetAllCommands());
     }
 
     // Update is called once per frame
@@ -130,18 +99,12 @@ public class VoiceController : MonoBehaviour
         {
             switch (resCommand)
             {
-                //case IRVVoiceRecCommand iRVCommand:
-                //    IamgeTrackConsole(iRVCommand);
-                //    break;
                 case VirHumanVoiceRecCommand virHumanCommand:
                     VirHumanAction(virHumanCommand);
                     break;
                 case SceneVoiceRecCommand sceneCommand:
                     SceneAction(sceneCommand);
                     break;
-                //case PlaneRelatedCommand planeRelatedCommand:
-                //    PlaneRelatedAction(planeRelatedCommand);
-                //    break;
                 case ActionTriggerCommand triggerCommand:
                     FindObjectOfType<SceneController>().ConsoleVoiceTrigger(triggerCommand);
                     break;
@@ -183,18 +146,12 @@ public class VoiceController : MonoBehaviour
         {
             switch (resCommand)
             {
-                //case IRVVoiceRecCommand iRVCommand:
-                //    IamgeTrackConsole(iRVCommand);
-                //    break;
                 case VirHumanVoiceRecCommand virHumanCommand:
                     VirHumanAction(virHumanCommand);
                     break;
                 case SceneVoiceRecCommand sceneCommand:
                     SceneAction(sceneCommand);
                     break;
-                //case PlaneRelatedCommand planeRelatedCommand:
-                //    PlaneRelatedAction(planeRelatedCommand);
-                //    break;
                 default:
                     matchFail = true;
                     RemoteChat($"现在面前的是一个声呐，用户提问的问题是{result},请以一个精通声呐的专家身份回答");
@@ -213,35 +170,13 @@ public class VoiceController : MonoBehaviour
         }
     }
 
-    //public void IamgeTrackConsole(IRVVoiceRecCommand command)
-    //{
-
-    //    switch (command.commandType)
-    //    {
-    //        case IRVVoiceRecCommand.IRVCommandType.TRACK_ENABLE:
-    //            trackingImageManager.EnableTrackImage(); break;
-    //        case IRVVoiceRecCommand.IRVCommandType.TRACK_DISABLE:
-    //            trackingImageManager.DisableTrackImage(); break;
-    //        case IRVVoiceRecCommand.IRVCommandType.VIDEO_PLAY:
-    //            trackingImageManager.PlayVideo(); break;
-    //        case IRVVoiceRecCommand.IRVCommandType.VIDEO_PAUSE:
-    //            trackingImageManager.PauseVideo(); break;
-    //        case IRVVoiceRecCommand.IRVCommandType.VIDEO_STOP:
-    //            trackingImageManager.StopVideo(); break;
-    //        default: ReconizeFail(); break;
-    //    }
-    //}
-
     public void VirHumanAction(VirHumanVoiceRecCommand command)
     {
 
         switch (command.commandType)
         {
             case VirHumanVoiceRecCommand.VirHumanCommandType.shengNa:
-                //StartCoroutine(smplController.moveToDestination(command)); break;
                 smplController.SetDestination(command.desLocalPosition); break;
-            //case VirHumanVoiceRecCommand.VirHumanCommandType.initializeSmpl:
-            //    smplController.InitializeSmplPosition(); break;
             default: ReconizeFail(); break;
         }
     }
@@ -260,105 +195,14 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
-                //smplController.SummonCurtain();
-                //smplController.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
-                smplController.SummonSonar(); break;
+                break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
-                smplController.SeparateSonar(); break;
+                break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
-                smplController.RecoverSonar(); break;
+                break;
             default: ReconizeFail(); break;
-        }
-    }
-
-    //public void PlaneRelatedAction(PlaneRelatedCommand command)
-    //{
-    //    switch (command._commandType)
-    //    {
-    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.showPlane:
-    //        //    if (_plane == null)
-    //        //    {
-    //        //        SpeechManager.SayFromStr("飞机出现");
-    //        //        _plane = Instantiate(_prefabOfPlane);
-    //        //        _mid = _plane.transform.Find("Mid").gameObject;
-    //        //        _body = _mid.transform.Find("Body").gameObject;
-    //        //        _wingLeft = _mid.transform.Find("WingLeft").gameObject;
-    //        //        _wingRight = _mid.transform.Find("WingRight").gameObject;
-    //        //    }
-    //        //    else
-    //        //    {
-    //        //        SpeechManager.SayFromStr("飞机已经出现");
-    //        //    }
-    //        //    break;
-    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodePlane:
-    //            if (_plane != null)
-    //            {
-    //                //SpeechManager.SayFromStr("一级爆炸");
-    //                ModelTreeNode.OneDofExplosion(_plane);
-    //                ModelTreeNode.OneDofExplosion(_mid);
-    //            }
-    //            else
-    //            {
-    //                SpeechManager.SayFromStr("飞机还没出现");
-    //            }
-    //            break;
-    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeMid:
-    //        //    SpeechManager.SayFromStr("二级爆炸");
-    //        //    ModelTreeNode.OneDofExplosion(_mid);
-    //        //    break;
-    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodeBody:
-    //            if (_plane != null)
-    //            {
-    //                //SpeechManager.SayFromStr("机身爆炸");
-    //                ModelTreeNode.TwoDofExplosion(_body);
-    //            }
-    //            else
-    //            {
-    //                SpeechManager.SayFromStr("飞机还没出现");
-    //            }
-    //            break;
-    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingLeft:
-    //        //    SpeechManager.SayFromStr("左翼爆炸");
-    //        //    ModelTreeNode.TwoDofExplosion(_wingLeft);
-    //        //    break;
-    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingRight:
-    //        //    SpeechManager.SayFromStr("右翼爆炸");
-    //        //    ModelTreeNode.TwoDofExplosion(_wingRight);
-    //        //    break;
-    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodWing:
-    //            if (_plane != null)
-    //            {
-    //                //SpeechManager.SayFromStr("侧翼爆炸");
-    //                ModelTreeNode.TwoDofExplosion(_wingLeft);
-    //                ModelTreeNode.TwoDofExplosion(_wingRight);
-    //            }
-    //            else
-    //            {
-    //                SpeechManager.SayFromStr("飞机还没出现");
-    //            }
-    //            break;
-    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.debug:
-    //        //    string debugStr;
-    //        //    if (_plane.activeSelf == true)
-    //        //        debugStr = "飞机已经激活了，位置是" + _plane.transform.position.ToString();
-    //        //    else
-    //        //        debugStr = "飞机还没激活呢";
-    //        //    SpeechManager.SayFromStr(debugStr);
-    //        //    break;
-    //        default:
-    //            ReconizeFail();
-    //            break;
-    //    }
-    //}
-
-    public void TestAddPlane()
-    {
-        if (Plane == null)
-        {
-            Plane = Instantiate(_prefabOfPlane);
-            Plane.transform.position = Camera.main.transform.position;
         }
     }
 
@@ -371,23 +215,6 @@ public class VoiceController : MonoBehaviour
     {
         清空文字();
     }
-
-    //private void RemoteChat(string userInput)
-    //{
-    //    StartCoroutine(baiduLLM.ChatRequest(
-    //        userInput,
-    //        successAction: (string reply) =>
-    //        {
-    //            UnityEngine.Debug.Log("Msg in Reply:" + reply);
-    //            SpeechManager.SayFromStr(reply);
-    //            voiceActiveButton.ResetBtn();
-    //        },
-    //        failAction: (string error) =>
-    //        {
-    //            ReconizeFail();
-    //        }
-    //        ));
-    //}
 
     private void ReconizeFail()
     {

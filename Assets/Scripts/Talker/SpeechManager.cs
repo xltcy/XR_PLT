@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
-using UnityEditor;
 
 /***
  * This file will be updated in future.
@@ -242,43 +241,6 @@ private bool IsRecognizing;
 
     private void OnDestroy()
     {
-       
+        synthesizer?.StopSpeakingAsync();
     }
-
-    private void OnEnable()
-    {
-        Application.quitting += HandleQuit;
-#if UNITY_EDITOR
-        EditorApplication.playModeStateChanged += OnPlayModeChanged;
-#endif
-    }
-
-    private void OnDisable()
-    {
-        Application.quitting -= HandleQuit;
-#if UNITY_EDITOR
-        EditorApplication.playModeStateChanged -= OnPlayModeChanged;
-#endif
-    }
-
-    private void HandleQuit()
-    {
-        // Stop synthesize gracefully
-        if (synthesizer != null)
-        {
-            synthesizer.StopSpeakingAsync().Wait();
-            synthesizer.Dispose();
-            synthesizer = null;
-        }
-    }
-
-#if UNITY_EDITOR
-    private void OnPlayModeChanged(PlayModeStateChange state)
-    {
-        if (state == PlayModeStateChange.ExitingPlayMode)
-        {
-            HandleQuit();
-        }
-    }
-#endif
 }

@@ -13,15 +13,10 @@ using UnityEngine.Events;
 
 public class MeshController : MonoBehaviour
 {
-    private GameObject modelToSummon;
     public Camera arCamera;
     private GameObject modelInstance;
 
     public Dropdown 模型选择;
-
-    protected String[] oringinData = new String[10];
-    private Matrix4x4 rtM;
-    private Matrix4x4 rtM_inverse;
 
     private float[,] num = new float[3, 4];
 
@@ -36,8 +31,6 @@ public class MeshController : MonoBehaviour
     private Vector2 oldPos1;
     private Vector2 oldPos2;
 
-    private string poseStr = "";
-
     private int mode = 0;
 
     private const string serverUrl = "http://123.57.25.77:7005/media_app/";
@@ -49,9 +42,6 @@ public class MeshController : MonoBehaviour
     public Button buttonShowMesh;
 
     public TMP_InputField datasetLoc;
-
-    public TextMeshProUGUI testText;
-
 
     public Shader hideShader;
 
@@ -65,7 +55,6 @@ public class MeshController : MonoBehaviour
 
     void Start()
     {
-        modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
         SetDropDownAddListener(模型切换);
         // 模型选择.value = 1;
         defaultShader = Shader.Find("Particles/Standard Surface");
@@ -74,9 +63,6 @@ public class MeshController : MonoBehaviour
 
         buttonHideMesh.gameObject.SetActive(true);
         buttonShowMesh.gameObject.SetActive(false);
-
-        //videoScreen = GameObject.FindGameObjectWithTag("Screen");
-        //sonar = GameObject.FindGameObjectWithTag("Sonar");
     }
 
     public void ClickToChangeMeshVisiblility()
@@ -89,7 +75,7 @@ public class MeshController : MonoBehaviour
         isMeshVisible = !isMeshVisible;
     }
 
-    public void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
+    private void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
     {
         // 提取位置
         position = pose.GetColumn(3);
@@ -110,27 +96,19 @@ public class MeshController : MonoBehaviour
         buttonSummonAtCamera.gameObject.SetActive(false);
 
         Pose pose = GetPoseByCapture();
+        // init modelInstance
+        modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
+        // set AstarPath ConsPos;
+        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
+        SMPLController.SetConsPos(centerPos);
 
-        if (modelInstance != null)
-        {
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
-        }
-        else
-        {
-            modelInstance = Instantiate(modelToSummon, new Vector3(0, 0, 0), Quaternion.identity);
-            Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
-            SMPLController.SetConsPos(centerPos);
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
-        }
+        //set model pos/rot/scale
+        modelInstance.transform.parent = arCamera.transform;
+        modelInstance.transform.localPosition = pose.position;
+        modelInstance.transform.localRotation = pose.rotation;
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 90f);
-        //modelInstance.transform.localScale = new Vector3(1, -1, -1);
         modelInstance.transform.Rotate(new Vector3(180, 0, 0));
-
         arCamera.transform.DetachChildren();
 
         // Record Camera Pose
@@ -148,16 +126,12 @@ public class MeshController : MonoBehaviour
         modelInstance.transform.position = modelPosition;
         modelInstance.transform.rotation = modelRotation;
 
+        
+
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
     }
 
-    public void ClickToGetInfo()
-    {
-        arCamera.GetComponent<ARCameraManager>().TryGetIntrinsics(out XRCameraIntrinsics intrinsics);
-
-        testText.text = intrinsics.ToString();
-    }
     public void ClickRotateR()
     {
         modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.right, 90f);
@@ -201,12 +175,6 @@ public class MeshController : MonoBehaviour
         renderTexture.Apply();
 
         byte[] rawData = renderTexture.EncodeToJPG();
-
-
-        //string imagePath = "F:\\UnityProjects\\Z_apks\\image1.jpg";
-        //byte[] rawData = ReadImageBytes(imagePath);
-
-        //Debug.Log(imagePath.ToString());
 
 
         if (datasetLoc != null)
@@ -337,19 +305,11 @@ public class MeshController : MonoBehaviour
             rowIndex++;
         }
 
-        //for (int i = 0; i < num.GetLength(0); i++)
-        //{
-        //    for (int j = 0; j < num.GetLength(1); j++)
-        //    {
-        //        Debug.Log(num[i, j] + "\t");
-        //    }
-        //}
-
     }
 
     public Pose TransferMatrix2Pose(Matrix4x4 rtM)
     {
-        rtM_inverse = rtM.inverse;
+        var rtM_inverse = rtM.inverse;
 
         Vector3 position = GetPosition(rtM_inverse);
 
@@ -357,10 +317,6 @@ public class MeshController : MonoBehaviour
         Quaternion q = GetRotation(rtM_inverse);
 
         v = q.eulerAngles;
-        //v.x = 180.0f - v.x;
-        //v.z *= 1;
-        //v.y = 180.0f - v.y;
-
         v.x *= -1;
         v.y = 180.0f - v.y;
         v.z = 180.0f + v.z;
@@ -373,7 +329,7 @@ public class MeshController : MonoBehaviour
 
     public Pose _TransferMatrix2Pose(Matrix4x4 rtM)
     {
-        rtM_inverse = rtM.inverse;
+        var rtM_inverse = rtM.inverse;
 
         Vector3 position = GetPosition(rtM_inverse);
 
@@ -381,10 +337,6 @@ public class MeshController : MonoBehaviour
         Quaternion q = GetRotation(rtM_inverse);
 
         v = q.eulerAngles;
-        //v.x = 180.0f - v.x;
-        //v.z *= 1;
-        //v.y = 180.0f - v.y;
-
         v.x *= -1;
         v.y = 180.0f + v.y;
         v.z = 180.0f - v.z;
@@ -420,76 +372,50 @@ public class MeshController : MonoBehaviour
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(false);
 
-        Pose pose = GetPoseByCapture();
+        Pose pose = testPose();
 
-        if (modelInstance != null)
-        {
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
-        }
-        else
-        {
-            modelInstance = Instantiate(modelToSummon, new Vector3(0, 0, 0), Quaternion.identity);
-            Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
-            SMPLController.SetConsPos(centerPos);
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
-        }
+        // init modelInstance
+        modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
+        // set AstarPath ConsPos;
+        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
+        SMPLController.SetConsPos(centerPos);
+
+        //set model pos/rot/scale
+        modelInstance.transform.parent = arCamera.transform;
+        modelInstance.transform.localPosition = pose.position;
+        modelInstance.transform.localRotation = pose.rotation;
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 90f);
-        //modelInstance.transform.localScale = new Vector3(1, -1, -1);
         modelInstance.transform.Rotate(new Vector3(180, 0, 0));
-
         arCamera.transform.DetachChildren();
+
+        // Record Camera Pose
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        camPoseT1 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+
+        // fix jitter error
+        Matrix4x4 deltaP = camPoseT1 * camPoseT0.inverse;
+        Matrix4x4 modelPose = Matrix4x4.TRS(modelInstance.transform.position, modelInstance.transform.rotation, modelInstance.transform.localScale);
+        modelPose = deltaP.inverse * modelPose;
+        Vector3 modelPosition, modelScale;
+        Quaternion modelRotation;
+        DecomposePoseMatrix(modelPose, out modelPosition, out modelRotation, out modelScale);
+        modelInstance.transform.position = modelPosition;
+        modelInstance.transform.rotation = modelRotation;
 
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
-    }
-
-    public GameObject scene;
-    public void tempClickSummon2()
-    {
-        Pose pose = testPose();
-        scene = Instantiate(scene, new Vector3(0, 0, 0), Quaternion.identity);
-        scene.transform.parent = arCamera.transform;
-        scene.transform.position = pose.position;
-        scene.transform.localRotation = pose.rotation;
-
-        arCamera.transform.DetachChildren();
-
-        //modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
-        //modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 180f); //暂时封印
-        //modelInstance.transform.localScale = new Vector3(1, -1, -1);
-
-        scene.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
-        scene.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 90f);
-
-        scene.transform.Rotate(new Vector3(180, 0, 0));
-
-        // modelInstance.transform.rotation = Quaternion.Euler(modelInstance.transform.rotation.x, modelInstance.transform.rotation.y + 180, modelInstance.transform.rotation.z);
-
-        arCamera.transform.DetachChildren();
-
-        buttonGetPose.gameObject.SetActive(true);
-        buttonSummonAtCamera.gameObject.SetActive(false);
-        //FindObjectOfType<UIManager>().TransToSelectDesUI();
     }
 
     public void 模型切换(int v)
     {
         switch (v)
         {
-            case 0: modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-SJS-1226"); break;
-            case 1: modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-test717-1009"); break;
+            case 0:  break;
+            case 1:  break;
             default: break;
         }
-    }
-
-    public void 切换UI()
-    {
-        FindObjectOfType<UIManager>().TransToSelectDesUI();
     }
 
     void SetDropDownAddListener(UnityAction<int> OnValueChangeListener)
@@ -501,15 +427,9 @@ public class MeshController : MonoBehaviour
 
     void FromMatrix(Transform trans, Matrix4x4 mat)
     {
-        //scannet数据集
-        //v.x = 180 - v.x;
-        //v.z *= -1;
-        //v.y = 180.0f - v.y;
-
         //3D scanner 需要调整子相机X轴旋转180,Z轴旋转90
         // 如果是移动模型的话，需要 v.z不变，子相机Z轴旋转-90（暂定）
         trans.position = GetPosition(mat);
-        //rtMText.text = mat.ToString();
         Vector3 v = new Vector3();
         Quaternion q = GetRotation(mat);
         v = q.eulerAngles;
@@ -521,10 +441,6 @@ public class MeshController : MonoBehaviour
     }
     Quaternion GetRotation(Matrix4x4 matrix)
     {
-        //Vector4 vy = matrix.GetColumn(1);
-        //Vector4 vz = matrix.GetColumn(2);
-
-        //Quaternion quaternion = Quaternion.LookRotation(new Vector3(vz.x, vz.y, vz.z), new Vector3(vy.x, vy.y, vy.z));
         float qw = Mathf.Sqrt(1f + matrix.m00 + matrix.m11 + matrix.m22) / 2;
         float w = 4 * qw;
         float qx = (matrix.m21 - matrix.m12) / w;
@@ -535,10 +451,6 @@ public class MeshController : MonoBehaviour
     }
     Vector3 GetPosition(Matrix4x4 matrix)
     {
-        //var x = -matrix.m03;
-        //var y = -matrix.m13;
-        //var z = matrix.m23;
-        //return new Vector3(x, y, z);
         var x = -matrix.m03;
         var y = matrix.m13;
         var z = matrix.m23;
@@ -594,12 +506,6 @@ public class MeshController : MonoBehaviour
 
     void Update()
     {
-        if (modelInstance)
-        {
-            //UpdateGraphTransform(modelInstance);
-        }
-        //make graph follow scene
-
 
         if (Input.touchCount == 0)
         {
@@ -678,19 +584,5 @@ public class MeshController : MonoBehaviour
             Debug.LogError($"Failed to read image bytes: {e.Message}");
             return null;
         }
-    }
-
-    public void changeToVirtualManExhibition()
-    {
-        // Debug.Log("modelToSummon.gameObject.activeSelf" + modelInstance.gameObject.activeSelf);
-        if (modelInstance && !modelInstance.gameObject.activeSelf)
-        {
-            modelInstance.SetActive(true);
-        }
-        //if (MySceneManager.instance != null)
-        //{
-        //    // MySceneManager.instance.ChangeToVirtualManExhibition();
-        //    MySceneManager.instance.ChangeTo1818();
-        //}
     }
 }
