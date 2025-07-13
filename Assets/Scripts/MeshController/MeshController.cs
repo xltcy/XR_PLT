@@ -333,8 +333,8 @@ public class MeshController : MonoBehaviour
 
         //set model pos/rot/scale
         modelInstance.transform.parent = arCamera.transform;
-        modelInstance.transform.localPosition = pose.position;
-        modelInstance.transform.localRotation = pose.rotation;
+        modelInstance.transform.localPosition = relocatedPose.position;
+        modelInstance.transform.localRotation = relocatedPose.rotation;
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 90f);
         modelInstance.transform.Rotate(new Vector3(180, 0, 0));
