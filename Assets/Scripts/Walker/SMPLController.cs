@@ -162,7 +162,6 @@ public class SMPLController : MonoBehaviour
                         SpeechManager.SayFromStr("请跟上我");
                         hasRemind = true;
                     }
-
                 }
                 else
                 {

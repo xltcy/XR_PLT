@@ -16,9 +16,9 @@ public class MeshController : MonoBehaviour
     public Camera arCamera;
     private GameObject modelInstance;
 
-    public Dropdown 模型选择;
+    public Dropdown sceneSelectDropdown;
 
-    private float[,] num = new float[3, 4];
+    private Pose relocatedPose;
 
     private static int 平移 = 1;
     private static int 旋转 = 2;
@@ -53,10 +53,22 @@ public class MeshController : MonoBehaviour
 
     private Matrix4x4 camPoseT0, camPoseT1;
 
+    private List<string> selectableScene = new List<string>
+    {
+        "北航工训楼展览厅", 
+        "青岛研究院展览厅"
+    };
+
     void Start()
     {
-        SetDropDownAddListener(模型切换);
-        // 模型选择.value = 1;
+        sceneSelectDropdown.ClearOptions();
+        sceneSelectDropdown.AddOptions(selectableScene);
+        // Fixme
+        sceneSelectDropdown.onValueChanged.AddListener((value) =>
+        {
+            FindObjectOfType<SceneController>().RequestSceneDataByKey(selectableScene[value]);
+        });
+
         defaultShader = Shader.Find("Particles/Standard Surface");
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
@@ -95,7 +107,8 @@ public class MeshController : MonoBehaviour
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(false);
 
-        Pose pose = GetPoseByCapture();
+        
+
         // init modelInstance
         modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
         // set AstarPath ConsPos;
@@ -104,8 +117,8 @@ public class MeshController : MonoBehaviour
 
         //set model pos/rot/scale
         modelInstance.transform.parent = arCamera.transform;
-        modelInstance.transform.localPosition = pose.position;
-        modelInstance.transform.localRotation = pose.rotation;
+        modelInstance.transform.localPosition = relocatedPose.position;
+        modelInstance.transform.localRotation = relocatedPose.rotation;
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.right, 180f);
         modelInstance.transform.RotateAround(arCamera.transform.position, arCamera.transform.forward, 90f);
         modelInstance.transform.Rotate(new Vector3(180, 0, 0));
@@ -176,14 +189,20 @@ public class MeshController : MonoBehaviour
 
         byte[] rawData = renderTexture.EncodeToJPG();
 
-
-        if (datasetLoc != null)
-        {
-            url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
-        }
-
-        StartCoroutine(UploadCapture(url, rawData));
-
+        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData, 
+            onSuccess: (res) => {
+                // TODO Console res;
+                relocatedPose = TransArrayToPose(res);
+                buttonGetPose.GetComponent<Button>().interactable = true;
+                buttonGetPose.gameObject.SetActive(false);
+                buttonSummonAtCamera.gameObject.SetActive(true);
+            }, 
+            onFail: (errorText) => {
+                // TODO Console Error
+                buttonGetPose.GetComponent<Button>().interactable = true;
+                buttonGetPose.gameObject.SetActive(true);
+                buttonSummonAtCamera.gameObject.SetActive(false);
+            }));
     }
 
     public void ClickToGetPoseWithImage()
@@ -203,18 +222,25 @@ public class MeshController : MonoBehaviour
 
         Debug.Log(imagePath.ToString());
 
-
-        if (datasetLoc != null)
-        {
-            url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
-        }
-
-        StartCoroutine(UploadCapture(url, rawData));
+        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData,
+            onSuccess: (res) => {
+                // TODO Console res;
+                relocatedPose = TransArrayToPose(res);
+                buttonGetPose.GetComponent<Button>().interactable = true;
+                buttonGetPose.gameObject.SetActive(false);
+                buttonSummonAtCamera.gameObject.SetActive(true);
+            },
+            onFail: (errorText) => {
+                // TODO Console Error
+                buttonGetPose.GetComponent<Button>().interactable = true;
+                buttonGetPose.gameObject.SetActive(true);
+                buttonSummonAtCamera.gameObject.SetActive(false);
+            }));
 
     }
 
 
-    public Pose GetPoseByCapture()
+    public Pose TransArrayToPose(float[,] num)
     {
         Matrix4x4 res = Matrix4x4.identity;
 
@@ -230,81 +256,6 @@ public class MeshController : MonoBehaviour
         Pose pose = TransferMatrix2Pose(res); //怎么获取返回值  
 
         return pose;
-    }
-
-    IEnumerator UploadCapture(string url, byte[] imageData)
-    {
-
-        string timestamp = "---------------------" + System.DateTime.Now.Ticks.ToString("x");
-        byte[] boundaryByte = System.Text.Encoding.UTF8.GetBytes(timestamp);
-
-        List<IMultipartFormSection> multipartSection = new List<IMultipartFormSection>();
-        multipartSection.Add(new MultipartFormFileSection("images", imageData, "image.jpg", "image/jpg"));
-
-        UnityWebRequest req = UnityWebRequest.Post(url, multipartSection, boundaryByte);
-
-        req.SetRequestHeader("Content-Type", "multipart/form-data; boundary=" + timestamp);
-
-        // send HTTP request
-        yield return req.SendWebRequest();
-
-        buttonGetPose.GetComponent<Button>().interactable = true;
-
-        // 处理请求结果
-        if (req.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Request succeeded. Response: " + req.downloadHandler.text);
-            buttonGetPose.gameObject.SetActive(false);
-            buttonSummonAtCamera.gameObject.SetActive(true);
-
-        }
-        else
-        {
-            Debug.LogError("Request failed. Error: " + req.error);
-            Debug.Log(req.downloadHandler.text);
-            buttonGetPose.gameObject.SetActive(true);
-            buttonSummonAtCamera.gameObject.SetActive(false);
-        }
-
-        string response = req.downloadHandler.text;
-
-
-        // 假设 receivedJson 是接收到的 JSON 字符串
-        int startIndex = response.IndexOf("[[");
-        int endIndex = response.IndexOf("]]");
-
-        string truncatedJson = response.Substring(startIndex + 1, endIndex - startIndex + 1);
-
-        Debug.Log("Truncated JSON: " + truncatedJson);
-
-        string outerPattern = @"\[.*?\]"; // 匹配最外层的方括号内的内容
-        string innerPattern = @"-?\d+\.\d+"; // 匹配一个浮点数
-
-        MatchCollection outerMatches = Regex.Matches(truncatedJson, outerPattern);
-
-        int rowIndex = 0;
-
-        foreach (Match outerMatch in outerMatches)
-        {
-            string subJson = outerMatch.Value;
-
-            MatchCollection innerMatches = Regex.Matches(subJson, innerPattern);
-
-            int columnIndex = 0;
-
-            foreach (Match innerMatch in innerMatches)
-            {
-                string numberString = innerMatch.Value;
-
-                // 解析浮点数并设置到矩阵
-                float number = float.Parse(numberString);
-                num[rowIndex, columnIndex] = number;
-
-                columnIndex++;
-            }
-            rowIndex++;
-        }
-
     }
 
     public Pose TransferMatrix2Pose(Matrix4x4 rtM)
@@ -372,7 +323,7 @@ public class MeshController : MonoBehaviour
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(false);
 
-        Pose pose = testPose();
+        relocatedPose = testPose();
 
         // init modelInstance
         modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
@@ -406,23 +357,6 @@ public class MeshController : MonoBehaviour
 
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
-    }
-
-    public void 模型切换(int v)
-    {
-        switch (v)
-        {
-            case 0:  break;
-            case 1:  break;
-            default: break;
-        }
-    }
-
-    void SetDropDownAddListener(UnityAction<int> OnValueChangeListener)
-    {
-        //模型选择.onValueChanged.AddListener((value) => {
-        //    OnValueChangeListener(value);
-        //});
     }
 
     void FromMatrix(Transform trans, Matrix4x4 mat)

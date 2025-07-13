@@ -15,6 +15,7 @@ public class SceneController : MonoBehaviour
         Mesh,
         initPos,
     }
+    [HideInInspector]
     public SceneData sceneData;
 
     private static string localJsonPath = "E:/Unity Proj/XR_PLT/test.json";
@@ -44,14 +45,35 @@ public class SceneController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // todo 
-        GetFakeResources();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void RequestSceneDataByKey(string sceneKey)
+    {
+        // TODO API get Response. Get From Local.
+        GetFakeResources();
+        // get json
+        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest("",
+            onSuccess: (res) => {
+                if (sceneData == null || sceneData.timestampMs < res.timestampMs)
+                {
+                    // TODO save to local
+                    sceneData = res;
+                } else
+                {
+                    // use sceneData directly.
+                }
+                
+            },
+            onFail: (errorText) => {
+                //TODO
+            }));
     }
 
     public void SetSelectedExplainationPoint(String explainationPointId)
