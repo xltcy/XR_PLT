@@ -59,19 +59,25 @@ public class MeshController : MonoBehaviour
         "北航航空馆"
     };
 
+    private List<SummaryItemData> summary = new List<SummaryItemData>();
+    private int selectedSceneIndex = 0;
+
+    enum StartState
+    {
+        Normal,
+        GettingPos,
+        WaitSummon,
+        Summoning
+    }
+
     void Start()
     {
         sceneSelectDropdown.ClearOptions();
-        sceneSelectDropdown.AddOptions(selectableScene);
         // Fixme
-        sceneSelectDropdown.onValueChanged.AddListener((value) =>
-        {
-            FindObjectOfType<SceneController>().RequestSceneDataByKey(value);
-        });
+        sceneSelectDropdown.onValueChanged.AddListener((value) => selectedSceneIndex = value);
 
         defaultShader = Shader.Find("Particles/Standard Surface");
-        buttonGetPose.gameObject.SetActive(true);
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.Normal);
 
         buttonHideMesh.gameObject.SetActive(true);
         buttonShowMesh.gameObject.SetActive(false);
@@ -85,6 +91,15 @@ public class MeshController : MonoBehaviour
             material.shader = newShader;
         }
         isMeshVisible = !isMeshVisible;
+    }
+
+    public void InitSceneSummary(List<SummaryItemData> items)
+    {
+        summary = items;
+        List<String> options = new List<string>();
+        items.ForEach(item => options.Add(item.sceneName));
+        sceneSelectDropdown.ClearOptions();
+        sceneSelectDropdown.AddOptions(options);
     }
 
     private void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
@@ -104,10 +119,7 @@ public class MeshController : MonoBehaviour
 
     public void ClickToSummonAtCamera()
     {
-        buttonGetPose.gameObject.SetActive(false);
-        buttonSummonAtCamera.gameObject.SetActive(false);
-
-        
+        SetStartState(StartState.Summoning);
 
         // init modelInstance
         modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
@@ -139,10 +151,7 @@ public class MeshController : MonoBehaviour
         modelInstance.transform.position = modelPosition;
         modelInstance.transform.rotation = modelRotation;
 
-        
-
-        buttonGetPose.gameObject.SetActive(true);
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.Normal);
     }
 
     public void ClickRotateR()
@@ -162,8 +171,7 @@ public class MeshController : MonoBehaviour
 
     public void ClickToGetPoseByCapture()
     {
-        buttonGetPose.GetComponent<Button>().interactable = false;
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.GettingPos);
 
         string url = serverUrl;
 
@@ -189,26 +197,24 @@ public class MeshController : MonoBehaviour
 
         byte[] rawData = renderTexture.EncodeToJPG();
 
+        UIManager.SetLoadingStatus(true);
         StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData, 
             onSuccess: (res) => {
                 // TODO Console res;
                 relocatedPose = TransArrayToPose(res);
-                buttonGetPose.GetComponent<Button>().interactable = true;
-                buttonGetPose.gameObject.SetActive(false);
-                buttonSummonAtCamera.gameObject.SetActive(true);
+                SetStartState(StartState.WaitSummon);
             }, 
             onFail: (errorText) => {
                 // TODO Console Error
-                buttonGetPose.GetComponent<Button>().interactable = true;
-                buttonGetPose.gameObject.SetActive(true);
-                buttonSummonAtCamera.gameObject.SetActive(false);
+                SetStartState(StartState.Normal);
             }));
+
+        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey);
     }
 
     public void ClickToGetPoseWithImage()
     {
-        buttonGetPose.GetComponent<Button>().interactable = false;
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.GettingPos);
 
         string url = serverUrl;
 
@@ -226,15 +232,11 @@ public class MeshController : MonoBehaviour
             onSuccess: (res) => {
                 // TODO Console res;
                 relocatedPose = TransArrayToPose(res);
-                buttonGetPose.GetComponent<Button>().interactable = true;
-                buttonGetPose.gameObject.SetActive(false);
-                buttonSummonAtCamera.gameObject.SetActive(true);
+                SetStartState(StartState.WaitSummon);
             },
             onFail: (errorText) => {
                 // TODO Console Error
-                buttonGetPose.GetComponent<Button>().interactable = true;
-                buttonGetPose.gameObject.SetActive(true);
-                buttonSummonAtCamera.gameObject.SetActive(false);
+                SetStartState(StartState.Normal);
             }));
 
     }
@@ -312,16 +314,22 @@ public class MeshController : MonoBehaviour
         return pose;
     }
 
+    private void SetStartState(StartState newState)
+    {
+        buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
+        buttonGetPose.gameObject.SetActive(newState != StartState.WaitSummon && newState != StartState.Summoning);
+        buttonSummonAtCamera.gameObject.SetActive(newState == StartState.WaitSummon);
+    }
+
     public void tempGetPose()
     {
-        buttonGetPose.gameObject.SetActive(false);
-        buttonSummonAtCamera.gameObject.SetActive(true);
+        SetStartState(StartState.WaitSummon);
+        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey);
     }
 
     public void tempClickSummon()
     {
-        buttonGetPose.gameObject.SetActive(false);
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.Summoning);
 
         relocatedPose = testPose();
 
@@ -355,8 +363,7 @@ public class MeshController : MonoBehaviour
         modelInstance.transform.position = modelPosition;
         modelInstance.transform.rotation = modelRotation;
 
-        buttonGetPose.gameObject.SetActive(true);
-        buttonSummonAtCamera.gameObject.SetActive(false);
+        SetStartState(StartState.GettingPos);
     }
 
     void FromMatrix(Transform trans, Matrix4x4 mat)

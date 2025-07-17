@@ -88,6 +88,33 @@ public class NetworkUtil
         }
     }
 
+    public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
+    {
+        // todo
+        yield return new WaitForSeconds(1);
+        string localJsonPath = "test-summary.json";
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            localJsonPath = Application.persistentDataPath + localJsonPath;
+        } else
+        {
+            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
+        }
+        if (!File.Exists(localJsonPath))
+        {
+            string error = "’“≤ªµΩ scene.json£°Path:" + localJsonPath;
+            Debug.LogError(error);
+            onFail.Invoke(error);
+        }
+        else
+        {
+            string json = File.ReadAllText(localJsonPath);
+            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(json);
+            Debug.Log("Get Response json: Data:" + data);
+            onSuccess.Invoke(data);
+        }
+    }
+
     public IEnumerator GetSceneDataRequest(string sceneLoc, Action<SceneData> onSuccess, Action<string> onFail)
     {
         // todo
@@ -106,5 +133,4 @@ public class NetworkUtil
             onSuccess.Invoke(data);
         }
     }
-
 }

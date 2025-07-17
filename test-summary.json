@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "sceneName": "北航工训楼展厅",
+      "sceneKey": "test-GXL.json"
+    },{
+      "sceneName": "北航航空博物馆",
+      "sceneKey": "test-HKG.json"
+    }
+  ]
+}

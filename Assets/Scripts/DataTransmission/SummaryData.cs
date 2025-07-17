@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class SummaryData
 {
     // maybe version control
-    public long timestampMs;
     public List<SummaryItemData> items;
 }
 

@@ -17,11 +17,13 @@ public class SceneController : MonoBehaviour
         initPos,
     }
     [HideInInspector]
+    public SummaryData summaryData;
+    [HideInInspector]
     public SceneData sceneData;
 
     public Text jsonLocationHint;
 
-    private static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
     private string jsonHomePath = "";
 
     private static string JSON_NAME_GXL = "test-GXL.json";
@@ -57,7 +59,7 @@ public class SceneController : MonoBehaviour
             jsonHomePath = Application.persistentDataPath; 
         else 
             jsonHomePath = TEST_JSON_PC_HOME_PATH;
-        
+        RequireSummaryData();
     }
 
     // Update is called once per frame
@@ -69,14 +71,9 @@ public class SceneController : MonoBehaviour
     /**
      * Send API Get Scene json data.
      */
-    public void RequestSceneDataByKey(int sceneKey)
+    public void RequestSceneDataByKey(string sceneKey)
     {
-        switch(sceneKey)
-        {
-            case 0: localJsonPath = jsonHomePath + JSON_NAME_GXL;break;
-            case 1: localJsonPath = jsonHomePath + JSON_NAME_HKG; break;
-            default: break;
-        }
+        localJsonPath = jsonHomePath + sceneKey;
         jsonLocationHint.text = "json应该放在：" + localJsonPath;
         // TODO API get Response. Get From Local.
         GetFakeResources();
@@ -136,6 +133,21 @@ public class SceneController : MonoBehaviour
         var pattern = command.matchPattern;
         ActionBase action = allActions.FindLast(item => item.id == actionId);
         StartCoroutine(ConsoleAction(action, isStartAction: pattern == action.startTrigger.matchPattern));
+    }
+
+    private void RequireSummaryData()
+    {
+        UIManager.SetLoadingStatus(true);
+        StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(
+            onSuccess: (res) => {
+                summaryData = res;
+                FindObjectOfType<MeshController>().InitSceneSummary(res.items);
+                UIManager.SetLoadingStatus(false);
+            },
+            onFail: (errorText) => {
+                //TODO
+                UIManager.SetLoadingStatus(false);
+            }));
     }
 
     private void GetResources()

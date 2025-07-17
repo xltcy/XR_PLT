@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     public GameObject StartView;
     public GameObject SelectDesView;
     public GameObject VirtualManIntroView;
+    public GameObject LoadingView;
     public GameObject smplController;
 
     // Initialize VirtualMan For First Time
@@ -101,6 +102,16 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         // todo set new des & trans UI run state.
         Debug.Log($"UIManager SelectDesActionInterface OnSelectDesAt {item.title}");
         TransToVirtualManIntroUI(item.pointId);
+    }
+
+    private void RequestLoadingStatus(bool setStart)
+    {
+        LoadingView.SetActive(setStart);
+    }
+
+    public static void SetLoadingStatus(bool setStart)
+    {
+        FindObjectOfType<UIManager>().RequestLoadingStatus(setStart);
     }
 
     public enum RunState
