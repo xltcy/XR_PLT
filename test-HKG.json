@@ -1,0 +1,13 @@
+{
+  "sceneModelPath": "Prefab-HKG",
+  "sceneName": "航空馆",
+  "initPosition": {
+  "x": -7,
+  "y": -1,
+  "z": -12.5
+},
+  "timestampMs": 123,
+  "explanationPoints": [],
+  "globalActions":[],
+  "objects":[]
+}

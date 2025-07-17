@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 /**
  * Use to read json auto generate everything.
@@ -18,7 +19,14 @@ public class SceneController : MonoBehaviour
     [HideInInspector]
     public SceneData sceneData;
 
-    private static string localJsonPath = "E:/Unity Proj/XR_PLT/test.json";
+    public Text jsonLocationHint;
+
+    private static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    private string jsonHomePath = "";
+
+    private static string JSON_NAME_GXL = "test-GXL.json";
+    private static string JSON_NAME_HKG = "test-HKG.json";
+    private string localJsonPath = "";
     // ObjectData objects' models.
     private Dictionary<String, GameObject> prefabs = new Dictionary<String, GameObject>();
     private Dictionary<int, GameObject> addedObjects = new Dictionary<int, GameObject>();
@@ -45,7 +53,11 @@ public class SceneController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        if (Application.platform == RuntimePlatform.Android) 
+            jsonHomePath = Application.persistentDataPath; 
+        else 
+            jsonHomePath = TEST_JSON_PC_HOME_PATH;
+        
     }
 
     // Update is called once per frame
@@ -54,12 +66,22 @@ public class SceneController : MonoBehaviour
         
     }
 
-    public void RequestSceneDataByKey(string sceneKey)
+    /**
+     * Send API Get Scene json data.
+     */
+    public void RequestSceneDataByKey(int sceneKey)
     {
+        switch(sceneKey)
+        {
+            case 0: localJsonPath = jsonHomePath + JSON_NAME_GXL;break;
+            case 1: localJsonPath = jsonHomePath + JSON_NAME_HKG; break;
+            default: break;
+        }
+        jsonLocationHint.text = "json应该放在：" + localJsonPath;
         // TODO API get Response. Get From Local.
         GetFakeResources();
         // get json
-        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest("",
+        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(localJsonPath,
             onSuccess: (res) => {
                 if (sceneData == null || sceneData.timestampMs < res.timestampMs)
                 {
@@ -76,6 +98,9 @@ public class SceneController : MonoBehaviour
             }));
     }
 
+    /**
+     * Set explaination point.
+     */
     public void SetSelectedExplainationPoint(String explainationPointId)
     {
         var voiceController = FindObjectOfType<VoiceController>();

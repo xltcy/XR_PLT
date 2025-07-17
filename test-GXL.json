@@ -216,40 +216,6 @@
           "animTrigger":"HandForward"
         }
       ]
-    },
-    {
-      "id":"虚实融合太空站2",
-      "title":"虚实融合太空站2",
-      "position":{
-          "x": 1.2,
-          "y": 0.0,
-          "z": -3.4
-      },
-      "arriveIntroduction":"nothing",
-      "thumb":"abc",
-      "actions":[]
-    },{
-      "id":"智慧海洋系统3",
-      "title":"智慧海洋系统3",
-      "position":{
-          "x": 1.2,
-          "y": 0.0,
-          "z": -3.4
-      },
-      "arriveIntroduction":"nothing",
-      "thumb":"abc",
-      "actions":[]
-    },{
-      "id":"虚实融合太空站4",
-      "title":"虚实融合太空站4",
-      "position":{
-          "x": 1.2,
-          "y": 0.0,
-          "z": -3.4
-      },
-      "arriveIntroduction":"nothing",
-      "thumb":"abc",
-      "actions":[]
     }
   ],
   "globalActions":[],

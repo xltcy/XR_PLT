@@ -91,9 +91,6 @@ public class MoveObjectAction : ActionBase
 public class IntroduceAction : ActionBase
 {
     public string introduction;
-    public List<Vector3> path;
-    public float duration;
-    public bool loop;
 }
 
 public class ExplosionAction: ActionBase

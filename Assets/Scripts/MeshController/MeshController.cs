@@ -56,7 +56,7 @@ public class MeshController : MonoBehaviour
     private List<string> selectableScene = new List<string>
     {
         "北航工训楼展览厅", 
-        "青岛研究院展览厅"
+        "北航航空馆"
     };
 
     void Start()
@@ -66,7 +66,7 @@ public class MeshController : MonoBehaviour
         // Fixme
         sceneSelectDropdown.onValueChanged.AddListener((value) =>
         {
-            FindObjectOfType<SceneController>().RequestSceneDataByKey(selectableScene[value]);
+            FindObjectOfType<SceneController>().RequestSceneDataByKey(value);
         });
 
         defaultShader = Shader.Find("Particles/Standard Surface");

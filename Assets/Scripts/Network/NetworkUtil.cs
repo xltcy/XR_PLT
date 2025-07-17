@@ -92,7 +92,7 @@ public class NetworkUtil
     {
         // todo
         yield return new WaitForSeconds(1);
-        string localJsonPath = "E:/Unity Proj/XR_PLT/test.json";
+        string localJsonPath = sceneLoc;
         if (!File.Exists(localJsonPath))
         {
             string error = "’“≤ªµΩ scene.json£°Path:" + localJsonPath;

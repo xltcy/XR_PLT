@@ -34,19 +34,32 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
 
     public void TransToSelectDesUI()
     {
-        SwitchRunState(RunState.SelectDestination);
-
-        if(!initPos)
+        var sceneData = FindObjectOfType<SceneController>()?.sceneData;
+        if (sceneData == null)
+        {
+            // Error
+            Debug.Log("No vailable explaination point!!!");
+            return;
+        }
+        if (!initPos)
         {
             smplController.SetActive(true);
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
-
+        if (sceneData.explanationPoints.Count == 1)
+        {
+            // skip selectDestination.
+            TransToVirtualManIntroUI(sceneData.explanationPoints[0].id);
+            return;
+        }
+        // Trans to select destination.
+        SwitchRunState(RunState.SelectDestination);
     }
 
-    public void TansToVirtualManIntroUI()
+    public void TransToVirtualManIntroUI(string pointId)
     {
+        FindObjectOfType<SceneController>().SetSelectedExplainationPoint(pointId);
         SwitchRunState(RunState.VirtualManIntro);
     }
 
@@ -87,8 +100,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     {
         // todo set new des & trans UI run state.
         Debug.Log($"UIManager SelectDesActionInterface OnSelectDesAt {item.title}");
-        FindObjectOfType<SceneController>().SetSelectedExplainationPoint(item.pointId);
-        TansToVirtualManIntroUI();
+        TransToVirtualManIntroUI(item.pointId);
     }
 
     public enum RunState
