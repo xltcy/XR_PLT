@@ -79,6 +79,7 @@ public class SMPLController : MonoBehaviour
     void Update()
     {
         //destination.transform.position = despositions[dropDown.options[dropDown.value].text];
+        //debugText.text = $"Destination: {destination.transform.position}\nGuide:{walkingModel.transform.position}";
         if (walkingModel.activeSelf)
         {
             animState = walkAnim.GetCurrentAnimatorStateInfo(0);

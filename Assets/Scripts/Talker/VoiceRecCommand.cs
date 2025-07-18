@@ -92,12 +92,12 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
         {
             case VirHumanCommandType.initPos:
                 matchPattern = "开始参观";
-                desLocalPosition = new Vector3(2.99f, -0.27f, -15.45f);
+                desLocalPosition = new Vector3(-1.179f, -0.709f, -15.45f);
                 introduction = "";
                 break;
             case VirHumanCommandType.shengNa:
                 matchPattern = "声呐";
-                desLocalPosition = new Vector3(0.25f, -1f, 5f);
+                desLocalPosition = new Vector3(1.655281f, -1.048873f, -8.6174285f);
                 introduction = "我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
                 break;
 
@@ -157,6 +157,12 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "模型分解"; break;
             case SceneCommandType.recoverSonar:
                 matchPattern = "模型恢复"; break;
+            case SceneCommandType.showSonarWave:
+                matchPattern = "声波"; break;
+            case SceneCommandType.showSonarLabel:
+                matchPattern = "型号"; break;
+            case SceneCommandType.showFinding:
+                matchPattern = "研究成果"; break;
         }
         commandType = type;
     }
@@ -164,7 +170,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
     public static List<SceneVoiceRecCommand> GetAllCommands()
     {
         List<SceneVoiceRecCommand> res = new List<SceneVoiceRecCommand>();
-        // res.Add(new SceneVoiceRecCommand("", SceneCommandType.takeMeTo));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideButton));
@@ -173,6 +178,9 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarWave));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
         return res;
     }
 
@@ -186,7 +194,10 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         screen,
         sonar,
         separateSonar,
-        recoverSonar
+        recoverSonar,
+        showSonarWave,
+        showSonarLabel,
+        showFinding
     }
 }
 
