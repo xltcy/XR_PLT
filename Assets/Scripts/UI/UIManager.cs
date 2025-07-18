@@ -11,7 +11,6 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     public GameObject VirtualManIntroView;
     public GameObject LoadingView;
     public GameObject smplController;
-    public GameObject mediaManager;
 
     // Initialize VirtualMan For First Time
     private bool initPos = false;
@@ -74,13 +73,15 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         Debug.Log($"UIManager SwitchRunState{newState}");
     }
 
+    /**
+     * TODO fix sayfromstr
+     */
     public void SkipSelect()
     {
         SwitchRunState(RunState.VirtualManIntro);
         if (!initPos)
         {
             smplController.SetActive(true);
-            mediaManager.SetActive(true);
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
@@ -134,10 +135,5 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         Start,
         SelectDestination,
         VirtualManIntro
-    }
-
-    public void GotoShengNa()
-    {
-        FindObjectOfType<SMPLController>().SetDestination("ShengNa");
     }
 }

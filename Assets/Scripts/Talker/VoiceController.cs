@@ -11,7 +11,6 @@ public class VoiceController : MonoBehaviour
     public Text debugText;
     public VoiceActiveButton voiceActiveButton;
     public SMPLController smplController;
-    public MediaManager mediaManager;
 
     [Header("模拟语音识别结果")]
     public Text fakeVoiceText;
@@ -196,15 +195,13 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
-                mediaManager.SummonCurtain();
-                mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
-                mediaManager.SummonSonar(); break;
+                 break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
-                mediaManager.SeparateSonar(); break;
+                break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
-                mediaManager.RecoverSonar(); break;
+                break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
                 break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
