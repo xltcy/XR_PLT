@@ -67,6 +67,9 @@ public class MeshController : MonoBehaviour
 
     private Matrix4x4 camPoseT0, camPoseT1;
 
+    [Header("本地图片路径")]
+    public string testImagePath;
+
     void Start()
     {
         modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
@@ -229,7 +232,7 @@ public class MeshController : MonoBehaviour
         Quaternion camRotation = arCamera.transform.rotation;
         camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
 
-        string imagePath = "D:\\0-Desktop\\1.jpg";
+        string imagePath = testImagePath;
         byte[] rawData = ReadImageBytes(imagePath);
 
         Debug.Log(imagePath.ToString());

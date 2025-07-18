@@ -1183,7 +1183,7 @@ PrefabInstance:
     - target: {fileID: 4944859874165462532, guid: 6f28fedcc61ac25448ef1b200bb71cac,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 4944859874165462532, guid: 6f28fedcc61ac25448ef1b200bb71cac,
         type: 3}
@@ -1543,7 +1543,7 @@ MonoBehaviour:
   repathRate: 0.5
   canSearch: 1
   canMove: 1
-  maxSpeed: 0.1
+  maxSpeed: 0.13
   gravity: {x: NaN, y: NaN, z: NaN}
   groundMask:
     serializedVersion: 2
@@ -1864,6 +1864,54 @@ Transform:
   m_Father: {fileID: 1016594552}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &342424903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 342424904}
+  - component: {fileID: 342424905}
+  m_Layer: 0
+  m_Name: MediaManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &342424904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 342424903}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 353603105}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &342424905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 342424903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 507736232e694174abf81845b322db76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  videoScreen: {fileID: 119848527}
+  prefabSonar: {fileID: 1660791833}
+  prefabCurtain: {fileID: 546509029452626613}
+  prefabWall: {fileID: 1296049683}
+  sonar: {fileID: 0}
 --- !u!1 &344753019
 GameObject:
   m_ObjectHideFlags: 0
@@ -2170,6 +2218,7 @@ Transform:
   - {fileID: 698180111}
   - {fileID: 1280279422}
   - {fileID: 1183033216}
+  - {fileID: 342424904}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3022,6 +3071,7 @@ MonoBehaviour:
   testText: {fileID: 0}
   hideShader: {fileID: 0}
   materials: []
+  testImagePath: H:/UnityProject/z_testImages/test_gxl.png
   scene: {fileID: 0}
 --- !u!1 &706212204
 GameObject:
@@ -3255,7 +3305,7 @@ PrefabInstance:
     - target: {fileID: 5184083231051114573, guid: da579d65d5913f041af0c07b5b406766,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5184083231051114573, guid: da579d65d5913f041af0c07b5b406766,
         type: 3}
@@ -4013,6 +4063,7 @@ MonoBehaviour:
   debugText: {fileID: 266939818}
   voiceActiveButton: {fileID: 1014693568}
   smplController: {fileID: 1914045658}
+  mediaManager: {fileID: 342424905}
   _prefabOfPlane: {fileID: 0}
   fakeVoiceText: {fileID: 104764210}
 --- !u!4 &930431121
@@ -5738,6 +5789,7 @@ MonoBehaviour:
   SelectDesView: {fileID: 8754343721734737847}
   VirtualManIntroView: {fileID: 8754343719761799212}
   smplController: {fileID: 1914045657}
+  mediaManager: {fileID: 342424903}
 --- !u!4 &1280279422
 Transform:
   m_ObjectHideFlags: 0
@@ -5794,7 +5846,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1286168898
 GameObject:
@@ -6555,7 +6607,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1280279421}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: TransToSelectDesUI
+        m_MethodName: SkipSelect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9792,6 +9844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 248896e16adcb0b4fac5d7279c6dba30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  talkAnim: {fileID: 0}
   destination: {fileID: 483724391}
   walkingModel: {fileID: 190015106}
   talkingModel: {fileID: 5835312896867757955}
@@ -9799,11 +9852,6 @@ MonoBehaviour:
   arCamera: {fileID: 73739826}
   occlusionMaterial: {fileID: 2100000, guid: 58300a8f36fe58a479616dccc09a7761, type: 2}
   texturedMaterial: {fileID: 2100000, guid: 2475351e2d0b40c4cb70b594dc7ed761, type: 2}
-  videoScreen: {fileID: 119848527}
-  prefabSonar: {fileID: 1660791833}
-  prefabCurtain: {fileID: 546509029452626613}
-  prefabWall: {fileID: 1296049683}
-  sonar: {fileID: 2018182068}
 --- !u!4 &1914045659
 Transform:
   m_ObjectHideFlags: 0
@@ -10215,12 +10263,6 @@ Transform:
   m_Father: {fileID: 365593959}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2018182068 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7810060960593948826, guid: ef2a707d0590e7e4794f5379cb1ef528,
-    type: 3}
-  m_PrefabInstance: {fileID: 2125403629}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2029400459
 GameObject:
   m_ObjectHideFlags: 0
@@ -10805,7 +10847,7 @@ PrefabInstance:
     - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
         type: 3}
       propertyPath: m_RootOrder
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
         type: 3}
@@ -11079,7 +11121,7 @@ PrefabInstance:
     - target: {fileID: 546509029888901186, guid: ef57d504048f3444da59fd436ac98b7d,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 546509029888901186, guid: ef57d504048f3444da59fd436ac98b7d,
         type: 3}

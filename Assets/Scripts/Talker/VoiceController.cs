@@ -12,6 +12,7 @@ public class VoiceController : MonoBehaviour
     public VoiceActiveButton voiceActiveButton;
     //public TrackingImageManager trackingImageManager;
     public SMPLController smplController;
+    public MediaManager mediaManager;
     [Header("Prefabs")]
     public GameObject _prefabOfPlane;
 
@@ -252,15 +253,21 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
-                smplController.SummonCurtain();
-                smplController.SummonWall();
+                mediaManager.SummonCurtain();
+                mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
-                smplController.SummonSonar(); break;
+                mediaManager.SummonSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
-                smplController.SeparateSonar(); break;
+                mediaManager.SeparateSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
-                smplController.RecoverSonar(); break;
+                mediaManager.RecoverSonar(); break;
+            case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
+                break;
+            case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
+                break;
+            case SceneVoiceRecCommand.SceneCommandType.showFinding:
+                break;
             default: ReconizeFail(); break;
         }
     }

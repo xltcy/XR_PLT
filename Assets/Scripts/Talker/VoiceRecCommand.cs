@@ -157,6 +157,12 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "模型分解"; break;
             case SceneCommandType.recoverSonar:
                 matchPattern = "模型恢复"; break;
+            case SceneCommandType.showSonarWave:
+                matchPattern = "声波"; break;
+            case SceneCommandType.showSonarLabel:
+                matchPattern = "型号"; break;
+            case SceneCommandType.showFinding:
+                matchPattern = "研究成果"; break;
         }
         commandType = type;
     }
@@ -164,7 +170,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
     public static List<SceneVoiceRecCommand> GetAllCommands()
     {
         List<SceneVoiceRecCommand> res = new List<SceneVoiceRecCommand>();
-        // res.Add(new SceneVoiceRecCommand("", SceneCommandType.takeMeTo));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showScene));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.hideButton));
@@ -173,6 +178,9 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarWave));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
         return res;
     }
 
@@ -186,7 +194,10 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         screen,
         sonar,
         separateSonar,
-        recoverSonar
+        recoverSonar,
+        showSonarWave,
+        showSonarLabel,
+        showFinding
     }
 }
 

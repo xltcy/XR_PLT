@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     public GameObject SelectDesView;
     public GameObject VirtualManIntroView;
     public GameObject smplController;
+    public GameObject mediaManager;
 
     // Initialize VirtualMan For First Time
     private bool initPos = false;
@@ -59,6 +60,20 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         Debug.Log($"UIManager SwitchRunState{newState}");
     }
 
+    public void SkipSelect()
+    {
+        SwitchRunState(RunState.VirtualManIntro);
+        if (!initPos)
+        {
+            smplController.SetActive(true);
+            mediaManager.SetActive(true);
+            FindObjectOfType<SMPLController>().InitializeSmplPosition();
+            initPos = true;
+        }
+        SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
+        Invoke("GotoShengNa", 3);
+    }
+
     private void SwitchForStart(RunState newState)
     {
         bool setActive = newState == RunState.Start;
@@ -96,5 +111,10 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         Start,
         SelectDestination,
         VirtualManIntro
+    }
+
+    public void GotoShengNa()
+    {
+        FindObjectOfType<SMPLController>().SetDestination("ShengNa");
     }
 }
