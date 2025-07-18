@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using System.Text.RegularExpressions;
-using UnityEngine.Events;
+using System.Threading;
 
 public class MeshController : MonoBehaviour
 {
@@ -20,21 +18,6 @@ public class MeshController : MonoBehaviour
 
     private Pose relocatedPose;
 
-    private static int 平移 = 1;
-    private static int 旋转 = 2;
-    private static int 缩放 = 3;
-
-    private static float rotateSpeed = 0.1f;
-    private static float translateSpeed = 0.001f;
-    private static float scaleSpeed = 1.025f;
-
-    private Vector2 oldPos1;
-    private Vector2 oldPos2;
-
-    private int mode = 0;
-
-    private const string serverUrl = "http://123.57.25.77:7005/media_app/";
-
     public Button buttonGetPose;
     public Button buttonSummonAtCamera;
 
@@ -43,21 +26,7 @@ public class MeshController : MonoBehaviour
 
     public TMP_InputField datasetLoc;
 
-    public Shader hideShader;
-
-    private Shader defaultShader;
-
-    public List<Material> materials;
-
-    private bool isMeshVisible = true;
-
     private Matrix4x4 camPoseT0, camPoseT1;
-
-    private List<string> selectableScene = new List<string>
-    {
-        "北航工训楼展览厅", 
-        "北航航空馆"
-    };
 
     private List<SummaryItemData> summary = new List<SummaryItemData>();
     private int selectedSceneIndex = 0;
@@ -76,21 +45,10 @@ public class MeshController : MonoBehaviour
         // Fixme
         sceneSelectDropdown.onValueChanged.AddListener((value) => selectedSceneIndex = value);
 
-        defaultShader = Shader.Find("Particles/Standard Surface");
         SetStartState(StartState.Normal);
 
         buttonHideMesh.gameObject.SetActive(true);
         buttonShowMesh.gameObject.SetActive(false);
-    }
-
-    public void ClickToChangeMeshVisiblility()
-    {
-        Shader newShader = isMeshVisible ? hideShader : defaultShader;
-        foreach (Material material in materials)
-        {
-            material.shader = newShader;
-        }
-        isMeshVisible = !isMeshVisible;
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -173,8 +131,6 @@ public class MeshController : MonoBehaviour
     {
         SetStartState(StartState.GettingPos);
 
-        string url = serverUrl;
-
         // Record Camera Pose
         Vector3 camPosition = arCamera.transform.position;
         Quaternion camRotation = arCamera.transform.rotation;
@@ -198,25 +154,43 @@ public class MeshController : MonoBehaviour
         byte[] rawData = renderTexture.EncodeToJPG();
 
         UIManager.SetLoadingStatus(true);
+        CountdownEvent countdownEvent = new CountdownEvent(2);
+        bool hasError = false;
+        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
+        {
+            if (hasError)
+            {
+                SetStartState(StartState.Normal);
+            } else
+            {
+                SetStartState(StartState.WaitSummon);
+            }
+            UIManager.SetLoadingStatus(false);
+        }));
         StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData, 
             onSuccess: (res) => {
                 // TODO Console res;
                 relocatedPose = TransArrayToPose(res);
-                SetStartState(StartState.WaitSummon);
+                countdownEvent.Signal();
+                
             }, 
             onFail: (errorText) => {
                 // TODO Console Error
-                SetStartState(StartState.Normal);
+                hasError = true;
+                countdownEvent.Signal();
             }));
 
-        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey);
+        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
+            onComplete: isError =>
+            {
+                hasError = isError;
+                countdownEvent.Signal();
+            });
     }
 
     public void ClickToGetPoseWithImage()
     {
         SetStartState(StartState.GettingPos);
-
-        string url = serverUrl;
 
         // Record Camera Pose
         Vector3 camPosition = arCamera.transform.position;
@@ -323,8 +297,27 @@ public class MeshController : MonoBehaviour
 
     public void tempGetPose()
     {
-        SetStartState(StartState.WaitSummon);
-        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey);
+        UIManager.SetLoadingStatus(true);
+        CountdownEvent countdownEvent = new CountdownEvent(1);
+        bool hasError = false;
+        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
+        {
+            if (hasError)
+            {
+                SetStartState(StartState.Normal);
+            }
+            else
+            {
+                SetStartState(StartState.WaitSummon);
+            }
+            UIManager.SetLoadingStatus(false);
+        }));
+        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
+            onComplete: isError =>
+            {
+                hasError = isError;
+                countdownEvent.Signal();
+            });
     }
 
     public void tempClickSummon()
@@ -363,7 +356,7 @@ public class MeshController : MonoBehaviour
         modelInstance.transform.position = modelPosition;
         modelInstance.transform.rotation = modelRotation;
 
-        SetStartState(StartState.GettingPos);
+        SetStartState(StartState.Normal);
     }
 
     void FromMatrix(Transform trans, Matrix4x4 mat)
@@ -427,10 +420,6 @@ public class MeshController : MonoBehaviour
         buttonHideMesh.gameObject.SetActive(true);
     }
 
-    public void 更换模式(int 模式)
-    {
-        mode = 模式;
-    }
     private bool IsEnlarge(Vector2 oP1, Vector2 oP2, Vector2 nP1, Vector2 nP2)
     {
         float length1 = Mathf.Sqrt((oP1.x - oP2.x) * (oP1.x - oP2.x) + (oP1.y - oP2.y) * (oP1.y - oP2.y));
@@ -447,68 +436,6 @@ public class MeshController : MonoBehaviour
 
     void Update()
     {
-
-        if (Input.touchCount == 0)
-        {
-            return;
-        }
-
-        if (mode == 平移)
-        {
-            if (Input.touchCount == 1)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    Vector2 deltaPos = touch.deltaPosition;
-                    Vector3 cameraDown = arCamera.transform.TransformVector(Vector3.down * deltaPos.y * translateSpeed);
-                    Vector3 cameraRight = arCamera.transform.TransformVector(Vector3.right * deltaPos.x * translateSpeed);
-                    modelInstance.transform.Translate(cameraDown + cameraRight);
-                }
-            }
-        }
-        else if (mode == 旋转)
-        {
-            if (Input.touchCount == 1)
-            {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    Vector2 deltaPos = touch.deltaPosition;
-                    modelInstance.transform.Rotate(Vector3.down * deltaPos.x * rotateSpeed, Space.World);
-                    modelInstance.transform.Rotate(Vector3.right * deltaPos.y * rotateSpeed, Space.World);
-                }
-            }
-        }
-        else if (mode == 缩放)
-        {
-            if (Input.touchCount == 2)
-            {
-                if (Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetTouch(1).phase == TouchPhase.Moved)
-                {
-                    Vector2 newPos1 = Input.GetTouch(0).position;
-                    Vector2 newPos2 = Input.GetTouch(1).position;
-                    if (IsEnlarge(oldPos1, oldPos2, newPos1, newPos2))
-                    {
-                        float oldScale = modelInstance.transform.localScale.x;
-                        float newScale = oldScale * scaleSpeed;
-                        modelInstance.transform.localScale = new Vector3(newScale, newScale, newScale);
-                    }
-                    else
-                    {
-                        float oldScale = modelInstance.transform.localScale.x;
-                        float newScale = oldScale / scaleSpeed;
-                        modelInstance.transform.localScale = new Vector3(newScale, newScale, newScale);
-                    }
-                    oldPos1 = newPos1;
-                    oldPos2 = newPos2;
-                }
-            }
-        }
-        else
-        {
-            return;
-        }
     }
 
 
@@ -525,5 +452,11 @@ public class MeshController : MonoBehaviour
             Debug.LogError($"Failed to read image bytes: {e.Message}");
             return null;
         }
+    }
+
+    private IEnumerator WaitUnitCountDownComplete(CountdownEvent countdownEvent, Action onComplete)
+    {
+        yield return new WaitUntil(() => countdownEvent.CurrentCount == 0);
+        onComplete?.Invoke();
     }
 }

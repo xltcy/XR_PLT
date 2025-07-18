@@ -70,8 +70,10 @@ public class SceneController : MonoBehaviour
 
     /**
      * Send API Get Scene json data.
+     * OnComplete only use to notify complete event.Param means hasError in http request.
+     * All dispositions should be dispose in onSuccess/onError.
      */
-    public void RequestSceneDataByKey(string sceneKey)
+    public void RequestSceneDataByKey(string sceneKey, Action<bool> onComplete = null)
     {
         localJsonPath = jsonHomePath + sceneKey;
         jsonLocationHint.text = "json应该放在：" + localJsonPath;
@@ -88,10 +90,11 @@ public class SceneController : MonoBehaviour
                 {
                     // use sceneData directly.
                 }
-                
+                onComplete?.Invoke(false);
             },
             onFail: (errorText) => {
                 //TODO
+                onComplete?.Invoke(true);
             }));
     }
 
