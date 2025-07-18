@@ -337,11 +337,10 @@ public class SMPLController : MonoBehaviour
 
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
-        {"Screen", new Vector3(1.285427f, -2.749307f, -6.771877f) },
-        //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
+        {"Screen", new Vector3(2.5861f, 0.6083161f, -6.951444f) },
         {"Sonar", new Vector3(2.32f, -0.071f, -7.391f) },
-        {"Curtain", new Vector3(1.285426f, -2.749306f, -6.771874f) },
-        {"Wall",new Vector3(0.1568542f,0.06963752f,-6.907047f) }
+        {"Curtain", new Vector3(2.706551f, 1.253959f, -6.9591f) },
+        {"Wall",new Vector3(2.220328f,0.1083427f,-4.278635f) }
     };
 
     public GameObject videoScreen;
