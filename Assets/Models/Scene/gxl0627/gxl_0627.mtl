@@ -1,0 +1,22 @@
+# Blender 4.3.2 MTL File: 'gxl_0627.blend'
+# www.blender.org
+
+newmtl material_0.002
+Ns 0.999999
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd jt.jpg
+
+newmtl material_0.003
+Ns 0.999999
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd scence.jpg

@@ -63,7 +63,7 @@ public class SMPLController : MonoBehaviour
 
     public void InitilizeObjectWithTag()
     {
-        scene = GameObject.FindGameObjectWithTag("Mesh");
+        scene = GameObject.FindGameObjectWithTag("Scene");
         target = GameObject.FindGameObjectWithTag("Target");
         initPos = GameObject.FindGameObjectWithTag("initPos");
         graphCenter = GameObject.FindGameObjectWithTag("GraphCenter");
@@ -337,11 +337,10 @@ public class SMPLController : MonoBehaviour
 
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
-        {"Screen", new Vector3(-1.09f, 0.47f, 4.037f) },
-        //{"Sonar", new Vector3(-0.2f, 0f, 3.3f) },
-        {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) },
-        {"Curtain", new Vector3(-1.054f, 1.178f, 4.15f) },
-        {"Wall",new Vector3(1.6229f,0.3723f,2.8281f) }
+        {"Screen", new Vector3(2.5861f, 0.6083161f, -6.951444f) },
+        {"Sonar", new Vector3(2.32f, -0.071f, -7.391f) },
+        {"Curtain", new Vector3(2.706551f, 1.253959f, -6.9591f) },
+        {"Wall",new Vector3(2.220328f,0.1083427f,-4.278635f) }
     };
 
     public GameObject videoScreen;
