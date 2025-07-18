@@ -92,12 +92,12 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
         {
             case VirHumanCommandType.initPos:
                 matchPattern = "开始参观";
-                desLocalPosition = new Vector3(2.99f, -0.27f, -15.45f);
+                desLocalPosition = new Vector3(-1.179f, -0.709f, -15.45f);
                 introduction = "";
                 break;
             case VirHumanCommandType.shengNa:
                 matchPattern = "声呐";
-                desLocalPosition = new Vector3(0.25f, -1f, 5f);
+                desLocalPosition = new Vector3(1.655281f, -1.048873f, -8.6174285f);
                 introduction = "我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
                 break;
 
