@@ -182,7 +182,6 @@ public class MeshController : MonoBehaviour
 
     }
 
-
     public Pose TransArrayToWorldPose(float[,] num)
     {
         Matrix4x4 res = Matrix4x4.identity;
@@ -197,16 +196,6 @@ public class MeshController : MonoBehaviour
         world2Camera = KeepModelYUp(world2Camera);
         var resModelPoseWorld = camPoseT0 * world2Camera;
         return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
-    }
-
-    public Pose TransferMatrix2Pose(Matrix4x4 camera2World)
-    {
-        Matrix4x4 world2Camera = camera2World.inverse;
-        world2Camera = KeepModelYUp(world2Camera);
-
-        Vector3 position = GetPosition(world2Camera);
-        Quaternion rotation = world2Camera.rotation;
-        return new Pose(position, rotation);
     }
 
     private Pose testPose()
