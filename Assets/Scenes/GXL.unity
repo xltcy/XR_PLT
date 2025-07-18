@@ -3309,7 +3309,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 728826163}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.668, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 73739831}
@@ -13541,6 +13541,7 @@ GameObject:
   - component: {fileID: 527407070042964494}
   - component: {fileID: 67147732572189639}
   - component: {fileID: 2777851616340710801}
+  - component: {fileID: 2777851616340710802}
   m_Layer: 0
   m_Name: snoar_underneath
   m_TagString: Untagged
@@ -13565,6 +13566,19 @@ MonoBehaviour:
   timeRound: 2
   ori_radius: 0.65
   count: 8
+--- !u!114 &2777851616340710802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2777851616340710800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fbc0753c0580148a4fa116dd5a16fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arCamera: {fileID: 73739826}
 --- !u!1 &2813176674308729604
 GameObject:
   m_ObjectHideFlags: 0
@@ -15593,6 +15607,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5766026043766939729}
   - component: {fileID: 3200059748593147049}
+  - component: {fileID: 5154192181468436842}
   m_Layer: 0
   m_Name: snoar_above
   m_TagString: Untagged
@@ -15600,6 +15615,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &5154192181468436842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5154192181468436841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fbc0753c0580148a4fa116dd5a16fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  arCamera: {fileID: 73739826}
 --- !u!1 &5160693382054902197
 GameObject:
   m_ObjectHideFlags: 0
