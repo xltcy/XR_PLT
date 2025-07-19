@@ -27,7 +27,7 @@ public class MeshController : MonoBehaviour
     private Matrix4x4 rtM;
     private Matrix4x4 rtM_inverse;
 
-    private float[,] num = new float[3, 4];
+    private Pose relocatedPose;
 
     private static int 平移 = 1;
     private static int 旋转 = 2;
@@ -96,59 +96,20 @@ public class MeshController : MonoBehaviour
         isMeshVisible = !isMeshVisible;
     }
 
-    public void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
-    {
-        // 提取位置
-        position = pose.GetColumn(3);
-
-        // 提取缩放
-        scale.x = new Vector4(pose.m00, pose.m01, pose.m02, 0).magnitude;
-        scale.y = new Vector4(pose.m10, pose.m11, pose.m12, 0).magnitude;
-        scale.z = new Vector4(pose.m20, pose.m21, pose.m22, 0).magnitude;
-
-        // 提取旋转
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, scale).inverse * pose;
-        rotation = rotationMatrix.rotation;
-    }
-
     public void ClickToSummonAtCamera()
     {
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(false);
 
-        Pose pose = GetPoseByCapture();
-
-        if (modelInstance != null)
-        {
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
-        }
-        else
+        if (modelInstance == null)
         {
             modelInstance = Instantiate(modelToSummon, new Vector3(0, 0, 0), Quaternion.identity);
             Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
             SMPLController.SetConsPos(centerPos);
-            modelInstance.transform.parent = arCamera.transform;
-            modelInstance.transform.localPosition = pose.position;
-            modelInstance.transform.localRotation = pose.rotation;
         }
-        arCamera.transform.DetachChildren();
 
-        // Record Camera Pose
-        Vector3 camPosition = arCamera.transform.position;
-        Quaternion camRotation = arCamera.transform.rotation;
-        camPoseT1 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
-
-        // fix jitter error
-        Matrix4x4 deltaP = camPoseT1 * camPoseT0.inverse;
-        Matrix4x4 modelPose = Matrix4x4.TRS(modelInstance.transform.position, modelInstance.transform.rotation ,modelInstance.transform.localScale);
-        modelPose = deltaP.inverse * modelPose;
-        Vector3 modelPosition, modelScale;
-        Quaternion modelRotation;
-        DecomposePoseMatrix(modelPose, out modelPosition, out modelRotation, out modelScale);
-        modelInstance.transform.position = modelPosition;
-        modelInstance.transform.rotation = modelRotation;
+        modelInstance.transform.position = relocatedPose.position;
+        modelInstance.transform.rotation = relocatedPose.rotation;
 
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
@@ -247,23 +208,20 @@ public class MeshController : MonoBehaviour
 
     }
 
-
-    public Pose GetPoseByCapture()
+    public Pose TransArrayToWorldPose(float[,] num)
     {
         Matrix4x4 res = Matrix4x4.identity;
-
         for (int i = 0; i < num.GetLength(0); i++)
         {
             res.SetRow(i, new Vector4(num[i, 0], num[i, 1], num[i, 2], num[i, 3]));
         }
-
         res.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
-
         Debug.Log(res.ToString());
 
-        Pose pose = TransferMatrix2Pose(res); //怎么获取返回值  
-
-        return pose;
+        Matrix4x4 world2Camera = res.inverse;
+        world2Camera = KeepModelYUp(world2Camera);
+        var resModelPoseWorld = camPoseT0 * world2Camera;
+        return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
     }
 
     IEnumerator UploadCapture(string url, byte[] imageData)
@@ -318,6 +276,7 @@ public class MeshController : MonoBehaviour
 
         int rowIndex = 0;
 
+        float[,] num = new float[4, 4];
         foreach (Match outerMatch in outerMatches)
         {
             string subJson = outerMatch.Value;
@@ -338,7 +297,7 @@ public class MeshController : MonoBehaviour
             }
             rowIndex++;
         }
-
+        relocatedPose = TransArrayToWorldPose(num);
         //for (int i = 0; i < num.GetLength(0); i++)
         //{
         //    for (int j = 0; j < num.GetLength(1); j++)
@@ -349,64 +308,35 @@ public class MeshController : MonoBehaviour
 
     }
 
-    public Pose TransferMatrix2Pose(Matrix4x4 camera2World)
-    {
-        Matrix4x4 world2Camera = camera2World.inverse;
-        world2Camera = KeepModelYUp(world2Camera);
-        Vector3 position = GetPosition(world2Camera);
-        Quaternion rotation = world2Camera.rotation;
-    
-        return new Pose(position, rotation);
-    }
-
-    public Pose _TransferMatrix2Pose(Matrix4x4 rtM)
-    {
-        rtM_inverse = rtM.inverse;
-
-        Vector3 position = GetPosition(rtM_inverse);
-
-        Vector3 v = new Vector3();
-        Quaternion q = GetRotation(rtM_inverse);
-
-        v = q.eulerAngles;
-        //v.x = 180.0f - v.x;
-        //v.z *= 1;
-        //v.y = 180.0f - v.y;
-
-        v.x *= -1;
-        v.y = 180.0f + v.y;
-        v.z = 180.0f - v.z;
-        q = Quaternion.Euler(v);
-
-        Quaternion rotation = q;
-
-        return new Pose(position, rotation);
-    }
-
     private Pose testPose()
     {
-        Matrix4x4 temp = Matrix4x4.identity;
+        float[,] temp = new float[4, 4]
+        {
+            { 0.04837900027632713f, 0.9958639740943909f, -0.07690999656915665f, 0.46216198801994324f },
+            { 0.9049069881439209f, -0.011102000251412392f, 0.425464004278183f, -1.8088890314102173f },
+            { 0.42285001277923584f, -0.09018000215291977f, -0.9017009735107422f, 16.555131912231445f },
+            { 0f, 0f, 0f, 1f }
+        };
 
-        temp.SetRow(0, new Vector4(0.053799f, -0.891866f, 0.449088f, 11.775786f));
-        temp.SetRow(1, new Vector4(-0.992680f, 0.000933f, 0.120771f, 0.481860f));
-        temp.SetRow(2, new Vector4(-0.108130f, -0.452298f, -0.885288f, -15.738567f));
-        temp.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
-
-        Pose pose = _TransferMatrix2Pose(temp);
-
-        return pose;
+        return TransArrayToWorldPose(temp);
     }
 
     public void tempGetPose()
     {
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(true);
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+
     }
 
     public void tempClickSummon()
     {
         buttonGetPose.gameObject.SetActive(false);
         buttonSummonAtCamera.gameObject.SetActive(false);
+
+        relocatedPose = testPose();
 
         if (modelInstance == null)
         {
@@ -415,12 +345,8 @@ public class MeshController : MonoBehaviour
             SMPLController.SetConsPos(centerPos);
         }
 
-        Pose pose = GetPoseByCapture();
-
-        modelInstance.transform.parent = arCamera.transform;
-        modelInstance.transform.localPosition = pose.position;
-        modelInstance.transform.localRotation = pose.rotation;
-        arCamera.transform.DetachChildren();
+        modelInstance.transform.position = relocatedPose.position;
+        modelInstance.transform.rotation = relocatedPose.rotation;
 
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
@@ -477,32 +403,8 @@ public class MeshController : MonoBehaviour
         //});
     }
 
-    void FromMatrix(Transform trans, Matrix4x4 mat)
-    {
-        //scannet数据集
-        //v.x = 180 - v.x;
-        //v.z *= -1;
-        //v.y = 180.0f - v.y;
-
-        //3D scanner 需要调整子相机X轴旋转180,Z轴旋转90
-        // 如果是移动模型的话，需要 v.z不变，子相机Z轴旋转-90（暂定）
-        trans.position = GetPosition(mat);
-        //rtMText.text = mat.ToString();
-        Vector3 v = new Vector3();
-        Quaternion q = GetRotation(mat);
-        v = q.eulerAngles;
-        v.x = 180.0f - v.x;
-        v.z *= 1;
-        v.y = 180.0f - v.y;
-        q = Quaternion.Euler(v);
-        trans.rotation = q;
-    }
     Quaternion GetRotation(Matrix4x4 matrix)
     {
-        //Vector4 vy = matrix.GetColumn(1);
-        //Vector4 vz = matrix.GetColumn(2);
-
-        //Quaternion quaternion = Quaternion.LookRotation(new Vector3(vz.x, vz.y, vz.z), new Vector3(vy.x, vy.y, vy.z));
         float qw = Mathf.Sqrt(1f + matrix.m00 + matrix.m11 + matrix.m22) / 2;
         float w = 4 * qw;
         float qx = (matrix.m21 - matrix.m12) / w;
@@ -513,17 +415,27 @@ public class MeshController : MonoBehaviour
     }
     Vector3 GetPosition(Matrix4x4 matrix)
     {
-        var x = matrix.m03;
-        var y = matrix.m13;
-        var z = matrix.m23;
-        return new Vector3(x, y, z);
+        return matrix.GetColumn(3);
     }
     Vector3 GetScale(Matrix4x4 matrix)
     {
-        var x = Mathf.Sqrt(matrix.m00 * matrix.m00 + matrix.m01 * matrix.m01 + matrix.m02 * matrix.m02);
-        var y = Mathf.Sqrt(matrix.m10 * matrix.m10 + matrix.m11 * matrix.m11 + matrix.m12 * matrix.m12);
-        var z = Mathf.Sqrt(matrix.m20 * matrix.m20 + matrix.m21 * matrix.m21 + matrix.m22 * matrix.m22);
-        return new Vector3(x, y, z);
+        Vector3 scale;
+        scale.x = matrix.GetColumn(0).magnitude;
+        scale.y = matrix.GetColumn(1).magnitude;
+        scale.z = matrix.GetColumn(2).magnitude;
+        return scale;
+    }
+
+    private void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
+    {
+        // 提取位置
+        position = GetPosition(pose);
+
+        // 提取缩放
+        scale = GetScale(pose);
+
+        // 提取旋转
+        rotation = GetRotation(pose);
     }
 
     public void HideMeshRender()
@@ -669,9 +581,9 @@ public class MeshController : MonoBehaviour
     }
     public Matrix4x4 KeepModelYUp(Matrix4x4 world2Camera)
     {
-        GameObject mesh = GameObject.FindGameObjectWithTag("Mesh");
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(Vector3.zero, mesh.transform.rotation, Vector3.one).inverse;
-        world2Camera = world2Camera * rotationMatrix;
+        Quaternion rot = Quaternion.Euler(0f, 0f, 90f);
+        Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
+        world2Camera = world2Camera * rotationMatrixTest;
         return world2Camera;
     }
 }
