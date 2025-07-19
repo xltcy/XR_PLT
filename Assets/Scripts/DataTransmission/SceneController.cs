@@ -127,7 +127,7 @@ public class SceneController : MonoBehaviour
             }
         });
 
-        FindObjectOfType<SMPLController>().SetDestination(selectedPoint.position, selectedPoint.arriveIntroduction);
+        FindObjectOfType<SMPLController>().SetDestination(selectedPoint.position, selectedPoint.initialIntroduction, selectedPoint.arriveIntroduction);
     }
 
     public void ConsoleVoiceTrigger(ActionTriggerCommand command)
@@ -151,15 +151,6 @@ public class SceneController : MonoBehaviour
                 //TODO
                 UIManager.SetLoadingStatus(false);
             }));
-    }
-
-    private void GetResources()
-    {
-        // todo http getJson if same do nothing;otherwise get new resources and store local.
-
-        // todo read from response or local.
-
-        // generate SceneData
     }
 
     private void GetFakeResources()

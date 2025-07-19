@@ -45,7 +45,6 @@ public class MeshController : MonoBehaviour
     void Start()
     {
         sceneSelectDropdown.ClearOptions();
-        // Fixme
         sceneSelectDropdown.onValueChanged.AddListener((value) => selectedSceneIndex = value);
 
         SetStartState(StartState.Normal);

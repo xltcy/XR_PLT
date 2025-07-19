@@ -264,13 +264,16 @@ public class SMPLController : MonoBehaviour
         walkAnim.SetFloat("Speed", speed);
     }
 
-    /**
-     * do nothing
-     */
-    public void SetDestination(Vector3 des, String arriveIntro = "")
+    public void SetDestination(Vector3 des, String initialIntro = "", String arriveIntro = "")
     {
-        destination.transform.position = scene.transform.TransformPoint(des);
         arriveIntroduction = arriveIntro;
+        SpeechManager.SayFromStr(initialIntro, onSpeakComplete: () => {
+            MainThreadDispatcher.InvokeOnMainThread(() =>
+            {
+                // Work in main thread.
+                destination.transform.position = scene.transform.TransformPoint(des);
+            });
+        });
     }
 
     /**

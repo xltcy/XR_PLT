@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
+using System;
 
 /***
  * This file will be updated in future.
@@ -148,15 +149,15 @@ private bool IsRecognizing;
         }
     }
 
-    public static void SayFromStr(string str)
+    public static void SayFromStr(string str, Action onSpeakComplete = null)
     {
         Debug.Log($"Msg in SayFromStr: {str}");
-        //if (Instance != null)
-        //{
-        //    var speakTask = Instance.OnlySpeakText(str);
-        //    Instance.RunTask(speakTask);
-        //    //isSpeaking = true;
-        //}
+        if (Instance != null)
+        {
+            var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
+            Instance.RunTask(speakTask);
+            //isSpeaking = true;
+        }
     }
 
     public static void ForceStop()
@@ -205,7 +206,7 @@ private bool IsRecognizing;
         // _audioSource.Play();
     }
 
-    public async Task OnlySpeakText(string text)
+    public async Task OnlySpeakText(string text, Action onSpeakComplete = null)
     {
         if (text == null || text == "")
         {
@@ -217,6 +218,7 @@ private bool IsRecognizing;
 
         var result = await synthesizer.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
         Debug.Log("Msg: " + text + "result" + result.AudioData.Length);
+        onSpeakComplete?.Invoke();
     }
 
     public async Task ForceStopSpeak()
