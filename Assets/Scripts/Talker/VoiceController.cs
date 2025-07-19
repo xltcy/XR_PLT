@@ -257,15 +257,17 @@ public class VoiceController : MonoBehaviour
                 mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
-                mediaManager.SummonSonar(); break;
+                mediaManager.SummonSonarWithWave(); break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
                 mediaManager.SeparateSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
                 mediaManager.RecoverSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
+                mediaManager.SummonSonarWithWave();
+                mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
-                break;
+                mediaManager.SummonSonarWithWave(); break;
             case SceneVoiceRecCommand.SceneCommandType.showFinding:
                 break;
             default: ReconizeFail(); break;

@@ -71,7 +71,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
             initPos = true;
         }
         SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
-        Invoke("GotoShengNa", 3);
+        Invoke("GotoShengNa", 2);
     }
 
     private void SwitchForStart(RunState newState)

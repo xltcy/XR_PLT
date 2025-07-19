@@ -3,17 +3,17 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class ArcSegmentGenerator : MonoBehaviour
 {
-    GameObject wave_generator;
+    public GameObject wave_generator;
     public float ori_radius = 1.0f;
     public float thickness = 0.03f;
     public float distance = 0.5f;
     public int count = 4;
     Vector3 emission_position = new Vector3();
     float radius;
-    float angle = 60.0f;
+    float angle = 15.0f;
     float startAngle = 0f;
-    public float centerAngle = 0.0f; 
-    int segments = 60;
+    public float centerAngle = 0.0f;
+    int segments = 15;
     float timer = 0f;
     float timeRound = 2.0f;
     float angleStep;
@@ -36,7 +36,7 @@ public class ArcSegmentGenerator : MonoBehaviour
             Vector3 point = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
             point += emission_position;
             Matrix4x4 matrix = Matrix4x4.TRS(parentTransform.position, parentTransform.rotation, Vector3.one);
-            point =  matrix.MultiplyPoint3x4(point);
+            point = matrix.MultiplyPoint3x4(point);
             lr.SetPosition(i, point);
         }
     }
@@ -61,18 +61,20 @@ public class ArcSegmentGenerator : MonoBehaviour
                     {
                         if (col.ClosestPoint(point) == point)
                         {
-                            Debug.Log(col.gameObject);
+                            Debug.Log("collider:"+ col.gameObject);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
+                            Debug.Log("reflector" + waveReflectorScript);
                             if (waveReflectorScript != null)
                             {
                                 waveReflectorScript.wave_generator = wave_generator;
+                                Debug.Log("111111:" + waveReflectorScript.wave_generator);
                                 waveReflectorScript.emission_position = point - col.gameObject.transform.position;
                                 Debug.Log(point);
                                 Debug.Log(col.gameObject.transform.position);
                                 waveReflectorScript.is_on = 1;
                                 waveReflectorScript.received_wave = gameObject;
                             }
-                      
+
                             break;
                         }
                     }

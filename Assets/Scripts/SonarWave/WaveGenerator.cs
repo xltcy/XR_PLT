@@ -14,7 +14,7 @@ public class WaveGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -22,7 +22,7 @@ public class WaveGenerator : MonoBehaviour
     {
         if (index >= count) index = 0;
         timer += Time.deltaTime;
-        if(timer >= timeRound)
+        if (timer >= timeRound)
         {
             GameObject child = Instantiate(wave);
             ArcSegmentGenerator waveScript = child.GetComponent<ArcSegmentGenerator>();
@@ -32,10 +32,10 @@ public class WaveGenerator : MonoBehaviour
             waveScript.centerAngle = 90.0f;
             waveScript.SetWaveGenerator(gameObject);
             child.transform.SetParent(transform);
-            child.name = "wave"+index;
+            child.name = "wave" + index;
             timer = 0;
             index += 1;
         }
-        
+
     }
 }

@@ -443,7 +443,14 @@ public class MeshController : MonoBehaviour
         GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
         MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
         Material targetMat = Resources.Load<Material>("Materials/Occlusion_Material");
-        sceneMeshRenderer.material = targetMat;
+        Material[] newMaterials = new Material[2];  // 假设你要设置两个材质
+
+        // 给每个材质槽赋值
+        newMaterials[0] = targetMat;
+        newMaterials[1] = targetMat;
+
+        // 设置到 MeshRenderer 上
+        sceneMeshRenderer.materials = newMaterials;
 
         buttonShowMesh.gameObject.SetActive(true);
         buttonHideMesh.gameObject.SetActive(false);
@@ -453,8 +460,19 @@ public class MeshController : MonoBehaviour
     {
         GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
         MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        Material targetMat = Resources.Load<Material>("Materials/GXL_Material");
-        sceneMeshRenderer.material = targetMat;
+        Material sceneMat = Resources.Load<Material>("Materials/GXL_Material");
+        Material deskMat = Resources.Load<Material>("Materials/Desk_Material");
+        Material[] newMaterials = new Material[2];  // 假设你要设置两个材质
+
+        // 给每个材质槽赋值
+        newMaterials[0] = sceneMat;
+        newMaterials[1] = deskMat;
+
+        // 设置到 MeshRenderer 上
+        sceneMeshRenderer.materials = newMaterials;
+
+        buttonShowMesh.gameObject.SetActive(true);
+        buttonHideMesh.gameObject.SetActive(false);
 
         buttonShowMesh.gameObject.SetActive(false);
         buttonHideMesh.gameObject.SetActive(true);
