@@ -20,8 +20,9 @@ public class WaveGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (index >= count) index = 0;
-        timer += Time.deltaTime;
+        //if (index >= count) index = 0;
+        if (index >= count) return;
+            timer += Time.deltaTime;
         if (timer >= timeRound)
         {
             GameObject child = Instantiate(wave);

@@ -99,7 +99,7 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
                 matchPattern = "声呐";
                 //desLocalPosition = new Vector3(1.455281f, -1.048873f, -8.3174285f);
                 desLocalPosition = new Vector3(2.02800012f, -0.943000019f, -8.32299995f);
-                introduction = "我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
+                introduction = "我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
                 break;
 
         }
@@ -151,7 +151,7 @@ public class SceneVoiceRecCommand : VoiceRecCommand
             case SceneCommandType.showButton:
                 matchPattern = "显示按钮"; break;
             case SceneCommandType.screen:
-                matchPattern = "播放视频"; break;
+                matchPattern = "讲解原理"; break;
             case SceneCommandType.sonar:
                 matchPattern = "展示模型"; break;
             case SceneCommandType.separateSonar:

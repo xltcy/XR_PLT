@@ -10,7 +10,7 @@ public class ArcSegmentGenerator : MonoBehaviour
     public int count = 4;
     Vector3 emission_position = new Vector3();
     float radius;
-    float angle = 15.0f;
+    float angle = 45.0f;
     float startAngle = 0f;
     public float centerAngle = 0.0f;
     int segments = 15;

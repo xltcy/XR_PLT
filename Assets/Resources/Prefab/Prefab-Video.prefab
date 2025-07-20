@@ -178,4 +178,4 @@ MonoBehaviour:
   videoPlayer: {fileID: 1106785056687259483}
   clips:
   - {fileID: 32900000, guid: 5638c6a8febea0e40a82c0646fafd318, type: 3}
-  - {fileID: 32900000, guid: bb5d30e4a17bc6e4b90915aa5b0a1c70, type: 3}
+  - {fileID: 32900000, guid: 45b526bd7e4085542b74a8f9304f06a3, type: 3}

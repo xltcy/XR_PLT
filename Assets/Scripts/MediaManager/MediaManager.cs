@@ -32,7 +32,8 @@ public class MediaManager : MonoBehaviour
         videoScreen.transform.rotation = target.transform.rotation;
         videoScreen.SetActive(true);
         FindObjectOfType<VideoManager>().PlayVideo("shengna");
-        Invoke("IntroduceSonar", 1.9f);
+        Invoke("IntroduceSonar", 1.5f);
+        Invoke("IntroduceGesture", 2.5f);
 
     }
 
@@ -42,14 +43,15 @@ public class MediaManager : MonoBehaviour
         videoScreen.transform.position = target.transform.position;
         videoScreen.transform.rotation = target.transform.rotation;
         videoScreen.SetActive(true);
-        FindObjectOfType<VideoManager>().PlayVideo("ShengNa");
-        Invoke("IntroduceFindings", 1.9f);
+        IntroduceFindings();
+        FindObjectOfType<VideoManager>().PlayVideo("findings");
+        Invoke("IntroduceFindings", 1.5f);
+        Invoke("IntroduceGesture", 2.5f);
 
     }
 
     public void IntroduceSonar()
     {
-        FindObjectOfType<SMPLController>().talkAnim.SetTrigger("introduce");
         //SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态的水下探测装置。根据是否发射声波，可分为主动式声呐和被动式声呐两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
         SpeechManager.SayFromStr("声呐是一种利用声波的传播和反射完成测量距离、探测动态和通讯任务的水下探测装置。根据是否发射声波，可分为主动式声纳和被动式声纳两种。声呐可用于收集水下舰艇数据，也可用于探测鱼群动向，在军用和民用领域都有广泛的应用。");
         //SpeechManager.SayFromStr("声呐作为先进的水下探测技术，正改变着我们对海洋的认知。声呐在工作时，会向海底发射宽扇区覆盖的声波。当声波接触到海底或障碍物时，就会产生反射和散射回波信号，此时接收换能器迅速捕捉这些回波，并将其转化为数据，通过线缆快速传输到船上的数据处理系统，最终生成直观的三维影像。在海洋牧场智能化监测、核电站冷源水口生物监测、城市管网污水井监测、海洋工程、科研等领域能够发挥重要作用。" +
@@ -63,11 +65,12 @@ public class MediaManager : MonoBehaviour
     public void IntroduceFindings()
     {
         // 播放第二个视频，讲解研究成果
-        // Todo
+        SpeechManager.SayFromStr("2025年，中央进一步强调建设海上牧场，并将海洋牧场与生物农业、智能农业结合，拓展全产业链。 生纳在海洋牧场中扮演水下之眼的角色，结合AI算法和无人平台，对养殖区进行多角度观测，通过深度学习实时监测分析数据，实现渔群数量统计，生长监测和健康监控等功能。 在饲料成本优化，病害防控与渔群成活率提升，人力与运维成本优化方面有着显著作用。");
     }
 
     public void SummonSonarWithWave()
     {
+        //prefabSonar.GetComponent<WaveGenerator>().enabled = true;
         target.transform.localPosition = meshLocalPosition["Sonar"];
         prefabSonar.transform.position = target.transform.position;
         prefabSonar.transform.rotation = target.transform.rotation;
@@ -76,25 +79,51 @@ public class MediaManager : MonoBehaviour
         sonarUnderneath.gameObject.SetActive(false);
         boardMiddle.gameObject.SetActive(false);
 
-        FindObjectOfType<SMPLController>().talkAnim.SetTrigger("HandForward");
-        SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
 
-        //Invoke("SeparateSonar", 15);
+        Invoke("IntroduceGesture", 2.5f);
+        SpeechManager.SayFromStr("现在展示的是声呐发射三维声波的动画");
+
+        Invoke("HideSonar", 13);
     }
 
     public void SummonSonarWithLabel()
     {
+        prefabSonar.GetComponent<WaveGenerator>().enabled = false;
         target.transform.localPosition = meshLocalPosition["Sonar"];
         prefabSonar.transform.position = target.transform.position;
         prefabSonar.transform.rotation = target.transform.rotation;
         prefabSonar.SetActive(true);
 
+        sonarAbove.gameObject.SetActive(false);
+        sonarUnderneath.gameObject.SetActive(false);
+        boardMiddle.gameObject.SetActive(false);
+
         ShowSonarLabel();
+        Invoke("IntroduceGesture", 2.5f);
 
-        FindObjectOfType<SMPLController>().talkAnim.SetTrigger("HandForward");
-        SpeechManager.SayFromStr("现在我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
+        SpeechManager.SayFromStr("我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。");
 
-        //Invoke("SeparateSonar", 15);
+        //HighLightAbove();
+        Invoke("HighLightAbove", 10);
+
+        
+    }
+
+    public void IntroduceGesture()
+    {
+        FindObjectOfType<SMPLController>().talkAnim.SetTrigger("introduce");
+    }
+
+    public void HighLightAbove()
+    {
+        FindObjectOfType<HighLight>().HighlightAbove();
+        Invoke("HighLightUnderneath", 5f);
+    }
+
+    public void HighLightUnderneath()
+    {
+        FindObjectOfType<HighLight>().HighlightUnderneath();
+        Invoke("HideSonar", 5f);
     }
 
     public void ShowSonarLabel()
@@ -132,7 +161,7 @@ public class MediaManager : MonoBehaviour
     }
 
     private void HideSonar()
-    {
+    { 
         prefabSonar.SetActive(false);
     }
 

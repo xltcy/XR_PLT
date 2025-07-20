@@ -267,9 +267,9 @@ public class VoiceController : MonoBehaviour
                 mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
-                mediaManager.SummonSonarWithWave(); break;
+                mediaManager.SummonSonarWithLabel(); break;
             case SceneVoiceRecCommand.SceneCommandType.showFinding:
-                break;
+                mediaManager.SummonFindingsVideo();  break;
             default: ReconizeFail(); break;
         }
     }
