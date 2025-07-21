@@ -10,4 +10,5 @@ public class ObjectData
     public string name;
     public string url;
     public bool isExplosible = false;
+    public bool isClickable = false;
 }

@@ -1,13 +1,162 @@
 {
-  "sceneModelPath": "Prefab-HKG",
+  "sceneModelPath": "Prefab-P61-0422",
   "sceneName": "航空馆",
   "initPosition": {
-  "x": -7,
-  "y": -1,
-  "z": -12.5
+  "x": -2.22,
+  "y": -2.177,
+  "z": 4.89
 },
   "timestampMs": 123,
-  "explanationPoints": [],
+  "explanationPoints": [
+    {
+      "id":"P61-黑寡妇战斗机",
+      "title":"P61-黑寡妇战斗机",
+      "position":{
+          "x": 3.8,
+          "y": -2.25,
+          "z": -6.58
+      }, 
+      "initialIntroduction":"欢迎来到北航航空博物馆，接下来我将带你参观介绍P61战斗机，请跟我来",
+      "arriveIntroduction":"我们已经到达P61战机处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问",
+      "thumb":"abc",
+      "actions":[
+        {
+          "type": "GenerateObject",
+          "id":1,
+          "startTrigger": {
+            "mode": "Immediate",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "objectDataId":"driverCabin",
+          "position":{
+            "x": -1.22,
+            "y": 0.16,
+            "z": -5.87
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "GenerateObject",
+          "id":2,
+          "startTrigger": {
+            "mode": "Immediate",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "objectDataId":"right",
+          "position":{
+            "x": -1.084581,
+            "y": -0.07,
+            "z": -8.54
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+          }
+        },{
+          "type": "GenerateObject",
+          "id":3,
+          "startTrigger": {
+            "mode": "Immediate",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "objectDataId":"left",
+          "position":{
+            "x": -1.057386,
+            "y": -0.002002358, 
+            "z": -3.138792
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "ObjectVisible",
+          "id":4,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":1,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "generateActionId":1
+        },{
+          "type": "ObjectVisible",
+          "id":5,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":2,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "generateActionId":2
+        },{
+          "type": "ObjectVisible",
+          "id":6,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":3,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "generateActionId":3
+        }
+      ]
+    }
+  ],
   "globalActions":[],
-  "objects":[]
+  "objects":[{
+    "id":"driverCabin",
+    "name":"driverCabin",
+    "url":"Prefab-driverCabin",
+    "isExplosible":false,
+    "isClickable":true
+  },{
+    "id":"right",
+    "name":"right",
+    "url":"Prefab-right",
+    "isExplosible":false,
+    "isClickable":true
+  },{
+    "id":"left",
+    "name":"left",
+    "url":"Prefab-left",
+    "isExplosible":false,
+    "isClickable":true
+  }
+  ]
 }

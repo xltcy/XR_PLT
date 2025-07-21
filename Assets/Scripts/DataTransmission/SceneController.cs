@@ -228,12 +228,15 @@ public class SceneController : MonoBehaviour
                 var addAction = actionData as AddObjectAction;
                 var prefab = prefabs[addAction.objectDataId];
                 GameObject addObject = Instantiate(prefab);
-                addObject.transform.SetParent(scene.transform, false);
-                addObject.transform.localPosition = addAction.position;
-                addObject.transform.localRotation = addAction.GetRotationQuaternion();
+                addObject.transform.position = scene.transform.TransformPoint(addAction.position);
+                addObject.transform.rotation = scene.transform.rotation * addAction.GetRotationQuaternion();
                 addObject.transform.localScale = addAction.scale;
                 addObject.SetActive(false);
                 addedObjects[addAction.id] = addObject;
+                if (sceneData.objects.Find(item => addAction.objectDataId == item.id)?.isClickable == true)
+                {
+                    FindObjectOfType<Click3DObjectManager>().RegisteClickableObject(addObject.GetComponent<ClickableObject>());
+                }
                 break;
             case ActionType.ObjectVisible:
                 var visibleAction = actionData as ObjectVisibleAction;
