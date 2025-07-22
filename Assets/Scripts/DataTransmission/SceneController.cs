@@ -23,7 +23,7 @@ public class SceneController : MonoBehaviour
 
     public Text jsonLocationHint;
 
-    public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    public static string TEST_JSON_PC_HOME_PATH = "H:/UnityProject/XR_PLT/";
     private string jsonHomePath = "";
 
     private static string JSON_NAME_GXL = "test-GXL.json";
