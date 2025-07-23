@@ -37,7 +37,7 @@ public class MoveCamera : MonoBehaviour
         camera.transform.position += move * moveSpeed * Time.deltaTime;
 
         // 鼠标控制视角移动仅在按下左键时生效
-        if (Input.GetMouseButton(0)) // 0表示鼠标左键
+        if (Input.GetMouseButton(1)) // 1表示鼠标右键
         {
             yaw += Input.GetAxis("Mouse X") * lookSpeed;
             pitch -= Input.GetAxis("Mouse Y") * lookSpeed;

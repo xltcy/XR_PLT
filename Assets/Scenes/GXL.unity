@@ -9830,7 +9830,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arCamera: {fileID: 73739826}
   normalColor: {r: 0, g: 0, b: 0, a: 0}
-  highlightColor: {r: 0, g: 0, b: 0, a: 0}
+  highlightColor: {r: 1, g: 1, b: 1, a: 0}
   hideColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1868107277
 GameObject:

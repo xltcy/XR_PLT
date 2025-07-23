@@ -236,6 +236,9 @@ public class SceneController : MonoBehaviour
                 var addAction = actionData as AddObjectAction;
                 var prefab = prefabs[addAction.objectDataId];
                 GameObject addObject = Instantiate(prefab);
+                addObject.AddComponent<Outline>();
+                Outline otl = addObject.GetComponent<Outline>();
+                otl.OutlineWidth = 0f;
                 addObject.transform.position = scene.transform.TransformPoint(addAction.position);
                 addObject.transform.rotation = scene.transform.rotation * addAction.GetRotationQuaternion();
                 addObject.transform.localScale = addAction.scale;

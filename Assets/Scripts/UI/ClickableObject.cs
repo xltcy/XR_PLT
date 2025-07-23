@@ -140,11 +140,17 @@ public class ClickableObject : MonoBehaviour
         if (newState == ClickableObjectState.HIGHTLIGHT || newState == ClickableObjectState.CLOSEUP)
         {
             newColor = highlightColor;
+            Outline otl = gameObject.GetComponent<Outline>();
+            otl.OutlineMode = Outline.Mode.OutlineAll;
+            otl.OutlineColor = highlightColor;
+            otl.OutlineWidth = 5f;
         } else
         {
             newColor = normalColor;
+            Outline otl = gameObject.GetComponent<Outline>();
+            otl.OutlineWidth = 0f;
         }
-        SetRenderColor(newColor);
+        //SetRenderColor(newColor);
 
         // trans position
         if (newState != ClickableObjectState.CLOSEUP)
