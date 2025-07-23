@@ -152,12 +152,15 @@ private bool IsRecognizing;
     public static void SayFromStr(string str, Action onSpeakComplete = null)
     {
         Debug.Log($"Msg in SayFromStr: {str}");
-        //if (Instance != null)
-        //{
-        //    var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
-        //    Instance.RunTask(speakTask);
-        //    //isSpeaking = true;
-        //}
+        if (Instance != null && Application.platform == RuntimePlatform.Android)
+        {
+            var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
+            Instance.RunTask(speakTask);
+            //isSpeaking = true;
+        } else
+        {
+            onSpeakComplete?.Invoke();
+        }
     }
 
     public static void ForceStop()

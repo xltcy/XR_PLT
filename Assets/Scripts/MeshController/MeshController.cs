@@ -96,12 +96,66 @@ public class MeshController : MonoBehaviour
     public void ClickToGetPoseByCapture()
     {
         SetStartState(StartState.GettingPos);
+        UIManager.SetLoadingStatus(true);
 
         // Record Camera Pose
         Vector3 camPosition = arCamera.transform.position;
         Quaternion camRotation = arCamera.transform.rotation;
         camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+        byte[] rawData;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // load from camera android aar
+            rawData = GetImageByARFoundation();
+        }
+        else
+        {
+            // load from file
+            rawData = ReadImageBytes(testImagePath);
+        }
+        SendImageAndReadJson(rawData);
+        Debug.Log(testImagePath.ToString());
+    }
 
+    private void SendImageAndReadJson(byte[] rawData)
+    {
+        CountdownEvent countdownEvent = new CountdownEvent(2);
+        bool hasError = false;
+        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
+        {
+            if (hasError)
+            {
+                SetStartState(StartState.Normal);
+            }
+            else
+            {
+                SetStartState(StartState.WaitSummon);
+            }
+            UIManager.SetLoadingStatus(false);
+        }));
+        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData,
+            onSuccess: (res) => {
+                // TODO Console res;
+                relocatedPose = TransArrayToWorldPose(res);
+                countdownEvent.Signal();
+
+            },
+            onFail: (errorText) => {
+                // TODO Console Error
+                hasError = true;
+                countdownEvent.Signal();
+            }));
+
+        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
+            onComplete: isError =>
+            {
+                hasError = isError;
+                countdownEvent.Signal();
+            });
+    }
+
+    private byte[] GetImageByARFoundation()
+    {
         arCamera.GetComponent<ARCameraManager>().TryAcquireLatestCpuImage(out XRCpuImage image);
 
         Texture2D renderTexture = new Texture2D(image.width, image.height, TextureFormat.BGRA32, false);
@@ -117,69 +171,9 @@ public class MeshController : MonoBehaviour
         }
         renderTexture.Apply();
 
-        byte[] rawData = renderTexture.EncodeToJPG();
-
-        UIManager.SetLoadingStatus(true);
-        CountdownEvent countdownEvent = new CountdownEvent(2);
-        bool hasError = false;
-        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
-        {
-            if (hasError)
-            {
-                SetStartState(StartState.Normal);
-            } else
-            {
-                SetStartState(StartState.WaitSummon);
-            }
-            UIManager.SetLoadingStatus(false);
-        }));
-        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData, 
-            onSuccess: (res) => {
-                // TODO Console res;
-                relocatedPose = TransArrayToWorldPose(res);
-                countdownEvent.Signal();
-                
-            }, 
-            onFail: (errorText) => {
-                // TODO Console Error
-                hasError = true;
-                countdownEvent.Signal();
-            }));
-
-        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
-            onComplete: isError =>
-            {
-                hasError = isError;
-                countdownEvent.Signal();
-            });
+        return renderTexture.EncodeToJPG();
     }
 
-    public void ClickToGetPoseWithImage()
-    {
-        SetStartState(StartState.GettingPos);
-
-        // Record Camera Pose
-        Vector3 camPosition = arCamera.transform.position;
-        Quaternion camRotation = arCamera.transform.rotation;
-        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
-
-        string imagePath = testImagePath;
-        byte[] rawData = ReadImageBytes(imagePath);
-
-        Debug.Log(imagePath.ToString());
-
-        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData,
-            onSuccess: (res) => {
-                // TODO Console res;
-                relocatedPose = TransArrayToWorldPose(res);
-                SetStartState(StartState.WaitSummon);
-            },
-            onFail: (errorText) => {
-                // TODO Console Error
-                SetStartState(StartState.Normal);
-            }));
-
-    }
 
     public Pose TransArrayToWorldPose(float[,] num)
     {

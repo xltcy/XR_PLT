@@ -2,9 +2,9 @@
   "sceneModelPath": "Prefab-P61-0320",
   "sceneName": "航空馆",
   "initPosition": {
-  "x": -2.22,
-  "y": -2.177,
-  "z": 4.89
+  "x": 3.28,
+  "y": -1.657607,
+  "z": -12.25
 },
   "timestampMs": 123,
   "explanationPoints": [
@@ -12,9 +12,9 @@
       "id":"P61-黑寡妇战斗机",
       "title":"P61-黑寡妇战斗机",
       "position":{
-          "x": 3.8,
-          "y": -2.25,
-          "z": -6.58
+          "x": -4.71,
+          "y": -1.657607,
+          "z": -0.5
       }, 
       "initialIntroduction":"欢迎来到北航航空博物馆，接下来我将带你参观介绍P61战斗机，请跟我来",
       "arriveIntroduction":"我们已经到达P61战机处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问",

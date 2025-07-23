@@ -23,7 +23,8 @@ public class SceneController : MonoBehaviour
 
     public Text jsonLocationHint;
 
-    public static string TEST_JSON_PC_HOME_PATH = "H:/UnityProject/XR_PLT/";
+    public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    public static string TEST_JSON_ANDROID_HOME_PATH = "/storage/emulated/0/Download/";
     private string jsonHomePath = "";
 
     private static string JSON_NAME_GXL = "test-GXL.json";
@@ -56,9 +57,16 @@ public class SceneController : MonoBehaviour
     void Start()
     {
         if (Application.platform == RuntimePlatform.Android) 
-            jsonHomePath = Application.persistentDataPath; 
+            jsonHomePath = TEST_JSON_ANDROID_HOME_PATH; 
         else 
             jsonHomePath = TEST_JSON_PC_HOME_PATH;
+        
+        string info = "1." + Application.persistentDataPath;
+        info += "2." + Application.dataPath;
+        info += "3." + Application.consoleLogPath;
+        info += "4." + Application.streamingAssetsPath;
+        info += "5." + Application.temporaryCachePath;
+        jsonLocationHint.text = info;
         RequireSummaryData();
     }
 
