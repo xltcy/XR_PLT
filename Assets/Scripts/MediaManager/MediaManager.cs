@@ -68,12 +68,18 @@ public class MediaManager : MonoBehaviour
         SpeechManager.SayFromStr("2025年，中央进一步强调建设海上牧场，并将海洋牧场与生物农业、智能农业结合，拓展全产业链。 生纳在海洋牧场中扮演水下之眼的角色，结合AI算法和无人平台，对养殖区进行多角度观测，通过深度学习实时监测分析数据，实现渔群数量统计，生长监测和健康监控等功能。 在饲料成本优化，病害防控与渔群成活率提升，人力与运维成本优化方面有着显著作用。");
     }
 
-    public void SummonSonarWithWave()
+    public void SummonSonar()
     {
         //prefabSonar.GetComponent<WaveGenerator>().enabled = true;
         target.transform.localPosition = meshLocalPosition["Sonar"];
         prefabSonar.transform.position = target.transform.position;
         prefabSonar.transform.rotation = target.transform.rotation;
+        prefabSonar.SetActive(true);
+    }
+
+    public void SummonSonarWithWave()
+    {
+        SummonSonar();
         prefabSonar.SetActive(true);
         sonarAbove.gameObject.SetActive(false);
         sonarUnderneath.gameObject.SetActive(false);
@@ -88,10 +94,7 @@ public class MediaManager : MonoBehaviour
 
     public void SummonSonarWithLabel()
     {
-        prefabSonar.GetComponent<WaveGenerator>().enabled = false;
-        target.transform.localPosition = meshLocalPosition["Sonar"];
-        prefabSonar.transform.position = target.transform.position;
-        prefabSonar.transform.rotation = target.transform.rotation;
+        SummonSonar();
         prefabSonar.SetActive(true);
 
         sonarAbove.gameObject.SetActive(false);

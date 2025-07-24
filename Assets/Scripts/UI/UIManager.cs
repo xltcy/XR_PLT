@@ -70,7 +70,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
-        SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
+        SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍水下装备数字孪生底座系统，请跟我来");
         Invoke("GotoShengNa", 7);
     }
 

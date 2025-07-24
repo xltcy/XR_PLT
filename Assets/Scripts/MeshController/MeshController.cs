@@ -75,7 +75,8 @@ public class MeshController : MonoBehaviour
         modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
         SetDropDownAddListener(模型切换);
         // 模型选择.value = 1;
-        defaultShader = Shader.Find("Particles/Standard Surface");
+        defaultShader = Shader.Find("Universal Render Pipeline/Lit");
+        hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
 
@@ -86,14 +87,31 @@ public class MeshController : MonoBehaviour
         //sonar = GameObject.FindGameObjectWithTag("Sonar");
     }
 
-    public void ClickToChangeMeshVisiblility()
+    public void ClickToChangeMeshVisibility()
+    {
+        ChangeMeshVisibility("Scene");
+        ChangeMeshVisibility("Sonar");
+        
+        isMeshVisible = !isMeshVisible;
+    }
+
+    // Change Mesh Visibility Under Obj with Tag
+    private void ChangeMeshVisibility(string Tag) 
     {
         Shader newShader = isMeshVisible ? hideShader : defaultShader;
-        foreach (Material material in materials)
+
+        GameObject scene = GameObject.FindGameObjectWithTag(Tag);
+        //MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
+        MeshRenderer[] meshRenderers = scene.GetComponentsInChildren<MeshRenderer>();
+
+        foreach (MeshRenderer meshRenderer in meshRenderers)
         {
-            material.shader = newShader;
+            Material[] materials = meshRenderer.materials;
+            foreach (Material material in materials)
+            {
+                material.shader = newShader;
+            }
         }
-        isMeshVisible = !isMeshVisible;
     }
 
     public void ClickToSummonAtCamera()
@@ -603,5 +621,11 @@ public class MeshController : MonoBehaviour
         Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
         world2Camera = world2Camera * rotationMatrixTest;
         return world2Camera;
+    }
+
+    public void ClickToSummonSonar()
+    {
+        //FindObjectOfType<MediaManager>().gameObject.SetActive(true);
+        FindObjectOfType<MediaManager>().SummonSonar();
     }
 }
