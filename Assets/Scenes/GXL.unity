@@ -9830,7 +9830,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arCamera: {fileID: 73739826}
   normalColor: {r: 0, g: 0, b: 0, a: 0}
-  highlightColor: {r: 1, g: 1, b: 1, a: 0}
+  highlightColor: {r: 1, g: 1, b: 1, a: 1}
   hideColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &1868107277
 GameObject:
@@ -25607,7 +25607,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
       - m_Target: {fileID: 698180112}
         m_TargetAssemblyTypeName: MeshController, Assembly-CSharp
         m_MethodName: ClickToGetPoseByCapture
@@ -25619,7 +25619,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
 --- !u!224 &8754343720443900558
 RectTransform:
   m_ObjectHideFlags: 0
@@ -26032,7 +26032,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
       - m_Target: {fileID: 698180112}
         m_TargetAssemblyTypeName: MeshController, Assembly-CSharp
         m_MethodName: ClickToSummonAtCamera
@@ -26044,7 +26044,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
 --- !u!224 &8754343721441319855
 RectTransform:
   m_ObjectHideFlags: 0
