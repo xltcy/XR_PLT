@@ -23,7 +23,8 @@ public class SceneController : MonoBehaviour
 
     public Text jsonLocationHint;
 
-    public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    //public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
+    public static string TEST_JSON_PC_HOME_PATH = "H:/UnityProject/XR_PLT/";
     public static string TEST_JSON_ANDROID_HOME_PATH = "/storage/emulated/0/Download/";
     private string jsonHomePath = "";
 
@@ -66,7 +67,10 @@ public class SceneController : MonoBehaviour
         info += "3." + Application.consoleLogPath;
         info += "4." + Application.streamingAssetsPath;
         info += "5." + Application.temporaryCachePath;
-        jsonLocationHint.text = info;
+        if (jsonLocationHint!=null)
+        {
+            jsonLocationHint.text = info;
+        }
         RequireSummaryData();
     }
 
@@ -84,11 +88,14 @@ public class SceneController : MonoBehaviour
     public void RequestSceneDataByKey(string sceneKey, Action<bool> onComplete = null)
     {
         localJsonPath = jsonHomePath + sceneKey;
-        jsonLocationHint.text = "json应该放在：" + localJsonPath;
+        if (jsonLocationHint != null)
+        {
+            jsonLocationHint.text = "json应该放在：" + localJsonPath;
+        }
         // TODO API get Response. Get From Local.
-        GetFakeResources();
+        // GetFakeResources();
         // get json
-        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(localJsonPath,
+        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(sceneKey,
             onSuccess: (res) => {
                 if (sceneData == null || sceneData.timestampMs < res.timestampMs)
                 {

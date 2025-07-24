@@ -361,7 +361,7 @@ public class SMPLController : MonoBehaviour
 
     public void IntroduceString(String introduction)
     {
-        talkAnim.SetTrigger("introduce");
+        //talkAnim.SetTrigger("introduce");
         SpeechManager.SayFromStr(introduction);
     }
 

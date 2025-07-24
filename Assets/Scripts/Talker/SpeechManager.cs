@@ -156,8 +156,9 @@ private bool IsRecognizing;
         {
             var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
             Instance.RunTask(speakTask);
-            //isSpeaking = true;
-        } else
+            isSpeaking = true;
+        }
+        else
         {
             onSpeakComplete?.Invoke();
         }

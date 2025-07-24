@@ -1,9 +1,11 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using UniJSON;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -93,6 +95,18 @@ public class NetworkUtil
         // todo
         yield return new WaitForSeconds(1);
         string localJsonPath = "test-summary.json";
+
+        // Temp logic start
+        // dont end with .json.
+        var jsonString = Resources.Load<TextAsset>("Configs/" + "test-summary").text;
+        if (jsonString != null)
+        {
+            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(jsonString);
+            onSuccess?.Invoke(data);
+            yield break;
+        }
+        // temp logic end
+
         if (Application.platform == RuntimePlatform.Android)
         {
             localJsonPath = Application.persistentDataPath + localJsonPath;
@@ -115,11 +129,37 @@ public class NetworkUtil
         }
     }
 
-    public IEnumerator GetSceneDataRequest(string sceneLoc, Action<SceneData> onSuccess, Action<string> onFail)
+    public IEnumerator GetSceneDataRequest(string sceneName, Action<SceneData> onSuccess, Action<string> onFail)
     {
         // todo
         yield return new WaitForSeconds(1);
-        string localJsonPath = sceneLoc;
+        string localJsonPath = sceneName;
+
+        // Temp logic start
+        var jsonString = Resources.Load<TextAsset>("Configs/" + localJsonPath).text;
+        if (jsonString != null)
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new StringEnumConverter());
+            SceneData data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
+            onSuccess?.Invoke(data);
+            yield break;
+        } else
+        {
+            onFail?.Invoke("jsonFail");
+            yield break;
+        }
+        // temp logic end
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            localJsonPath = Application.persistentDataPath + localJsonPath;
+        }
+        else
+        {
+            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
+        }
+
         if (!File.Exists(localJsonPath))
         {
             string error = "’“≤ªµΩ scene.json£°Path:" + localJsonPath;

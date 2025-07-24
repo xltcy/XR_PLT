@@ -34,6 +34,9 @@ public class MeshController : MonoBehaviour
     private List<SummaryItemData> summary = new List<SummaryItemData>();
     private int selectedSceneIndex = 0;
 
+    private Shader defaultShader;
+    private Shader hideShader;
+
     enum StartState
     {
         Normal,
@@ -51,6 +54,9 @@ public class MeshController : MonoBehaviour
 
         buttonHideMesh.gameObject.SetActive(true);
         buttonShowMesh.gameObject.SetActive(false);
+
+        defaultShader = Shader.Find("Universal Render Pipeline/Lit");
+        hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -292,10 +298,7 @@ public class MeshController : MonoBehaviour
 
     public void HideMeshRender()
     {
-        GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
-        MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        Material targetMat = Resources.Load<Material>("Materials/Occlusion_Material");
-        sceneMeshRenderer.material = targetMat;
+        ChangeMeshShaderWithTag("Mesh", hideShader);
 
         buttonShowMesh.gameObject.SetActive(true);
         buttonHideMesh.gameObject.SetActive(false);
@@ -303,13 +306,24 @@ public class MeshController : MonoBehaviour
 
     public void ShowMeshRender()
     {
-        GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
-        MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        Material targetMat = Resources.Load<Material>("Materials/GXL_Material");
-        sceneMeshRenderer.material = targetMat;
+        ChangeMeshShaderWithTag("Mesh", defaultShader);
 
         buttonShowMesh.gameObject.SetActive(false);
         buttonHideMesh.gameObject.SetActive(true);
+    }
+
+    public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
+    {
+        GameObject obj = GameObject.FindGameObjectWithTag(tag);
+        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
+        foreach(MeshRenderer meshRenderer in meshRenderers)
+        {
+            Material[] materials = meshRenderer.materials;
+            foreach(Material material in materials)
+            {
+                material.shader = targetShader;
+            }
+        }
     }
 
     private bool IsEnlarge(Vector2 oP1, Vector2 oP2, Vector2 nP1, Vector2 nP2)
@@ -353,7 +367,7 @@ public class MeshController : MonoBehaviour
     }
     public Matrix4x4 KeepModelYUp(Matrix4x4 world2Camera)
     {
-        Quaternion rot = Quaternion.Euler(0f, 0f, 90f);
+        Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
         Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
         world2Camera = world2Camera * rotationMatrixTest;
         return world2Camera;
