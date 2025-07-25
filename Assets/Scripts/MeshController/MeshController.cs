@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Threading;
+using Unity.Collections;
 
 public class MeshController : MonoBehaviour
 {
@@ -164,19 +165,27 @@ public class MeshController : MonoBehaviour
     {
         arCamera.GetComponent<ARCameraManager>().TryAcquireLatestCpuImage(out XRCpuImage image);
 
-        Texture2D renderTexture = new Texture2D(image.width, image.height, TextureFormat.BGRA32, false);
-        XRCpuImage.ConversionParams conversionParams = new XRCpuImage.ConversionParams(image, TextureFormat.BGRA32);
+        // mirror vertically not horizental.
+        var conversionParams = new XRCpuImage.ConversionParams
+        {
+            inputRect = new RectInt(0, 0, image.width, image.height),
+            outputDimensions = new Vector2Int(image.width, image.height),
+            outputFormat = TextureFormat.RGBA32,
+            transformation = XRCpuImage.Transformation.MirrorX
+        };
 
-        try
-        {
-            image.Convert(conversionParams, renderTexture.GetRawTextureData<byte>());
-        }
-        finally
-        {
-            image.Dispose();
-        }
+        //// Get native data.
+        var renderTexture = new Texture2D(image.width, image.height, conversionParams.outputFormat, false);
+        int dataSize = image.GetConvertedDataSize(conversionParams);
+        var buffer = new NativeArray<byte>(dataSize, Allocator.Temp);
+        image.Convert(conversionParams, buffer);
+        image.Dispose();
+        renderTexture.LoadRawTextureData(buffer);
         renderTexture.Apply();
+        buffer.Dispose();
 
+        // fix image orientation.
+        renderTexture = Texture2DRotateUtil.RotateByOrientation(renderTexture);
         return renderTexture.EncodeToJPG();
     }
 
@@ -351,7 +360,8 @@ public class MeshController : MonoBehaviour
         {
             // 使用 File.ReadAllBytes 读取本地图片的字节数组
             byte[] fileData = File.ReadAllBytes(path);
-            return fileData;
+            var texture = ExifUtil.FixOrientation(fileData);
+            return texture.EncodeToPNG();
         }
         catch (Exception e)
         {
