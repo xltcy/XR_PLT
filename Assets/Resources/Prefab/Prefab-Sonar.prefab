@@ -65,7 +65,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 85377765797212242}
-  - component: {fileID: 1660791834}
   m_Layer: 0
   m_Name: Prefab-Sonar
   m_TagString: Sonar
@@ -88,23 +87,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1660791834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1235368465023494823}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61e91cff647623944ac66420554c93a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wave: {fileID: 7606380433806973667, guid: 450ae561461fa274bbc030aa7472569b, type: 3}
-  distance: 0.3
-  timeRound: 2
-  ori_radius: 0.45
-  count: 3
 --- !u!114 &6276024274513852104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,7 +234,6 @@ GameObject:
   - component: {fileID: 3602331741253699239}
   - component: {fileID: 3843042677588583246}
   - component: {fileID: 487427550}
-  - component: {fileID: 823363006}
   m_Layer: 0
   m_Name: snoar
   m_TagString: Untagged
@@ -267,8 +248,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7810060960593948826}
-  m_LocalRotation: {x: -0.7301606, y: -0.0015049599, z: 0.68327266, w: -0.001352544}
-  m_LocalPosition: {x: 0.422, y: 0.001, z: 0.494}
+  m_LocalRotation: {x: -0.7287226, y: -0.019012384, z: 0.68433213, w: -0.017074449}
+  m_LocalPosition: {x: 0.029052364, y: 0.0014854148, z: 0.00059968233}
   m_LocalScale: {x: 0.00137, y: 0.00137, z: 0.00137}
   m_Children:
   - {fileID: 5766026045318405916}
@@ -276,7 +257,7 @@ Transform:
   - {fileID: 527407071709855043}
   m_Father: {fileID: 85377765797212242}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0.231, y: -93.8, z: 179.98}
+  m_LocalEulerAnglesHint: {x: 2.918, y: -93.605, z: 179.751}
 --- !u!114 &3843042677588583246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,7 +291,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7810060960593948826}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61e91cff647623944ac66420554c93a7, type: 3}
   m_Name: 
@@ -320,22 +301,6 @@ MonoBehaviour:
   timeRound: 1.5
   ori_radius: 0.65
   count: 5
---- !u!114 &823363006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7810060960593948826}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd21e091a7ec3a4fa53c6e0e7d1797e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  highlightcolor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  sonarAbove: {fileID: 5766026045318405916}
-  boardMiddle: {fileID: 5047673151215872356}
-  sonarUnderneath: {fileID: 527407071709855043}
 --- !u!114 &8886035403534819211
 MonoBehaviour:
   m_ObjectHideFlags: 0
