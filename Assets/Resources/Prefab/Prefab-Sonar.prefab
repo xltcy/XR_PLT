@@ -65,13 +65,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 85377765797212242}
+  - component: {fileID: 1378268894}
   m_Layer: 0
   m_Name: Prefab-Sonar
   m_TagString: Sonar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &85377765797212242
 Transform:
   m_ObjectHideFlags: 0
@@ -87,6 +88,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1378268894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1235368465023494823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b063035257a028e4ead993b82269cf9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sonar_subobj: {fileID: 7810060960593948826}
+  wall: {fileID: 0}
 --- !u!114 &6276024274513852104
 MonoBehaviour:
   m_ObjectHideFlags: 0
