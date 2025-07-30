@@ -2439,6 +2439,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1378268894, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
+      propertyPath: wall
+      value: 
+      objectReference: {fileID: 1296049684}
     - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
         type: 3}
       propertyPath: m_RootOrder
@@ -2498,11 +2502,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Prefab-Sonar
-      objectReference: {fileID: 0}
-    - target: {fileID: 1235368465023494823, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
@@ -6195,6 +6194,12 @@ Transform:
 --- !u!1 &1296049683 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5184083231051114572, guid: da579d65d5913f041af0c07b5b406766,
+    type: 3}
+  m_PrefabInstance: {fileID: 751654943}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1296049684 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5184083231051114573, guid: da579d65d5913f041af0c07b5b406766,
     type: 3}
   m_PrefabInstance: {fileID: 751654943}
   m_PrefabAsset: {fileID: 0}
