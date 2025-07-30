@@ -1977,9 +1977,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightcolor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  sonarAbove: {fileID: 0}
-  boardMiddle: {fileID: 0}
-  sonarUnderneath: {fileID: 0}
+  sonarAbove: {fileID: 451209054}
+  boardMiddle: {fileID: 451209055}
+  sonarUnderneath: {fileID: 451209056}
 --- !u!1 &344753019
 GameObject:
   m_ObjectHideFlags: 0
@@ -2505,6 +2505,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
+--- !u!4 &451209054 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5766026045318405916, guid: ef2a707d0590e7e4794f5379cb1ef528,
+    type: 3}
+  m_PrefabInstance: {fileID: 451209053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &451209055 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5047673151215872356, guid: ef2a707d0590e7e4794f5379cb1ef528,
+    type: 3}
+  m_PrefabInstance: {fileID: 451209053}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &451209056 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 527407071709855043, guid: ef2a707d0590e7e4794f5379cb1ef528,
+    type: 3}
+  m_PrefabInstance: {fileID: 451209053}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &458128371
 GameObject:
   m_ObjectHideFlags: 0
