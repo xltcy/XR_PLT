@@ -52,6 +52,9 @@ public class MeshController : MonoBehaviour
     public Button buttonHideMesh;
     public Button buttonShowMesh;
 
+    public Button buttonHideSonar;
+    public Button buttonShowSonar;
+
     public TMP_InputField datasetLoc;
 
     public TextMeshProUGUI testText;
@@ -87,29 +90,48 @@ public class MeshController : MonoBehaviour
         //sonar = GameObject.FindGameObjectWithTag("Sonar");
     }
 
-    public void ClickToChangeMeshVisibility()
+    public void HideMeshRender()
     {
-        ChangeMeshVisibility("Scene");
-        ChangeMeshVisibility("Sonar");
-        
-        isMeshVisible = !isMeshVisible;
+        ChangeMeshShaderWithTag("Scene", hideShader);
+
+        buttonShowMesh.gameObject.SetActive(true);
+        buttonHideMesh.gameObject.SetActive(false);
     }
 
-    // Change Mesh Visibility Under Obj with Tag
-    private void ChangeMeshVisibility(string Tag) 
+    public void ShowMeshRender()
     {
-        Shader newShader = isMeshVisible ? hideShader : defaultShader;
+        ChangeMeshShaderWithTag("Scene", defaultShader);
 
-        GameObject scene = GameObject.FindGameObjectWithTag(Tag);
-        //MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        MeshRenderer[] meshRenderers = scene.GetComponentsInChildren<MeshRenderer>();
+        buttonShowMesh.gameObject.SetActive(false);
+        buttonHideMesh.gameObject.SetActive(true);
+    }
 
+    public void HideSonarRender()
+    {
+        ChangeMeshShaderWithTag("Sonar", hideShader);
+
+        buttonShowSonar.gameObject.SetActive(true);
+        buttonHideSonar.gameObject.SetActive(false);
+    }
+
+    public void ShowSonarRender()
+    {
+        ChangeMeshShaderWithTag("Sonar", defaultShader);
+
+        buttonShowSonar.gameObject.SetActive(false);
+        buttonHideSonar.gameObject.SetActive(true);
+    }
+
+    public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
+    {
+        GameObject obj = GameObject.FindGameObjectWithTag(tag);
+        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
         foreach (MeshRenderer meshRenderer in meshRenderers)
         {
             Material[] materials = meshRenderer.materials;
             foreach (Material material in materials)
             {
-                material.shader = newShader;
+                material.shader = targetShader;
             }
         }
     }
@@ -454,46 +476,6 @@ public class MeshController : MonoBehaviour
 
         // 提取旋转
         rotation = GetRotation(pose);
-    }
-
-    public void HideMeshRender()
-    {
-        GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
-        MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        Material targetMat = Resources.Load<Material>("Materials/Occlusion_Material");
-        Material[] newMaterials = new Material[2];  // 假设你要设置两个材质
-
-        // 给每个材质槽赋值
-        newMaterials[0] = targetMat;
-        newMaterials[1] = targetMat;
-
-        // 设置到 MeshRenderer 上
-        sceneMeshRenderer.materials = newMaterials;
-
-        buttonShowMesh.gameObject.SetActive(true);
-        buttonHideMesh.gameObject.SetActive(false);
-    }
-
-    public void ShowMeshRender()
-    {
-        GameObject scene = GameObject.FindGameObjectWithTag("Mesh");
-        MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        Material sceneMat = Resources.Load<Material>("Materials/GXL_Material");
-        Material deskMat = Resources.Load<Material>("Materials/Desk_Material");
-        Material[] newMaterials = new Material[2];  // 假设你要设置两个材质
-
-        // 给每个材质槽赋值
-        newMaterials[0] = sceneMat;
-        newMaterials[1] = deskMat;
-
-        // 设置到 MeshRenderer 上
-        sceneMeshRenderer.materials = newMaterials;
-
-        buttonShowMesh.gameObject.SetActive(true);
-        buttonHideMesh.gameObject.SetActive(false);
-
-        buttonShowMesh.gameObject.SetActive(false);
-        buttonHideMesh.gameObject.SetActive(true);
     }
 
     public void 更换模式(int 模式)

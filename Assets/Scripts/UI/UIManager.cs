@@ -60,9 +60,8 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         Debug.Log($"UIManager SwitchRunState{newState}");
     }
 
-    public void SkipSelect()
+    public void ShowManager()
     {
-        SwitchRunState(RunState.VirtualManIntro);
         if (!initPos)
         {
             smplController.SetActive(true);
@@ -70,6 +69,19 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
+    }
+
+    public void SkipSelect()
+    {
+        SwitchRunState(RunState.VirtualManIntro);
+        ShowManager();
+        //if (!initPos)
+        //{
+        //    smplController.SetActive(true);
+        //    mediaManager.SetActive(true);
+        //    FindObjectOfType<SMPLController>().InitializeSmplPosition();
+        //    initPos = true;
+        //}
         SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍水下装备数字孪生底座系统，请跟我来");
         Invoke("GotoShengNa", 7);
     }
