@@ -9,9 +9,9 @@ public class MediaManager : MonoBehaviour
     private Dictionary<string, Vector3> meshLocalPosition = new Dictionary<string, Vector3>
     {
         {"Screen", new Vector3(2.5861f, 0.6083161f, -6.951444f) },
-        {"Sonar", new Vector3(2.32f, -0.071f, -7.391f) },
+        {"Sonar", new Vector3(2.63f,-0.0520000011f,-6.89699984f) },
         {"Curtain", new Vector3(2.706551f, 1.253959f, -6.9591f) },
-        {"Wall",new Vector3(2.220328f,0.1083427f,-4.278635f) }
+        {"Wall",new Vector3(-0.0540000014f,4.26999998f,-6.83699989f) }
     };
 
     public GameObject videoScreen;
@@ -79,27 +79,19 @@ public class MediaManager : MonoBehaviour
 
     public void SummonSonarWithWave()
     {
-        SummonSonar();
-        prefabSonar.SetActive(true);
-        sonarAbove.gameObject.SetActive(false);
-        sonarUnderneath.gameObject.SetActive(false);
-        boardMiddle.gameObject.SetActive(false);
-
-
+        VoiceToGenerateWave();
         Invoke("IntroduceGesture", 2.5f);
         SpeechManager.SayFromStr("现在展示的是声呐发射三维声波的动画");
-
-        Invoke("HideSonar", 13);
+        Invoke("VoiceToStopWave", 20);
     }
 
     public void SummonSonarWithLabel()
     {
-        SummonSonar();
-        prefabSonar.SetActive(true);
+        //prefabSonar.SetActive(true);
 
-        sonarAbove.gameObject.SetActive(false);
-        sonarUnderneath.gameObject.SetActive(false);
-        boardMiddle.gameObject.SetActive(false);
+        //sonarAbove.gameObject.SetActive(false);
+        //sonarUnderneath.gameObject.SetActive(false);
+        //boardMiddle.gameObject.SetActive(false);
 
         ShowSonarLabel();
         Invoke("IntroduceGesture", 2.5f);
@@ -110,6 +102,11 @@ public class MediaManager : MonoBehaviour
         Invoke("HighLightAbove", 10);
 
         
+    }
+
+    public void HideLabel()
+    {
+        FindObjectOfType<Label3D>().HideLabel();
     }
 
     public void IntroduceGesture()
@@ -126,7 +123,7 @@ public class MediaManager : MonoBehaviour
     public void HighLightUnderneath()
     {
         FindObjectOfType<HighLight>().HighlightUnderneath();
-        Invoke("HideSonar", 5f);
+        Invoke("HideLabel", 5f);
     }
 
     public void ShowSonarLabel()
@@ -166,6 +163,21 @@ public class MediaManager : MonoBehaviour
     private void HideSonar()
     { 
         prefabSonar.SetActive(false);
+    }
+
+    public void VoiceToGenerateWave()
+    {
+        FindObjectOfType<SonarWaveManager>().StartGenerate();
+    }
+
+    public void VoiceToStopWave()
+    {
+        FindObjectOfType<SonarWaveManager>().StopGenerateAndDestroyWave();
+    }
+
+    public void EenNarrating()
+    {
+        SpeechManager.SayFromStr("您还有其他想了解的吗");
     }
 
     // Start is called before the first frame update

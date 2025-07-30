@@ -254,10 +254,9 @@ public class VoiceController : MonoBehaviour
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
                 mediaManager.SummonCurtain();
-                mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
-                mediaManager.SummonSonarWithWave(); break;
+                mediaManager.SummonSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
                 mediaManager.SeparateSonar(); break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
