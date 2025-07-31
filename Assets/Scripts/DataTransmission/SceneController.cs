@@ -243,22 +243,17 @@ public class SceneController : MonoBehaviour
                 var addAction = actionData as AddObjectAction;
                 var prefab = prefabs[addAction.objectDataId];
                 GameObject addObject = Instantiate(prefab);
-                addObject.AddComponent<Outline>();
-                Outline otl = addObject.GetComponent<Outline>();
-                otl.OutlineWidth = 0f;
+                addObject.AddComponent<DynamicObject>();
                 addObject.transform.position = scene.transform.TransformPoint(addAction.position);
                 addObject.transform.rotation = scene.transform.rotation * addAction.GetRotationQuaternion();
                 addObject.transform.localScale = addAction.scale;
                 addObject.SetActive(false);
                 addedObjects[addAction.id] = addObject;
+                // TODO clickTrigger auto add.
                 if (sceneData.objects.Find(item => addAction.objectDataId == item.id)?.isClickable == true)
                 {
                     FindObjectOfType<Click3DObjectManager>().RegisteClickableObject(addObject.GetComponent<ClickableObject>());
                 }
-                break;
-            case ActionType.ObjectVisible:
-                var visibleAction = actionData as ObjectVisibleAction;
-                addedObjects[visibleAction.generateActionId].SetActive(isStartAction);
                 break;
             case ActionType.PlayVideo:
                 // TODO
@@ -275,8 +270,15 @@ public class SceneController : MonoBehaviour
                 videoScreen.SetActive(true);
                 FindObjectOfType<VideoManager>().PlayVideo(videoAction.videoPath);
                 break;
+
+            case ActionType.ObjectVisible:
             case ActionType.MoveObject:
-                // TODO
+            case ActionType.RotateObject:
+            case ActionType.HighlightObject:
+            case ActionType.Explosion:
+                var objectAction = actionData as ObjectActionBase;
+                var addedModel = addedObjects[objectAction.generateActionId];
+                addedModel.GetComponent<DynamicObject>().ConsoleActions(objectAction, isStartAction, onComplete: () => { });
                 break;
             case ActionType.Introduce:
                 var introduroduceAction = actionData as IntroduceAction;
@@ -284,28 +286,6 @@ public class SceneController : MonoBehaviour
                 if (smplController != null && introduroduceAction != null)
                 {
                     smplController.IntroduceString(introduroduceAction.introduction);
-                }
-                break;
-            case ActionType.Explosion:
-                // TODO
-                var explosionAction = actionData as ExplosionAction;
-                var explosionModel = addedObjects[explosionAction.generateActionId];
-                var nodes = explosionModel.transform.GetComponentsInChildren<ModelTreeNode>();
-                GameObject rootNodeObject = null;
-                foreach(var i in nodes)
-                {
-                    if (i._isRoot)
-                    {
-                        rootNodeObject = i.gameObject;
-                        break;
-                    }
-                }
-                if (isStartAction)
-                {
-                    ModelTreeNode.OneDofExplosion(rootNodeObject);
-                } else
-                {
-                    ModelTreeNode.OneDofRecovery(rootNodeObject);
                 }
                 break;
             case ActionType.AvatarAnim:
@@ -353,13 +333,15 @@ public class SceneController : MonoBehaviour
             {
                 var beforeAction = actions[action.startTrigger.afterActionId];
                 var trigger = action.startTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
-                trigger.nextActionIds.Add(action.id, true);
+                //trigger.nextActionIds.Add(action.id, true);
+                AddActionIntoNextActionDictionary(trigger.nextActionIds, action, true);
             }
             if (action.stopTrigger.mode == TriggerMode.AfterAction)
             {
                 var beforeAction = actions[action.stopTrigger.afterActionId];
-                var trigger = action.startTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
-                trigger.nextActionIds.Add(action.id, false);
+                var trigger = action.stopTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
+                //trigger.nextActionIds.Add(action.id, false);
+                AddActionIntoNextActionDictionary(trigger.nextActionIds, action, false);
             }
         }
 
@@ -405,5 +387,26 @@ public class SceneController : MonoBehaviour
             }
         }
         return list;
+    }
+
+    /**
+     * Solve Error when an action's start & stop trigger after same actionID.
+     * Start must before stop.
+     */
+    private void AddActionIntoNextActionDictionary(Dictionary<int, bool> desDict, ActionBase desAction ,bool isActionStart)
+    {
+        if (!desDict.ContainsKey(desAction.id))
+        {
+            desDict.Add(desAction.id, isActionStart);
+            return;
+        }
+        desAction.stopTrigger.afterActionId = desAction.id;
+        desAction.stopTrigger.isWhenActionStart = true;
+        desAction.stopTrigger.delay -= desAction.startTrigger.delay;
+        if (desAction.stopTrigger.delay < 0)
+        {
+            desAction.stopTrigger.delay = 0;
+        }
+        desAction.startTrigger.nextActionIds.Add(desAction.id, isActionStart);
     }
 }

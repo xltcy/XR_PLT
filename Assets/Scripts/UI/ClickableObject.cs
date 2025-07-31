@@ -31,6 +31,7 @@ public class ClickableObject : MonoBehaviour
     public Color normalColor;
     public Color highlightColor;
     public Color hideColor;
+    public float highlightWidth = 5f;
 
     /**
      * True: normalColor, highlightColor, hideColor will be set by Click3DObjectManager.
@@ -141,13 +142,21 @@ public class ClickableObject : MonoBehaviour
         {
             newColor = highlightColor;
             Outline otl = gameObject.GetComponent<Outline>();
+            if (otl == null)
+            {
+                otl = gameObject.AddComponent<Outline>();
+            }
             otl.OutlineMode = Outline.Mode.OutlineAll;
             otl.OutlineColor = highlightColor;
-            otl.OutlineWidth = 5f;
+            otl.OutlineWidth = highlightWidth;
         } else
         {
             newColor = normalColor;
             Outline otl = gameObject.GetComponent<Outline>();
+            if (otl == null)
+            {
+                otl = gameObject.AddComponent<Outline>();
+            }
             otl.OutlineWidth = 0f;
         }
         //SetRenderColor(newColor);

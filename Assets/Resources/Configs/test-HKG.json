@@ -126,12 +126,13 @@
           "id":6,
          "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":3,
+            "afterActionId":7,
             "delay":0
           },
           "stopTrigger": {
-            "mode": "Never",
-            "delay":0
+            "mode": "AfterAction",
+            "afterActionId":7,
+            "delay":20
           },
           "generateActionId":3
         },{
@@ -186,6 +187,62 @@
             "delay":5
           },
           "animTrigger":"LeftHandUp"
+        },{
+          "type": "RotateObject",
+          "id":11,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0,
+            "isWhenActionStart":false
+          },
+          "generateActionId":3,
+          "rotateType":"RoateAlongAxies_Y",
+          "velocity":1.0,
+          "rotatableParts":["P61Rprop.001","P61Lpro2"]
+        },{
+          "type": "HighlightObject",
+          "id":12,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0,
+            "isWhenActionStart":false
+          },
+          "generateActionId":3,
+          "highlightColor":{
+            "r": 0.945,
+            "g": 0.831,
+            "b": 0.0588,
+            "a": 1.0
+          },
+          "highlightWidth":10
+        },{
+          "type": "MoveObject",
+          "id":13,
+         "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0,
+            "isWhenActionStart":false
+          },
+          "generateActionId":3,
+          "moveType":"MoveTo_Auto"
         }
       ]
     }
@@ -195,20 +252,15 @@
     "id":"driverCabin",
     "name":"driverCabin",
     "url":"Prefab-driverCabin",
-    "isExplosible":false,
     "isClickable":true
   },{
     "id":"right",
     "name":"right",
-    "url":"Prefab-right",
-    "isExplosible":false,
-    "isClickable":true
+    "url":"Prefab-right"
   },{
     "id":"left",
     "name":"left",
-    "url":"Prefab-left",
-    "isExplosible":false,
-    "isClickable":true
+    "url":"Prefab-left"
   }
   ]
 }

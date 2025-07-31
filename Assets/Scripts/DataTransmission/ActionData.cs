@@ -12,6 +12,8 @@ public enum ActionType
     ObjectVisible,
     PlayVideo,
     MoveObject,
+    RotateObject,
+    HighlightObject,
     Introduce,
     Explosion,
     WaveGenerate,
@@ -57,11 +59,6 @@ public class AddObjectAction : ActionBase
     }
 }
 
-public class ObjectVisibleAction : ActionBase
-{
-    public int generateActionId;
-}
-
 public class PlayVideoAction : ActionBase
 {
     public string videoPath;
@@ -80,29 +77,9 @@ public class PlayVideoAction : ActionBase
     }
 }
 
-public class MoveObjectAction : ActionBase
-{
-    public string targetObjectName;
-    public List<Vector3> path;
-    public float duration;
-    public bool loop;
-}
-
 public class IntroduceAction : ActionBase
 {
     public string introduction;
-}
-
-public class ExplosionAction: ActionBase
-{
-    //TODO
-    public int generateActionId;
-}
-
-public class WaveGenerateAction: ActionBase
-{
-    // TODO
-    public int generateActionId;
 }
 
 public class AvatarAnimAction: ActionBase
@@ -143,6 +120,12 @@ public class ActionConverter : JsonConverter
                 break;
             case ActionType.MoveObject:
                 action = new MoveObjectAction();
+                break;
+            case ActionType.RotateObject:
+                action = new RotateObjectAction();
+                break;
+            case ActionType.HighlightObject:
+                action = new HighlightObjectAction();
                 break;
             case ActionType.Introduce:
                 action = new IntroduceAction();

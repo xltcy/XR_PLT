@@ -10,6 +10,7 @@ public class Click3DObjectManager : MonoBehaviour
     public Color normalColor;
     public Color highlightColor;
     public Color hideColor;
+    public float highlightWidth = 5f;
 
     private String logStr = "";
 

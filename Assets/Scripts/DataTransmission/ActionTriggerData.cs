@@ -22,6 +22,9 @@ public class ActionTriggerData
     public string matchPattern;
     // PassbySpot mode
     public Vector3 spotPosition;
+    // ClickObject mode
+    public bool isLongHit; // is long click or not
+    public int generateActionId; // clicked object
 
     //-------------JsonIgnore-----------//
     [JsonIgnore]
@@ -91,4 +94,6 @@ public enum TriggerMode
     Never,
     // Passby a spot
     PassbySpot,
+    // Click a dynamic object
+    ClickObject,
 }
