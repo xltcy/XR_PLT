@@ -359,10 +359,10 @@ public class SMPLController : MonoBehaviour
         {"Sonar", new Vector3(-0.9f, -0.2f, 3.9f) }
     };
 
-    public void IntroduceString(String introduction)
+    public void IntroduceString(String introduction, Action onComplete = null)
     {
         //talkAnim.SetTrigger("introduce");
-        SpeechManager.SayFromStr(introduction);
+        SpeechManager.SayFromStr(introduction, onComplete);
     }
 
     /**

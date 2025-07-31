@@ -283,9 +283,13 @@ public class SceneController : MonoBehaviour
             case ActionType.Introduce:
                 var introduroduceAction = actionData as IntroduceAction;
                 var smplController = FindObjectOfType<SMPLController>();
-                if (smplController != null && introduroduceAction != null)
+                if (smplController != null && introduroduceAction != null && isStartAction)
                 {
-                    smplController.IntroduceString(introduroduceAction.introduction);
+                    // only use in start action;stop action do nothing.
+                    smplController.IntroduceString(introduroduceAction.introduction, onComplete: () =>
+                    {
+                        StartCoroutine(ConsoleAction(introduroduceAction, false));
+                    });
                 }
                 break;
             case ActionType.AvatarAnim:
