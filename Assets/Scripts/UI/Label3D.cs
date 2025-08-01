@@ -70,7 +70,8 @@ public class Label3D : MonoBehaviour
 
         Vector3 offset = new Vector3(0, 0.3f, -0.4f);
 
-        container.transform.position = labelTarget.transform.position + offset;
+        //container.transform.position = labelTarget.transform.position + offset;
+        container.transform.localPosition = offset;
         //container.SetActive(false);
         //container.transform.rotation = Quaternion.LookRotation(container.transform.position - arCamera.transform.position);
     }

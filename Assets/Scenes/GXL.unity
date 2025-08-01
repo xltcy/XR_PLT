@@ -1216,7 +1216,7 @@ PrefabInstance:
     - target: {fileID: 4944859874165462532, guid: 6f28fedcc61ac25448ef1b200bb71cac,
         type: 3}
       propertyPath: m_RootOrder
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4944859874165462532, guid: 6f28fedcc61ac25448ef1b200bb71cac,
         type: 3}
@@ -2116,9 +2116,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightcolor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  sonarAbove: {fileID: 451209054}
-  boardMiddle: {fileID: 451209055}
-  sonarUnderneath: {fileID: 451209056}
+  sonarAbove: {fileID: 2125403630}
+  boardMiddle: {fileID: 2125403631}
+  sonarUnderneath: {fileID: 2125403632}
 --- !u!1 &344753019
 GameObject:
   m_ObjectHideFlags: 0
@@ -2783,97 +2783,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 440837864}
   m_CullTransparentMesh: 1
---- !u!1001 &451209053
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1378268894, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
-      propertyPath: wall
-      value: 
-      objectReference: {fileID: 1296049684}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1235368465023494823, guid: ef2a707d0590e7e4794f5379cb1ef528,
-        type: 3}
-      propertyPath: m_Name
-      value: Prefab-Sonar
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
---- !u!4 &451209054 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5766026045318405916, guid: ef2a707d0590e7e4794f5379cb1ef528,
-    type: 3}
-  m_PrefabInstance: {fileID: 451209053}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &451209055 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5047673151215872356, guid: ef2a707d0590e7e4794f5379cb1ef528,
-    type: 3}
-  m_PrefabInstance: {fileID: 451209053}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &451209056 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 527407071709855043, guid: ef2a707d0590e7e4794f5379cb1ef528,
-    type: 3}
-  m_PrefabInstance: {fileID: 451209053}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &458128371
 GameObject:
   m_ObjectHideFlags: 0
@@ -3795,7 +3704,7 @@ MonoBehaviour:
   testText: {fileID: 0}
   hideShader: {fileID: 15300, guid: 0000000000000000f000000000000000, type: 0}
   materials: []
-  testImagePath: H:/UnityProject/z_testImages/test_gxl.png
+  testImagePath: H:/UnityProject/z_testImages/test_sonar.jpg
   scene: {fileID: 0}
 --- !u!1 &706212204
 GameObject:
@@ -4086,6 +3995,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5241303576285833007, guid: da579d65d5913f041af0c07b5b406766,
+        type: 3}
+      propertyPath: distance
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5241303576285833007, guid: da579d65d5913f041af0c07b5b406766,
+        type: 3}
+      propertyPath: wave_generator
+      value: 
+      objectReference: {fileID: 147938839}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: da579d65d5913f041af0c07b5b406766, type: 3}
 --- !u!1 &765823385
@@ -10073,7 +9992,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1765523790
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10138,9 +10057,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 342424905}
-        m_TargetAssemblyTypeName: MediaManager, Assembly-CSharp
-        m_MethodName: VoiceToStopWave
+      - m_Target: {fileID: 342424907}
+        m_TargetAssemblyTypeName: HighLight, Assembly-CSharp
+        m_MethodName: HighlightAbove
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10658,7 +10577,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u53D1\u6CE2"
+  m_Text: "\u9AD8\u4EAE"
 --- !u!222 &1850783401
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12102,6 +12021,10 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 487427550, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
+      propertyPath: distance
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 487427550, guid: ef2a707d0590e7e4794f5379cb1ef528, type: 3}
       propertyPath: ori_radius
       value: 0.35
       objectReference: {fileID: 0}
@@ -12112,7 +12035,7 @@ PrefabInstance:
     - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 85377765797212242, guid: ef2a707d0590e7e4794f5379cb1ef528,
         type: 3}
@@ -17771,7 +17694,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 0
       - m_Target: {fileID: 698180112}
         m_TargetAssemblyTypeName: MeshController, Assembly-CSharp
         m_MethodName: ClickToSummonAtCamera
@@ -17783,7 +17706,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
 --- !u!224 &8754343721441319855
 RectTransform:
   m_ObjectHideFlags: 0

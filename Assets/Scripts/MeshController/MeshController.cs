@@ -259,7 +259,6 @@ public class MeshController : MonoBehaviour
         Debug.Log(res.ToString());
 
         Matrix4x4 world2Camera = res.inverse;
-        world2Camera = KeepModelYUp(world2Camera);
         var resModelPoseWorld = camPoseT0 * world2Camera;
         return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
     }
@@ -352,7 +351,7 @@ public class MeshController : MonoBehaviour
     {
         float[,] temp = new float[4, 4]
         {
-            { 0.04837900027632713f, 0.9958639740943909f, -0.07690999656915665f, 0.46216198801994324f },
+            { -0.994569278666888f, 0.009617385193789074f, 0.10363134580839106f, 0.46216198801994324f },
             { 0.9049069881439209f, -0.011102000251412392f, 0.425464004278183f, -1.8088890314102173f },
             { 0.42285001277923584f, -0.09018000215291977f, -0.9017009735107422f, 16.555131912231445f },
             { 0f, 0f, 0f, 1f }
@@ -596,13 +595,6 @@ public class MeshController : MonoBehaviour
         //    // MySceneManager.instance.ChangeToVirtualManExhibition();
         //    MySceneManager.instance.ChangeTo1818();
         //}
-    }
-    public Matrix4x4 KeepModelYUp(Matrix4x4 world2Camera)
-    {
-        Quaternion rot = Quaternion.Euler(0f, 0f, 90f);
-        Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
-        world2Camera = world2Camera * rotationMatrixTest;
-        return world2Camera;
     }
 
     public void ClickToSummonSonar()

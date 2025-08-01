@@ -269,6 +269,8 @@ public class VoiceController : MonoBehaviour
                 mediaManager.SummonSonarWithLabel(); break;
             case SceneVoiceRecCommand.SceneCommandType.showFinding:
                 mediaManager.SummonFindingsVideo();  break;
+            case SceneVoiceRecCommand.SceneCommandType.end:
+                SpeechManager.SayFromStr("好的，如果您还有兴趣了解更多内容，欢迎选择自由参观或向我提问"); break;
             default: ReconizeFail(); break;
         }
     }
