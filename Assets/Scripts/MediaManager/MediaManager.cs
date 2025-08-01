@@ -47,7 +47,7 @@ public class MediaManager : MonoBehaviour
         FindObjectOfType<VideoManager>().PlayVideo("findings");
         Invoke("IntroduceFindings", 1.5f);
         Invoke("IntroduceGesture", 2.5f);
-        Invoke("EndNarrating", 132f);
+        Invoke("EndNarrating", 128f);
     }
 
     public void IntroduceSonar()

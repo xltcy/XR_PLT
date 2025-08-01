@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class ArcSegmentGenerator : MonoBehaviour
 {
-    public GameObject wave_generator;
+    GameObject wave_generator;
     public float ori_radius = 1.0f;
     public float thickness = 0.03f;
     public float distance = 0.5f;
     public int count = 4;
     Vector3 emission_position = new Vector3();
     float radius;
-    float angle = 45.0f;
+    float angle = 15.0f;
     float startAngle = 0f;
     public float centerAngle = 0.0f;
     int segments = 15;
@@ -61,20 +61,17 @@ public class ArcSegmentGenerator : MonoBehaviour
                     {
                         if (col.ClosestPoint(point) == point)
                         {
-                            Debug.Log("collider:"+ col.gameObject);
+                            Debug.Log(col.gameObject);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
-                            Debug.Log("reflector" + waveReflectorScript);
-                            if (waveReflectorScript != null)
+                            if (waveReflectorScript != null && wave_generator != null)
                             {
                                 waveReflectorScript.wave_generator = wave_generator;
-                                Debug.Log("111111:" + waveReflectorScript.wave_generator);
                                 waveReflectorScript.emission_position = point - col.gameObject.transform.position;
                                 Debug.Log(point);
                                 Debug.Log(col.gameObject.transform.position);
-                                waveReflectorScript.is_on = 1;
                                 waveReflectorScript.received_wave = gameObject;
+                                waveReflectorScript.is_on = 1;
                             }
-
                             break;
                         }
                     }

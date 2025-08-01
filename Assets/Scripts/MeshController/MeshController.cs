@@ -1,19 +1,20 @@
+using Pathfinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using TMPro;
+using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using Pathfinding;
-using System.Text.RegularExpressions;
-using UnityEngine.Events;
-using static VirHumanVoiceRecCommand;
 using static UnityEngine.GraphicsBuffer;
-using System.Globalization;
+using static VirHumanVoiceRecCommand;
 
 public class MeshController : MonoBehaviour
 {
@@ -190,18 +191,38 @@ public class MeshController : MonoBehaviour
 
         arCamera.GetComponent<ARCameraManager>().TryAcquireLatestCpuImage(out XRCpuImage image);
 
-        Texture2D renderTexture = new Texture2D(image.width, image.height, TextureFormat.BGRA32, false);
-        XRCpuImage.ConversionParams conversionParams = new XRCpuImage.ConversionParams(image, TextureFormat.BGRA32);
+        //Texture2D renderTexture = new Texture2D(image.width, image.height, TextureFormat.BGRA32, false);
+        //XRCpuImage.ConversionParams conversionParams = new XRCpuImage.ConversionParams(image, TextureFormat.BGRA32);
 
-        try
+        //try
+        //{
+        //    image.Convert(conversionParams, renderTexture.GetRawTextureData<byte>());
+        //}
+        //finally
+        //{
+        //    image.Dispose();
+        //}
+
+        var conversionParams = new XRCpuImage.ConversionParams
         {
-            image.Convert(conversionParams, renderTexture.GetRawTextureData<byte>());
-        }
-        finally
-        {
-            image.Dispose();
-        }
+            inputRect = new RectInt(0, 0, image.width, image.height),
+            outputDimensions = new Vector2Int(image.width, image.height),
+            outputFormat = TextureFormat.RGBA32,
+            transformation = XRCpuImage.Transformation.MirrorX
+        };
+
+        //// Get native data.
+        var renderTexture = new Texture2D(image.width, image.height, conversionParams.outputFormat, false);
+        int dataSize = image.GetConvertedDataSize(conversionParams);
+        var buffer = new NativeArray<byte>(dataSize, Allocator.Temp);
+        image.Convert(conversionParams, buffer);
+        image.Dispose();
+        renderTexture.LoadRawTextureData(buffer);
         renderTexture.Apply();
+        buffer.Dispose();
+
+        // fix image orientation.
+        renderTexture = Texture2DRotateUtil.RotateByOrientation(renderTexture);
 
         byte[] rawData = renderTexture.EncodeToJPG();
 
@@ -234,7 +255,8 @@ public class MeshController : MonoBehaviour
         camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
 
         string imagePath = testImagePath;
-        byte[] rawData = ReadImageBytes(imagePath);
+        byte[] fileData = File.ReadAllBytes(imagePath);
+        var texture = ExifUtil.FixOrientation(fileData);
 
         Debug.Log(imagePath.ToString());
 
@@ -244,7 +266,7 @@ public class MeshController : MonoBehaviour
             url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
         }
 
-        StartCoroutine(UploadCapture(url, rawData));
+        StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
 
     }
 
