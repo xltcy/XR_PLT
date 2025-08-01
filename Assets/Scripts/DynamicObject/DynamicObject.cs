@@ -11,18 +11,23 @@ using UnityEngine.XR.ARFoundation;
  */
 public class DynamicObject : MonoBehaviour
 {
+    public int generateActionId;
+    // use to manage click3DObject state.
+    private Stack<Click3DObjectManager.ClickAction> clickActionStack = new Stack<Click3DObjectManager.ClickAction>();
+
     // Rotating Flag.
     private RotateObjectAction rotateAction;
-    // use to cal rotate angle when doRotate
+    // use to cal rotate angle while do rotate auto.
     private float totalRotate = 0f;
     private List<Transform> rotateParts = new List<Transform>();
-
+    // use to reset pose
     private Vector3 originPos;
+    // use to reset rot when rotate to a new rotation.
+    private Quaternion originRot;
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -57,7 +62,7 @@ public class DynamicObject : MonoBehaviour
                 break;
             case ActionType.RotateObject:
                 var rotateObjectAction = action as RotateObjectAction;
-                SetAutoRotate(rotateObjectAction, isStartAction);
+                SetRotate(rotateObjectAction, isStartAction);
                 break;
             case ActionType.HighlightObject:
                 var highlightObjectAction = action as HighlightObjectAction;
@@ -70,6 +75,32 @@ public class DynamicObject : MonoBehaviour
                 // nothing
                 break;
         }
+    }
+
+    /**
+     * Manage Stack update;Call Console trigger.
+     */
+    public void UpdateClickStateFromAction(Click3DObjectManager.ClickAction newAction)
+    {
+        if (clickActionStack.Count == 0 && newAction == Click3DObjectManager.ClickAction.Longclick)
+        {
+            // Dispatch Longclick in normal.
+            return;
+        }
+        var isExit = clickActionStack.Contains(newAction);
+        if (isExit)
+        {
+            while(clickActionStack.Peek() != newAction)
+            {
+                var dispatchAction = clickActionStack.Pop();
+                FindObjectOfType<SceneController>().ConsoleClickTrigger(generateActionId, dispatchAction, true);
+            }
+            clickActionStack.Pop();
+        } else
+        {
+            clickActionStack.Push(newAction);
+        }
+        FindObjectOfType<SceneController>().ConsoleClickTrigger(generateActionId, newAction, isExit);
     }
 
     private void SetVisible(bool isStartAction)
@@ -124,6 +155,30 @@ public class DynamicObject : MonoBehaviour
         transform.position = originPos;
     }
 
+    /**
+     * Distribute rotate action.
+     */
+    private void SetRotate(RotateObjectAction rotateObjectAction, bool isStartAction)
+    {
+        // aksdjfls
+        switch(rotateObjectAction.rotateType)
+        {
+            case RotateObjectAction.RotateType.RoateAlongAxies_Forward:
+            case RotateObjectAction.RotateType.RotateAlongAxies_Up:
+            case RotateObjectAction.RotateType.RotateAlongAxies_Right:
+            case RotateObjectAction.RotateType.RoateAlongAxies_X:
+            case RotateObjectAction.RotateType.RoateAlongAxies_Y:
+            case RotateObjectAction.RotateType.RoateAlongAxies_Z:
+                SetAutoRotate(rotateObjectAction, isStartAction);
+                break;
+            case RotateObjectAction.RotateType.RotateToCamera:
+                SetRotateToObject(FindObjectOfType<Camera>().transform, rotateObjectAction.objectForward, rotateObjectAction.objectUp,isStartAction);
+                break;
+            default:
+                break;
+        }
+    }
+
     private void SetAutoRotate(RotateObjectAction rotateObjectAction, bool isStartAction)
     {
         if (isStartAction)
@@ -132,6 +187,25 @@ public class DynamicObject : MonoBehaviour
         } else
         {
             StopRotating();
+        }
+    }
+
+    private void SetRotateToObject(Transform targetTransform, Vector3 objectForward, Vector3 objectUp, bool isStartAction)
+    {
+        if (isStartAction)
+        {
+            originRot = gameObject.transform.rotation;
+            // rotate
+            var worldForward = transform.TransformDirection(objectForward);
+            var worldUp = transform.TransformDirection(objectUp);
+            var curRotation = Quaternion.LookRotation(worldForward, worldUp);
+            var targetRotation = Quaternion.LookRotation(targetTransform.forward, targetTransform.up);
+            var offsetRotation = targetRotation * Quaternion.Inverse(curRotation);
+            transform.rotation = offsetRotation * transform.rotation;
+        } else
+        {
+            // reset
+            transform.rotation = originRot;
         }
     }
 

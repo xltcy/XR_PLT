@@ -47,10 +47,15 @@ public class MoveObjectAction : ObjectActionBase
 public class RotateObjectAction : ObjectActionBase
 {
     public RotateType rotateType;
+    //-------------Rotate Along Object self's axies param------------//
     // rotate degree once; > 0 clockwise; < 0 anticlockwise.
     public float velocity = 1f;
     // empty => rotate total object; otherwise rotate partially.
     public List<string> rotatableParts;
+    //-------------Rotate Object as other's Rotation------------//
+    public Vector3 objectForward;
+    public Vector3 objectUp;
+    //-------------------------------------------------------------//
 
     public Vector3 GetRotateAlongAxies(Transform transform)
     {
@@ -91,6 +96,8 @@ public class RotateObjectAction : ObjectActionBase
         RoateAlongAxies_X,
         RoateAlongAxies_Y,
         RoateAlongAxies_Z,
+        //-------------Rotate Object as other's Rotation------------//
+        RotateToCamera
     }
 }
 

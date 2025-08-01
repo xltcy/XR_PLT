@@ -36,6 +36,8 @@ public class SceneController : MonoBehaviour
     private Dictionary<int, GameObject> addedObjects = new Dictionary<int, GameObject>();
     private List<ActionTriggerCommand> globalTriggerCommands = new List<ActionTriggerCommand>();
     private Dictionary<string, List<ActionTriggerCommand>> pointTriggerCommands = new Dictionary<string, List<ActionTriggerCommand>>();
+    // use to search click trigger.
+    private Dictionary<int, List<ActionBase>> clickTriggerActions = new Dictionary<int, List<ActionBase>>();
     private String selectedExplainationPointId = "";
     private GameObject videoScreen;
     private ExplanationPoint selectedPoint
@@ -153,6 +155,25 @@ public class SceneController : MonoBehaviour
         StartCoroutine(ConsoleAction(action, isStartAction: pattern == action.startTrigger.matchPattern));
     }
 
+    public void ConsoleClickTrigger(int generateActionId, Click3DObjectManager.ClickAction newClickAction, bool isExit)
+    {
+        if (!clickTriggerActions.ContainsKey(generateActionId))
+        {
+            // dispatch
+            return;
+        }
+        var actions = clickTriggerActions[generateActionId];
+        // match action
+        bool isStartAction;
+        foreach(var action in actions)
+        {
+            if (action.IsClickTriggered(newClickAction, isExit, out isStartAction))
+            {
+                StartCoroutine(ConsoleAction(action, isStartAction));
+            }
+        }
+    }
+
     private void RequireSummaryData()
     {
         UIManager.SetLoadingStatus(true);
@@ -243,16 +264,16 @@ public class SceneController : MonoBehaviour
                 var addAction = actionData as AddObjectAction;
                 var prefab = prefabs[addAction.objectDataId];
                 GameObject addObject = Instantiate(prefab);
-                addObject.AddComponent<DynamicObject>();
+                var dynamicObject = addObject.AddComponent<DynamicObject>();
+                dynamicObject.generateActionId = addAction.id;
                 addObject.transform.position = scene.transform.TransformPoint(addAction.position);
                 addObject.transform.rotation = scene.transform.rotation * addAction.GetRotationQuaternion();
                 addObject.transform.localScale = addAction.scale;
                 addObject.SetActive(false);
                 addedObjects[addAction.id] = addObject;
-                // TODO clickTrigger auto add.
-                if (sceneData.objects.Find(item => addAction.objectDataId == item.id)?.isClickable == true)
+                if (clickTriggerActions.ContainsKey(addAction.id))
                 {
-                    FindObjectOfType<Click3DObjectManager>().RegisteClickableObject(addObject.GetComponent<ClickableObject>());
+                    FindObjectOfType<Click3DObjectManager>().RegisteClickableObject(dynamicObject);
                 }
                 break;
             case ActionType.PlayVideo:
@@ -330,23 +351,12 @@ public class SceneController : MonoBehaviour
             }
         }
 
+        // init actions relate lists by trigger type.
         foreach(var i in actions)
         {
             var action = i.Value;
-            if (action.startTrigger.mode == TriggerMode.AfterAction)
-            {
-                var beforeAction = actions[action.startTrigger.afterActionId];
-                var trigger = action.startTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
-                //trigger.nextActionIds.Add(action.id, true);
-                AddActionIntoNextActionDictionary(trigger.nextActionIds, action, true);
-            }
-            if (action.stopTrigger.mode == TriggerMode.AfterAction)
-            {
-                var beforeAction = actions[action.stopTrigger.afterActionId];
-                var trigger = action.stopTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
-                //trigger.nextActionIds.Add(action.id, false);
-                AddActionIntoNextActionDictionary(trigger.nextActionIds, action, false);
-            }
+            InitActionsByTriggerType(action.startTrigger, isStartTrigger: true, action, actions);
+            InitActionsByTriggerType(action.stopTrigger, isStartTrigger: false, action, actions);
         }
 
         globalTriggerCommands = GetTriggerCommands(sceneData.globalActions);
@@ -391,6 +401,33 @@ public class SceneController : MonoBehaviour
             }
         }
         return list;
+    }
+
+    private void InitActionsByTriggerType(ActionTriggerData curTrigger, bool isStartTrigger, ActionBase curAction, Dictionary<int, ActionBase> actions)
+    {
+        // init nextActionIds
+        if (curTrigger.mode == TriggerMode.AfterAction)
+        {
+            var beforeAction = actions[curTrigger.afterActionId];
+            var beforeTrigger = curTrigger.isWhenActionStart ? beforeAction.startTrigger : beforeAction.stopTrigger;
+            //trigger.nextActionIds.Add(action.id, true);
+            AddActionIntoNextActionDictionary(beforeTrigger.nextActionIds, curAction, isStartTrigger);
+        }
+
+        // init clickTriggerActions
+        if (curTrigger.mode == TriggerMode.ClickObject)
+        {
+            var generateActionId = curTrigger.generateActionId;
+            if (!clickTriggerActions.ContainsKey(generateActionId))
+            {
+                clickTriggerActions.Add(generateActionId, new List<ActionBase>());
+            }
+            var list = clickTriggerActions[generateActionId];
+            if (!list.Contains(curAction))
+            {
+                list.Add(curAction);
+            }
+        }
     }
 
     /**

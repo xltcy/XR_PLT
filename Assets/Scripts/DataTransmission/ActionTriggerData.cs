@@ -23,7 +23,9 @@ public class ActionTriggerData
     // PassbySpot mode
     public Vector3 spotPosition;
     // ClickObject mode
-    public bool isLongHit; // is long click or not
+    [JsonConverter(typeof(StringEnumConverter))]
+    public Click3DObjectManager.ClickAction clickAction; // is long click or not
+    public bool isExit = false; // is exit clickAction or enter clickAction
     public int generateActionId; // clicked object
 
     //-------------JsonIgnore-----------//
@@ -78,7 +80,10 @@ public class ActionTriggerData
         return null;
     }
 
-    
+    public bool IsClickTriggered(Click3DObjectManager.ClickAction newAction, bool isExitNew)
+    {
+        return clickAction == newAction && isExitNew == isExit;
+    }
 }
 
 [JsonConverter(typeof(StringEnumConverter))]

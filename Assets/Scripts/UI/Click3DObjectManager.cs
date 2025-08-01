@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -5,6 +7,14 @@ using UnityEngine;
 
 public class Click3DObjectManager : MonoBehaviour
 {
+    // use to signal action to DynamicObject to control state change.
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ClickAction
+    {
+        Click,
+        Longclick,
+    }
+    
     public Camera arCamera;
 
     public Color normalColor;
@@ -15,6 +25,7 @@ public class Click3DObjectManager : MonoBehaviour
     private String logStr = "";
 
     private List<ClickableObject> clickableObjs = new List<ClickableObject>();
+    private List<DynamicObject> dynamicObjects = new List<DynamicObject>();
     private DateTime touchStartTime;
     private int TOUCH_TIME_THRESHOLD = 200;
     private int LONG_TOUCH_TIME_TRHRESHOLD = 1000;
@@ -48,6 +59,11 @@ public class Click3DObjectManager : MonoBehaviour
         clickableObjs.Add(item);
     }
 
+    public void RegisteClickableObject(DynamicObject item)
+    {
+        dynamicObjects.Add(item);
+    }
+
     private void MouseClick()
     {
         if (Input.GetMouseButtonDown(0))
@@ -66,6 +82,14 @@ public class Click3DObjectManager : MonoBehaviour
                 if (Physics.Raycast(ray, out RaycastHit hit))
                 {
                     foreach (var item in clickableObjs)
+                    {
+                        if (hit.collider.gameObject == item.gameObject)
+                        {
+                            Debug.Log("Object Clicked:" + item.name);
+                            HitObject(item, isLongTouch);
+                        }
+                    }
+                    foreach(var item in dynamicObjects)
                     {
                         if (hit.collider.gameObject == item.gameObject)
                         {
@@ -99,6 +123,14 @@ public class Click3DObjectManager : MonoBehaviour
                         if (Physics.Raycast(ray, out RaycastHit hit))
                         {
                             foreach (var item in clickableObjs)
+                            {
+                                if (hit.collider.gameObject == item.gameObject)
+                                {
+                                    Debug.Log("Object Clicked:" + item.name);
+                                    HitObject(item, isLongTouch);
+                                }
+                            }
+                            foreach (var item in dynamicObjects)
                             {
                                 if (hit.collider.gameObject == item.gameObject)
                                 {
@@ -176,6 +208,15 @@ public class Click3DObjectManager : MonoBehaviour
         }
     }
 
+    private void HitObject(DynamicObject dynamicObject, bool isLongTouch)
+    {
+        ClickAction newAction = ClickAction.Click;
+        if (isLongTouch)
+        {
+            newAction = ClickAction.Longclick;
+        }
+        dynamicObject.UpdateClickStateFromAction(newAction);
+    }
     public void TestObjectLongClick()
     {
         HitObject(clickableObjs[1], true);

@@ -27,6 +27,14 @@ public abstract class ActionBase
     public ActionTriggerData startTrigger;
     public ActionTriggerData stopTrigger;
     public int id;
+
+    public bool IsClickTriggered(Click3DObjectManager.ClickAction newClickAction, bool isExitNew, out bool isStartTriggered)
+    {
+        var startTriggered = startTrigger.IsClickTriggered(newClickAction, isExitNew);
+        var stopTriggered = stopTrigger.IsClickTriggered(newClickAction, isExitNew);
+        isStartTriggered = startTriggered;
+        return startTriggered || stopTriggered;
+    }
 }
 
 /**
