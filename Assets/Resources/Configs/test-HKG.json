@@ -112,8 +112,7 @@
           "type": "ObjectVisible",
           "id":5,
          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":2,
+            "mode": "Never",
             "delay":0
           },
           "stopTrigger": {
@@ -132,7 +131,8 @@
           "stopTrigger": {
             "mode": "AfterAction",
             "afterActionId":7,
-            "delay":20
+            "isWhenActionStart":false,
+            "delay":5
           },
           "generateActionId":3
         },{
@@ -320,6 +320,33 @@
             "y": 0.217, 
             "z": 0
           }
+        },{
+          "type": "Introduce",
+          "id": 17,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":7,
+            "delay":15,
+            "isWhenActionStart":false
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "您还有其他想了解的吗"
+        },{
+          "type": "Introduce",
+          "id": 18,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"没有",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "好的，如果您还有兴趣了解更多内容，欢迎选择自由参观或向我提问"
         }
       ]
     }
