@@ -148,9 +148,9 @@ public class DynamicObject : MonoBehaviour
         originPos = transform.position;
         Transform cam = Camera.main.transform;
 
-        Vector3 rightOffset = cam.right.normalized * 1.0f;
-        Vector3 placePos = cam.position + rightOffset;
-        placePos.y = -0.25f;
+        Vector3 leftOffset = - cam.right.normalized * 1.0f;
+        Vector3 placePos = cam.position + leftOffset;
+        placePos.y = placePos.y - 0.35f;
 
         //var trans = cam.position - transform.TransformPoint(action.movedPointPosition);
         var trans = placePos - transform.TransformPoint(action.movedPointPosition);
