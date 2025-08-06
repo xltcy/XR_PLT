@@ -150,15 +150,16 @@ public class DynamicObject : MonoBehaviour
 
         Vector3 leftOffset = - cam.right.normalized * 1.0f;
         Vector3 placePos = cam.position + leftOffset;
-        placePos.y = placePos.y - 0.35f;
+        placePos.y = placePos.y - 0.7f;
 
+        transform.position = placePos;
         //var trans = cam.position - transform.TransformPoint(action.movedPointPosition);
-        var trans = placePos - transform.TransformPoint(action.movedPointPosition);
+        //var trans = placePos - transform.TransformPoint(action.movedPointPosition);
 
-        transform.Translate(trans, Space.World);
+        //transform.Translate(trans, Space.World);
 
-        Vector3 euler = transform.rotation.eulerAngles;
-        transform.rotation = Quaternion.Euler(0f, euler.y, 0f);
+        //Vector3 euler = transform.rotation.eulerAngles;
+        //transform.rotation = Quaternion.Euler(0f, euler.y, 0f);
     }
 
     private void ResetPosition()
@@ -210,7 +211,8 @@ public class DynamicObject : MonoBehaviour
             var worldForward = transform.TransformDirection(objectForward);
             var worldUp = transform.TransformDirection(objectUp);
             var curRotation = Quaternion.LookRotation(worldForward, worldUp);
-            var targetRotation = Quaternion.LookRotation(targetTransform.forward, targetTransform.up);
+            //var targetRotation = Quaternion.LookRotation(targetTransform.forward, targetTransform.up);
+            var targetRotation = Quaternion.LookRotation(new Vector3(targetTransform.forward.x,0,targetTransform.forward.z), targetTransform.up);
             var offsetRotation = targetRotation * Quaternion.Inverse(curRotation);
             transform.rotation = offsetRotation * transform.rotation;
         } else
