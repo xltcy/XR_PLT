@@ -146,8 +146,19 @@ public class DynamicObject : MonoBehaviour
     private void SetMovePointToCamera(MoveObjectAction action)
     {
         originPos = transform.position;
-        var trans = FindObjectOfType<Camera>().transform.position - transform.TransformPoint(action.movedPointPosition);
+        Transform cam = Camera.main.transform;
+
+        Vector3 rightOffset = cam.right.normalized * 1.0f;
+        Vector3 placePos = cam.position + rightOffset;
+        placePos.y = -0.25f;
+
+        //var trans = cam.position - transform.TransformPoint(action.movedPointPosition);
+        var trans = placePos - transform.TransformPoint(action.movedPointPosition);
+
         transform.Translate(trans, Space.World);
+
+        Vector3 euler = transform.rotation.eulerAngles;
+        transform.rotation = Quaternion.Euler(0f, euler.y, 0f);
     }
 
     private void ResetPosition()
@@ -320,11 +331,12 @@ public class DynamicObject : MonoBehaviour
         var cameraTrans = FindObjectOfType<ARCameraManager>().gameObject.transform;
 
         Vector3 trans = cameraTrans.position - GetCenterPosInWorldSpace();
+        trans.y = (cameraTrans.position.y - 1.1f) - GetCenterPosInWorldSpace().y;
 
         BoxCollider boxCollider = GetComponent<BoxCollider>();
         float r = boxCollider.size.magnitude / 2;
         Vector3 n = trans / trans.magnitude;
-        return max(trans - n * r * 3, trans * 0.72f);
+        return max(trans - n * r * 3, trans * 0.6f);
     }
 
     private Vector3 max(Vector3 v1, Vector3 v2)
