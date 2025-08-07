@@ -212,7 +212,7 @@ public class DynamicObject : MonoBehaviour
             var worldUp = transform.TransformDirection(objectUp);
             var curRotation = Quaternion.LookRotation(worldForward, worldUp);
             //var targetRotation = Quaternion.LookRotation(targetTransform.forward, targetTransform.up);
-            var targetRotation = Quaternion.LookRotation(new Vector3(targetTransform.forward.x,0,targetTransform.forward.z), targetTransform.up);
+            var targetRotation = Quaternion.LookRotation(new Vector3(targetTransform.forward.x,0,targetTransform.forward.z), new Vector3(0,1,0));
             var offsetRotation = targetRotation * Quaternion.Inverse(curRotation);
             transform.rotation = offsetRotation * transform.rotation;
         } else
