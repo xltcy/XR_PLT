@@ -40,9 +40,11 @@ public class HighLight : MonoBehaviour
     }*/
     void SetGroupEmission(Transform show, Transform hide1,Transform hide2)
     {
-        show.gameObject.SetActive(true);
-        hide1.gameObject.SetActive(false);
-        hide2.gameObject.SetActive(false);
+        //show.gameObject.SetActive(true);
+        //hide1.gameObject.SetActive(false);
+        //hide2.gameObject.SetActive(false);
+        hide1.gameObject.GetComponent<Outline>().enabled = false;
+        hide2.gameObject.GetComponent<Outline>().enabled = false;
         show.gameObject.GetComponent<Outline>().enabled = true;
     }
     /*void ResetGroupEmission(List<Material> matList, List<Color> original)
