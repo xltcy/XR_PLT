@@ -263,16 +263,16 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7810060960593948826}
-  m_LocalRotation: {x: -0.7287226, y: -0.019012384, z: 0.68433213, w: -0.017074449}
+  m_LocalRotation: {x: -0.7289104, y: 0.0009842516, z: 0.6845955, w: 0.0042179474}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.00137, y: 0.00137, z: 0.00137}
+  m_LocalScale: {x: 0.0011, y: 0.0011, z: 0.0011}
   m_Children:
   - {fileID: 5766026045318405916}
   - {fileID: 5047673151215872356}
   - {fileID: 527407071709855043}
   m_Father: {fileID: 85377765797212242}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 2.918, y: -93.605, z: 179.751}
+  m_LocalEulerAnglesHint: {x: -0.43, y: -93.59, z: 179.751}
 --- !u!114 &3843042677588583246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,10 +312,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wave: {fileID: 7606380433806973667, guid: 450ae561461fa274bbc030aa7472569b, type: 3}
-  distance: 0.3
+  distance: 0.5
   timeRound: 1.5
-  ori_radius: 0.65
-  count: 5
+  ori_radius: 0.35
+  count: 25
 --- !u!114 &8886035403534819211
 MonoBehaviour:
   m_ObjectHideFlags: 0

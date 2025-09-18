@@ -96,7 +96,7 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
                 introduction = "";
                 break;
             case VirHumanCommandType.shengNa:
-                matchPattern = "声呐";
+                matchPattern = "qidong";
                 //desLocalPosition = new Vector3(1.455281f, -1.048873f, -8.3174285f);
                 desLocalPosition = new Vector3(2.02800012f, -0.943000019f, -8.32299995f);
                 introduction = "我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";

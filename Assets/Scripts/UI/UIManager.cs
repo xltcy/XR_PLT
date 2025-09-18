@@ -66,7 +66,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         {
             smplController.SetActive(true);
             mediaManager.SetActive(true);
-            FindObjectOfType<SMPLController>().InitializeSmplPosition();
+            //FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
     }
@@ -74,7 +74,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
     public void SkipSelect()
     {
         SwitchRunState(RunState.VirtualManIntro);
-        ShowManager();
+        //ShowManager();
         //if (!initPos)
         //{
         //    smplController.SetActive(true);
@@ -82,8 +82,9 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         //    FindObjectOfType<SMPLController>().InitializeSmplPosition();
         //    initPos = true;
         //}
-        SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍水下装备数字孪生底座系统，请跟我来");
-        Invoke("GotoShengNa", 7);
+        FindObjectOfType<SMPLController>().InitializeSmplPosition();
+        SpeechManager.SayFromStr("欢迎来到VR实验室科教平台，接下来我将带你参观介绍水下装备数字孪生底座系统，请跟我来");
+        Invoke("GotoShengNa", 12);
     }
 
     private void SwitchForStart(RunState newState)
