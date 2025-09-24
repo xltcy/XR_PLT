@@ -1,0 +1,27 @@
+{
+  "sceneModelPath": "Prefab-SJS",
+  "sceneName": "石景山",
+  "initPosition": {
+  "x": 2.79,
+  "y": -1.2,
+  "z": -2.43
+},
+  "timestampMs": 123,
+  "explanationPoints": [
+    {
+      "id":"P61-黑寡妇战斗机",
+      "title":"P61-黑寡妇战斗机",
+      "position":{
+          "x": -0.83,
+          "y": -1.21,
+          "z": -1.71
+      }, 
+      "initialIntroduction":"欢迎来到石景山，接下来我将带你参观，请跟我来",
+      "arriveIntroduction":"我们已经到达桌子，石景山的历史",
+      "thumb":"abc",
+      "actions":[]
+    }
+  ],
+  "globalActions":[],
+  "objects":[]
+}

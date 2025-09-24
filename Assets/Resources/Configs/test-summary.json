@@ -6,6 +6,9 @@
     },{
       "sceneName": "北航航空博物馆",
       "sceneKey": "test-HKG"
+    },{
+      "sceneName": "石景山",
+      "sceneKey": "test-SJS"
     }
   ]
 }
