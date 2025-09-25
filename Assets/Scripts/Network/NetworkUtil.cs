@@ -13,9 +13,9 @@ using UnityEngine.Networking;
  * Use to send http request.
  */
 public class NetworkUtil
- {
-    private const string SEVER_URL = "http://123.57.25.77:7005/media_app/";
-    private const string RELOCATE_REQUEST_URL_SUFFIX = "request_NVLAD_redir/?source_location=";
+ { 
+    private const string SEVER_URL = "http://60.205.232.241:7171/";
+    private const string RELOCATE_REQUEST_URL_SUFFIX = "media_app/request_NVLAD_redir/?source_location=";
 
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();

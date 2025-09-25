@@ -12,9 +12,9 @@ using System;
 public class LLMGenerator : MonoBehaviour
 {
     // LLM Configs
-    private string baseUrl = "https://gemini.19980709.xyz:2053/v1/chat/completions";
-    private string apiKey = "sk-Fy0ClFrgCfhnd5WLwSnT1CwjQmHnLZUU1ymiQkNc4OaS1ie8";
-    private string modelName = "gemini-flash";
+    private string baseUrl = "http://60.205.232.241:7171/ai_app/chat/";
+    private string modelName = "qwen2.5:72b";
+    
     private List<Dictionary<string, string>> messages = new List<Dictionary<string, string>>();
 
     private static LLMGenerator llmGenerator;
@@ -66,7 +66,7 @@ public class LLMGenerator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", "Bearer " + apiKey);
+        //request.SetRequestHeader("Authorization", "Bearer " + apiKey);
 
         // ��������
         yield return request.SendWebRequest();
@@ -160,7 +160,7 @@ public class LLMGenerator : MonoBehaviour
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", "Bearer " + apiKey);
+        //request.SetRequestHeader("Authorization", "Bearer " + apiKey);
 
         yield return request.SendWebRequest();
 

@@ -110,7 +110,8 @@ public class VoiceController : MonoBehaviour
                     break;
                 default:
                     matchFail = true;
-                    RemoteChat($"现在面前的是一个声呐，用户提问的问题是{result},请以一个精通声呐的专家身份回答");
+                    //todo 移动到场景相关的配置文件
+                    RemoteChat($"现在你们正位于石景山首钢，用户提问的问题是{result},请以一个精通历史的专家身份回答");
                     break;
             }
         }
