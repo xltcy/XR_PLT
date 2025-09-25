@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -19,14 +20,39 @@ public class TrackingImageManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        DisableTrackImage();
-        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+            Debug.Log("trackedImageManager注册");
+        }    
+        //DisableTrackImage();
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    void OnEnable()
+    {
+        if (trackedImageManager != null)
+        {
+            Debug.Log("trackedImageManager OnEnable存在");
+        }
+        else
+        {
+            Debug.Log("trackedImageManager OnEnable不存在");
+        }
+    }
+    
+    void OnDisable()
+    {
+        // 取消订阅
+        if (trackedImageManager != null)
+        {
+            trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+        }
     }
 
     public void InitTriggeredImage(List<ActionTriggerData> triggerList)
@@ -75,6 +101,46 @@ public class TrackingImageManager : MonoBehaviour
             Debug.Log($"? Added image {name} successfully!");
         else
             Debug.LogError($"? Failed to add image {name}: {job.status}");
+
+        CheckSetup();
+
+    }
+    
+    void CheckSetup()
+    {
+        var debugMode = true;
+        if (debugMode)
+        {
+            // 检查管理器
+            if (trackedImageManager == null)
+            {
+                Debug.LogError("ARTrackedImageManager is null!");
+                return;
+            }
+            
+            // 检查是否启用
+            if (!trackedImageManager.enabled)
+            {
+                Debug.LogWarning("ARTrackedImageManager is disabled!");
+            }
+            
+            // 检查参考图像库
+            if (trackedImageManager.referenceLibrary == null)
+            {
+                Debug.LogError("Reference Image Library is null!");
+            }
+            else
+            {
+                Debug.Log($"Reference Library has {trackedImageManager.referenceLibrary.count} images");
+            }
+            
+            // 检查AR会话
+            var arSession = FindObjectOfType<ARSession>();
+            if (arSession == null)
+            {
+                Debug.LogError("ARSession not found in scene!");
+            }
+        }
     }
 
     /// <summary>
@@ -127,8 +193,6 @@ public class TrackingImageManager : MonoBehaviour
 
     public void EnableTrackImage()
     {
-        trackedImageManager.SetTrackablesActive(true);
-        trackedImageManager.enabled = true;
         // 取到一个可修改的 runtime library
         if (trackedImageManager.referenceLibrary is MutableRuntimeReferenceImageLibrary mutableLib)
         {
@@ -139,6 +203,8 @@ public class TrackingImageManager : MonoBehaviour
             runtimeLibrary = trackedImageManager.CreateRuntimeLibrary() as MutableRuntimeReferenceImageLibrary;
             trackedImageManager.referenceLibrary = runtimeLibrary;
         }
+        trackedImageManager.SetTrackablesActive(true);
+        trackedImageManager.enabled = true;
     }
 
     public void DisableTrackImage()
