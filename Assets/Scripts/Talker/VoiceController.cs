@@ -111,7 +111,7 @@ public class VoiceController : MonoBehaviour
                 default:
                     matchFail = true;
                     //todo 移动到场景相关的配置文件
-                    RemoteChat($"现在你们正位于石景山首钢，用户提问的问题是{result},请以一个精通历史的专家身份回答");
+                    RemoteChat($"现在你们正位于石景山首钢，用户提问的问题是{result},请以一个精通历史的专家身份回答，每次回答尽量不要超过五十字。");
                     break;
             }
         }
