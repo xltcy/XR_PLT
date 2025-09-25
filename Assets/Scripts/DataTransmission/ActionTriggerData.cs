@@ -27,11 +27,18 @@ public class ActionTriggerData
     public Click3DObjectManager.ClickAction clickAction; // is long click or not
     public bool isExit = false; // is exit clickAction or enter clickAction
     public int generateActionId; // clicked object
+    // ImageRecognition mode
+    public string imagePath;// image used to recognize.
+    public string imageName;// image name pattern in library.
+    public bool keepTracking = true; // keep tracking after image is recognized & stop when action is finished.
 
     //-------------JsonIgnore-----------//
     [JsonIgnore]
     public Dictionary<int, bool> nextActionIds = new Dictionary<int, bool>(); // [ActionId: isStartAction] use to calculate startWithTrigger.
-    
+    [JsonIgnore]
+    public int originActionId;
+    [JsonIgnore]
+    public bool isStartTrigger;
 
     public ActionTriggerData(TriggerMode mode, float delay = 0)
     {
@@ -101,4 +108,6 @@ public enum TriggerMode
     PassbySpot,
     // Click a dynamic object
     ClickObject,
+    // Image recognized by ARTrackedImageManager
+    ImageRecognition
 }

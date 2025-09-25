@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 /**
  * Use to read json auto generate everything.
@@ -38,6 +39,9 @@ public class SceneController : MonoBehaviour
     private Dictionary<string, List<ActionTriggerCommand>> pointTriggerCommands = new Dictionary<string, List<ActionTriggerCommand>>();
     // use to search click trigger.
     private Dictionary<int, List<ActionBase>> clickTriggerActions = new Dictionary<int, List<ActionBase>>();
+    // use to search imageRecognition trigger.
+    private List<ActionTriggerData> imageRecognitionTrigggers = new List<ActionTriggerData>();
+
     private String selectedExplainationPointId = "";
     private GameObject videoScreen;
     private ExplanationPoint selectedPoint
@@ -83,6 +87,24 @@ public class SceneController : MonoBehaviour
     }
 
     /**
+     * Send API to get summary data.
+     */
+    private void RequireSummaryData()
+    {
+        UIManager.SetLoadingStatus(true);
+        StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(
+            onSuccess: (res) => {
+                summaryData = res;
+                FindObjectOfType<MeshController>().InitSceneSummary(res.items);
+                UIManager.SetLoadingStatus(false);
+            },
+            onFail: (errorText) => {
+                //TODO
+                UIManager.SetLoadingStatus(false);
+            }));
+    }
+
+    /**
      * Send API Get Scene json data.
      * OnComplete only use to notify complete event.Param means hasError in http request.
      * All dispositions should be dispose in onSuccess/onError.
@@ -116,7 +138,88 @@ public class SceneController : MonoBehaviour
     }
 
     /**
-     * Set explaination point.
+     * Preprocess SceneData.
+     * Instantiate SceneModel.
+     * When a scene is selected & relocation is finished.
+     */
+    public GameObject AnalysisSceneData()
+    {
+        if (sceneData == null)
+        {
+            // todo error
+            Debug.Log("No SceneData found!");
+            return null;
+        }
+        // init object for SMPLController
+
+        // load scene
+        if (scene == null)
+        {
+            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + sceneData.sceneModelPath);
+            scene = Instantiate(scenePrefab);
+            scene.tag = GameObjectTag.Mesh.ToString();
+        }
+
+        // initPos
+        GameObject initPos = new GameObject("initPos");
+        initPos.transform.SetParent(scene.transform, false);
+        initPos.transform.localPosition = sceneData.initPosition;
+        initPos.tag = GameObjectTag.initPos.ToString();
+
+        // Generate ObjectDatas
+        prefabs.Clear();
+        foreach (var objectData in sceneData.objects)
+        {
+            GameObject prefab = (GameObject)Resources.Load("Prefab/" + objectData.url);
+            prefabs[objectData.id] = prefab;
+        }
+        // explanationPoints. Use in selectDesController
+
+        // Init voice commands
+        InitAllTriggers();
+        return scene;
+    }
+
+    /**
+    * init globalTriggerCommands and pointTriggerCommands.
+    * When initing SceneData.
+    * Just load commands into list for further control, not trigger immediate.
+    */
+    private void InitAllTriggers()
+    {
+        // calculate each action's nextAction.
+        var actions = new Dictionary<int, ActionBase>();
+        foreach (var action in sceneData.globalActions)
+        {
+            actions.Add(action.id, action);
+        }
+        foreach (var point in sceneData.explanationPoints)
+        {
+            foreach (var action in point.actions)
+            {
+                actions.Add(action.id, action);
+            }
+        }
+
+        // init actions relate lists by trigger type.
+        foreach (var i in actions)
+        {
+            var action = i.Value;
+            InitActionsByTriggerType(action.startTrigger, isStartTrigger: true, action, actions);
+            InitActionsByTriggerType(action.stopTrigger, isStartTrigger: false, action, actions);
+        }
+
+        globalTriggerCommands = GetTriggerCommands(sceneData.globalActions);
+        foreach (var p in sceneData.explanationPoints)
+        {
+            pointTriggerCommands[p.id] = GetTriggerCommands(p.actions);
+        }
+    }
+
+    /**
+     * Set explaination point with SceneData.
+     * When an explaination point is selected.
+     * Load voice commands into voiceController.
      */
     public void SetSelectedExplainationPoint(String explainationPointId)
     {
@@ -130,6 +233,11 @@ public class SceneController : MonoBehaviour
         selectedExplainationPointId = explainationPointId;
         var commands = GetTriggerCommandsByPoint(explainationPointId);
         voiceController.RegisteVoiceRecCommands(commands);
+
+        // init image Recognition triggers.
+        imageRecognitionTrigggers.Clear();
+        imageRecognitionTrigggers.AddRange(GetImageRecognitionTriggers(allActions));
+        FindObjectOfType<TrackingImageManager>().InitTriggeredImage(imageRecognitionTrigggers);
 
         // Immidiate Action
         allActions.ForEach(item =>
@@ -174,84 +282,16 @@ public class SceneController : MonoBehaviour
         }
     }
 
-    private void RequireSummaryData()
+    public void ConsoleImageRecognizeTrigger(ActionTriggerData triggerData, ARTrackedImage trackedImage)
     {
-        UIManager.SetLoadingStatus(true);
-        StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(
-            onSuccess: (res) => {
-                summaryData = res;
-                FindObjectOfType<MeshController>().InitSceneSummary(res.items);
-                UIManager.SetLoadingStatus(false);
-            },
-            onFail: (errorText) => {
-                //TODO
-                UIManager.SetLoadingStatus(false);
-            }));
-    }
-
-    private void GetFakeResources()
-    {
-        // todo use prefab
-
-        // todo get json from local
-        if (!File.Exists(localJsonPath))
-        {
-            Debug.LogError("’“≤ªµΩ scene.json£°Path:" + localJsonPath);
-            return;
-        }
-
-        string json = File.ReadAllText(localJsonPath);
-        SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
-        Debug.Log("Load json: Data:" + data);
-        sceneData = data;
-    }
-
-    /**
-     * Preprocess SceneData.
-     * Instantiate SceneModel
-     */
-    public GameObject AnalysisSceneData()
-    {
-        if (sceneData == null)
-        {
-            // todo error
-            Debug.Log("No SceneData found!");
-            return null;
-        }
-        // init object for SMPLController
-
-        // load scene
-        if (scene == null)
-        {
-            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + sceneData.sceneModelPath);
-            scene = Instantiate(scenePrefab);
-            scene.tag = GameObjectTag.Mesh.ToString();
-        }
-
-        // initPos
-        GameObject initPos = new GameObject("initPos");
-        initPos.transform.SetParent(scene.transform, false);
-        initPos.transform.localPosition = sceneData.initPosition;
-        initPos.tag = GameObjectTag.initPos.ToString();
-
-        // Generate ObjectDatas
-        prefabs.Clear();
-        foreach (var objectData in sceneData.objects)
-        {
-            GameObject prefab = (GameObject)Resources.Load("Prefab/" + objectData.url);
-            prefabs[objectData.id] = prefab;
-        }
-        // explanationPoints. Use in selectDesController
-
-        // Init voice commands
-        InitAllTriggerCommands();
-        return scene;
+        ActionBase action = allActions.FindLast(item => item.id == triggerData.originActionId);
+        StartCoroutine(ConsoleAction(action, triggerData.isStartTrigger));
     }
 
     /**
      * Console Action & Check StartWithTrigger After Action.
      */
-    private IEnumerator ConsoleAction(ActionBase actionData, bool isStartAction)
+    private IEnumerator ConsoleAction(ActionBase actionData, bool isStartAction, ARTrackedImage arTrackedImage = null)
     {
         var trigger = isStartAction ? actionData.startTrigger : actionData.stopTrigger;
         if (trigger.delay > 0)
@@ -288,8 +328,14 @@ public class SceneController : MonoBehaviour
                 videoScreen.transform.localPosition = videoAction.position;
                 videoScreen.transform.localRotation = videoAction.GetRotationQuaternion();
                 videoScreen.transform.localScale = videoAction.scale;
+                if (arTrackedImage != null)
+                {
+                    videoScreen.transform.SetParent(arTrackedImage.transform, false);
+                }
                 videoScreen.SetActive(true);
-                FindObjectOfType<VideoManager>().PlayVideo(videoAction.videoPath);
+                var videoManager = FindObjectOfType<VideoManager>();
+                videoManager.PlayVideo(videoAction.videoPath);
+                videoManager.trackedImage = arTrackedImage;
                 break;
 
             case ActionType.ObjectVisible:
@@ -333,41 +379,8 @@ public class SceneController : MonoBehaviour
     }
 
     /**
-     * init globalTriggerCommands and pointTriggerCommands
-     */
-    private void InitAllTriggerCommands()
-    {
-        // calculate each action's nextAction.
-        var actions = new Dictionary<int, ActionBase>();
-        foreach (var action in sceneData.globalActions)
-        {
-            actions.Add(action.id, action);
-        }
-        foreach(var point in sceneData.explanationPoints)
-        {
-            foreach (var action in point.actions)
-            {
-                actions.Add(action.id, action);
-            }
-        }
-
-        // init actions relate lists by trigger type.
-        foreach(var i in actions)
-        {
-            var action = i.Value;
-            InitActionsByTriggerType(action.startTrigger, isStartTrigger: true, action, actions);
-            InitActionsByTriggerType(action.stopTrigger, isStartTrigger: false, action, actions);
-        }
-
-        globalTriggerCommands = GetTriggerCommands(sceneData.globalActions);
-        foreach (var p in sceneData.explanationPoints)
-        {
-            pointTriggerCommands[p.id] = GetTriggerCommands(p.actions);
-        }
-    }
-
-    /**
      *  Get commands used in a point.Include global actions.
+     *  return a command list include global actions & pointId's actions.
      */
     private List<VoiceRecCommand> GetTriggerCommandsByPoint(string pointId)
     {
@@ -378,7 +391,7 @@ public class SceneController : MonoBehaviour
     }
 
     /**
-     * Generate Voice Commands from actions.
+     * Return a trigger list include input actions' start & stop triggers.
      */
     private List<ActionTriggerCommand> GetTriggerCommands(List<ActionBase> actions)
     {
@@ -403,8 +416,38 @@ public class SceneController : MonoBehaviour
         return list;
     }
 
+    private List<ActionTriggerData> GetImageRecognitionTriggers(List<ActionBase> actions) 
+    {
+        var list = new List<ActionTriggerData>();
+        foreach(var action in actions)
+        {
+            if (action.startTrigger.mode == TriggerMode.ImageRecognition)
+            {
+                list.Add(action.startTrigger);
+            }
+            if (action.stopTrigger.mode == TriggerMode.ImageRecognition)
+            {
+                list.Add(action.stopTrigger);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * curTrigger: the trigger assume triggering curAction.
+     * isStartTrigger: curTrigger is start trigger or not.
+     * curAction: assume triggered action.
+     * actions: <actionId, action data>.
+     * If curTrigger is AfterAction, curAction will be added into before action's "nextActionIds" list.
+     * If curTrigger is ClickObject, curAction will be added into clickTriggerActions.
+     * Add here when a kind of trigger need to be inited before system work.
+     */
     private void InitActionsByTriggerType(ActionTriggerData curTrigger, bool isStartTrigger, ActionBase curAction, Dictionary<int, ActionBase> actions)
     {
+        // init ignored value.
+        curTrigger.originActionId = curAction.id;
+        curTrigger.isStartTrigger = isStartTrigger;
+
         // init nextActionIds
         if (curTrigger.mode == TriggerMode.AfterAction)
         {
@@ -431,8 +474,17 @@ public class SceneController : MonoBehaviour
     }
 
     /**
-     * Solve Error when an action's start & stop trigger after same actionID.
-     * Start must before stop.
+     * Only for AfterAction type trigger.
+     * Add desAction's id into preAction's trigger's nextActionIds.
+     * 
+     * desDict: <actionId, isStartAction> desDict is saved in trigger data model.
+     * desAction: action need to be added into desDict.
+     * isActionStart: desAction is start or stop when is triggered by desDict's owner trigger.
+     * 
+     * If desDict doesn't contain desAction, add actionId directly;
+     * Otherwise, desAction's startTrigger & stopTrigger both need to be added into desDict,
+     * in this condition, only trigger(<desAction's id, isActionStart==true>) will be added into desDict,
+     * trigger(<desAction's id, isActionStart==false>) will be added into desAction's startTrigger's nextActionIds.
      */
     private void AddActionIntoNextActionDictionary(Dictionary<int, bool> desDict, ActionBase desAction ,bool isActionStart)
     {

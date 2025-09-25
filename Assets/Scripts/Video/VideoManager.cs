@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Video;
+using UnityEngine.XR.ARFoundation;
 
 /// <summary>
 /// Manage to play video on an ARTrackedImage.
@@ -9,7 +10,9 @@ public class VideoManager : MonoBehaviour
 {
     public VideoPlayer videoPlayer;
 
-    public VideoClip[] clips; 
+    public VideoClip[] clips;
+
+    public ARTrackedImage trackedImage;
 
     private string video_url;
 
@@ -22,6 +25,10 @@ public class VideoManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (trackedImage != null)
+        {
+            transform.localScale = new Vector3(trackedImage.size.x, 1f, trackedImage.size.y);
+        }
     }
 
     public void PlayShengnaVideo()

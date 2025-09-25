@@ -19,7 +19,61 @@
       "initialIntroduction":"欢迎来到石景山，接下来我将带你参观，请跟我来",
       "arriveIntroduction":"我们已经到达桌子，石景山的历史",
       "thumb":"abc",
-      "actions":[]
+      "actions":[{
+          "type": "PlayVideo",
+          "id":1,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay":0,
+            "imagePath":"Images/TrackedImages/brand",
+            "imageName":"brand"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "videoPath":"test",
+          "position":{
+              "x": 2.5861,
+              "y": 0.6083161,
+              "z": -6.951444
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "PlayVideo",
+          "id":2,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay":0,
+            "imagePath":"Images/TrackedImages/cow",
+            "imageName":"cow"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "videoPath":"test",
+          "position":{
+              "x": 2.5861,
+              "y": 0.6083161,
+              "z": -6.951444
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }]
     }
   ],
   "globalActions":[],
