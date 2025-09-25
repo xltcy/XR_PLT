@@ -201,7 +201,7 @@ public class MeshController : MonoBehaviour
         Debug.Log(res.ToString());
 
         Matrix4x4 world2Camera = res.inverse;
-        world2Camera = KeepModelYUp(world2Camera);
+        // world2Camera = KeepModelYUp(world2Camera);
         var resModelPoseWorld = camPoseT0 * world2Camera;
         return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
     }

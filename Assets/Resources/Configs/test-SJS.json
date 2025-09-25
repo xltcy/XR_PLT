@@ -32,7 +32,7 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"test",
+          "videoPath":"video/test",
           "position":{
               "x": 2.5861,
               "y": 0.6083161,
@@ -59,7 +59,7 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"test",
+          "videoPath":"video/sjs01",
           "position":{
               "x": 2.5861,
               "y": 0.6083161,
@@ -73,7 +73,34 @@
             "y": 1,
             "z": 1
           }
-        }]
+        },{
+        "type": "PlayVideo",
+        "id":3,
+        "startTrigger": {
+          "mode": "ImageRecognition",
+          "delay":0,
+          "imagePath":"Images/TrackedImages/sjs01",
+          "imageName":"sjs01"
+        },
+        "stopTrigger": {
+          "mode": "Never",
+          "delay":0
+        },
+        "videoPath":"video/sjs01",
+        "position":{
+          "x": 2.5861,
+          "y": 0.6083161,
+          "z": -6.951444
+        },
+        "rotation":{
+          "x": 0, "y": 0, "z": 0, "w": 1
+        },
+        "scale":{
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      }]
     }
   ],
   "globalActions":[],
