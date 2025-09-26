@@ -1,9 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -34,8 +31,12 @@ public class TrackingImageManager : MonoBehaviour
 
     }
 
+    /**
+     * Init ImageRecognition trigger list.
+     */
     public void InitTriggeredImage(List<ActionTriggerData> triggerList)
     {
+        triggers.Clear();
         triggers.AddRange(triggerList);
         if (triggers.IsEmpty())
         {
@@ -74,6 +75,9 @@ public class TrackingImageManager : MonoBehaviour
         StartCoroutine(CheckJob(job, name));
     }
 
+    /**
+     * Wait AddReferenceImageJobState complete.
+     */
     private IEnumerator CheckJob(AddReferenceImageJobState job, string name)
     {
         while (!job.jobHandle.IsCompleted)
@@ -89,8 +93,11 @@ public class TrackingImageManager : MonoBehaviour
         CheckSetup();
 
     }
-    
-    void CheckSetup()
+
+    /**
+     * Use to debug trackedImageManager's relating state.
+     */
+    private void CheckSetup()
     {
         var debugMode = true;
         if (debugMode)
@@ -127,13 +134,10 @@ public class TrackingImageManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 把模型放置到被追踪图片的位置
-    /// </summary>
-    /// <param name="model">需要设置位置的模型</param>
-    /// <param name="trackedImage">被Tracked Image Manager追踪到的图片</param>
-    /// <returns></returns>
-    IEnumerator AlignModelToTrackedImage(List<ActionTriggerData> triggers, ARTrackedImage trackedImage)
+    /**
+     * Delegate trigger after trackedImage inited.
+     */
+    IEnumerator DelegateTriggers(List<ActionTriggerData> triggers, ARTrackedImage trackedImage)
     {
         yield return new WaitUntil(() =>
         {
@@ -148,12 +152,12 @@ public class TrackingImageManager : MonoBehaviour
         foreach(ARTrackedImage i in args.added)
         {
             // a new image tracked
-            var desList = triggers.FindAll(item => item.imageName == i.referenceImage.name);
-            if (desList != null && !desList.IsEmpty())
+            var desTriggerList = triggers.FindAll(item => item.imageName == i.referenceImage.name);
+            if (desTriggerList != null && !desTriggerList.IsEmpty())
             {
-                LogInfo("args.added:" + i.ToString() + ", name:" + i.referenceImage.name + ", imageName " + desList);
+                LogInfo("args.added:" + i.ToString() + ", name:" + i.referenceImage.name + ", imageName " + desTriggerList);
                 trackedImages.Add(i);
-                StartCoroutine(AlignModelToTrackedImage(desList, i));
+                StartCoroutine(DelegateTriggers(desTriggerList, i));
                 LogInfo("args.added:" + i.ToString());
             }
         }
@@ -173,6 +177,9 @@ public class TrackingImageManager : MonoBehaviour
         }
     }
 
+    /**
+     * library init must before enabled = true;
+     */
     public void EnableTrackImage()
     {
         // 取到一个可修改的 runtime library

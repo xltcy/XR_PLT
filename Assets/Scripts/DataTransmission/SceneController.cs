@@ -340,6 +340,7 @@ public class SceneController : MonoBehaviour
                     //trackedImage.transform.up → 图片的竖直方向 图像的高度方向
                     //trackedImage.transform.forward → 图片的法线（垂直于图片） 法线方向（垂直于图片，指向相机这一侧）
                     // innerObject x 垂直视频向外， y 面向视频的上方, z 面向视频的左向 
+                    // reset innerObject's transform to align with ARTrackedImage
                     var interObject = videoScreen.transform.Find("Screen");
                     interObject.transform.localScale = new Vector3(1,1,0.001f);
                     interObject.transform.localPosition = Vector3.zero;
