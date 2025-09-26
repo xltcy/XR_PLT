@@ -179,3 +179,5 @@ MonoBehaviour:
   clips:
   - {fileID: 32900000, guid: 5638c6a8febea0e40a82c0646fafd318, type: 3}
   - {fileID: 32900000, guid: bb5d30e4a17bc6e4b90915aa5b0a1c70, type: 3}
+  - {fileID: 32900000, guid: 50d7dae17fc5bf24093a881e0fd13c99, type: 3}
+  trackedImage: {fileID: 0}

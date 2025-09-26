@@ -34,32 +34,16 @@ public class TrackingImageManager : MonoBehaviour
 
     }
 
-    void OnEnable()
-    {
-        if (trackedImageManager != null)
-        {
-            Debug.Log("trackedImageManager OnEnable存在");
-        }
-        else
-        {
-            Debug.Log("trackedImageManager OnEnable不存在");
-        }
-    }
-    
-    void OnDisable()
-    {
-        // 取消订阅
-        if (trackedImageManager != null)
-        {
-            trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
-        }
-    }
-
     public void InitTriggeredImage(List<ActionTriggerData> triggerList)
     {
         triggers.AddRange(triggerList);
         if (triggers.IsEmpty())
         {
+            return;
+        }
+        if (Application.platform != RuntimePlatform.Android)
+        {
+            Debug.LogError("System not support ARTrackedImageManager");
             return;
         }
         EnableTrackImage();
@@ -161,15 +145,13 @@ public class TrackingImageManager : MonoBehaviour
     // use to console when a image is tracked.
     public void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
     {
-        LogInfo("OnTrackedImagesChanged");
-
         foreach(ARTrackedImage i in args.added)
         {
             // a new image tracked
-            LogInfo("args.added:" + i.ToString() + ", name:" + i.referenceImage.name + ", imageName ");
             var desList = triggers.FindAll(item => item.imageName == i.referenceImage.name);
             if (desList != null && !desList.IsEmpty())
             {
+                LogInfo("args.added:" + i.ToString() + ", name:" + i.referenceImage.name + ", imageName " + desList);
                 trackedImages.Add(i);
                 StartCoroutine(AlignModelToTrackedImage(desList, i));
                 LogInfo("args.added:" + i.ToString());

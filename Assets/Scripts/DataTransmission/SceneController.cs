@@ -285,7 +285,7 @@ public class SceneController : MonoBehaviour
     public void ConsoleImageRecognizeTrigger(ActionTriggerData triggerData, ARTrackedImage trackedImage)
     {
         ActionBase action = allActions.FindLast(item => item.id == triggerData.originActionId);
-        StartCoroutine(ConsoleAction(action, triggerData.isStartTrigger));
+        StartCoroutine(ConsoleAction(action, triggerData.isStartTrigger, trackedImage));
     }
 
     /**
@@ -298,6 +298,7 @@ public class SceneController : MonoBehaviour
         {
             yield return new WaitForSeconds(trigger.delay);
         }
+        Debug.Log("ConsoleAction: action id:" + actionData.id + "trigger mode: " + trigger.mode + "isStartAction: " + isStartAction + "arTrackedImage: " + arTrackedImage);
         switch (actionData.type)
         {
             case ActionType.GenerateObject:
@@ -328,14 +329,22 @@ public class SceneController : MonoBehaviour
                 videoScreen.transform.localPosition = videoAction.position;
                 videoScreen.transform.localRotation = videoAction.GetRotationQuaternion();
                 videoScreen.transform.localScale = videoAction.scale;
-                if (arTrackedImage != null)
-                {
-                    videoScreen.transform.SetParent(arTrackedImage.transform, false);
-                }
                 videoScreen.SetActive(true);
                 var videoManager = FindObjectOfType<VideoManager>();
                 videoManager.PlayVideo(videoAction.videoPath);
                 videoManager.trackedImage = arTrackedImage;
+                if (arTrackedImage != null)
+                {
+                    //trackedImage原点：识别图的几何中心
+                    //trackedImage.transform.right → 图片的水平方向 图像的宽度方向
+                    //trackedImage.transform.up → 图片的竖直方向 图像的高度方向
+                    //trackedImage.transform.forward → 图片的法线（垂直于图片） 法线方向（垂直于图片，指向相机这一侧）
+                    // innerObject x 垂直视频向外， y 面向视频的上方, z 面向视频的左向 
+                    var interObject = videoScreen.transform.Find("Screen");
+                    interObject.transform.localScale = new Vector3(1,1,0.001f);
+                    interObject.transform.localPosition = Vector3.zero;
+                    interObject.transform.localRotation = Quaternion.Euler(90, 180, 0);
+                }
                 break;
 
             case ActionType.ObjectVisible:

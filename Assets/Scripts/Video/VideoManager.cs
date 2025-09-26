@@ -27,7 +27,14 @@ public class VideoManager : MonoBehaviour
     {
         if (trackedImage != null)
         {
+            //trackedImage原点：识别图的几何中心
+            //trackedImage.transform.right → 图片的水平方向 图像的宽度方向
+            //trackedImage.transform.up → 图片的竖直方向 图像的高度方向
+            //trackedImage.transform.forward → 图片的法线（垂直于图片） 法线方向（垂直于图片，指向相机这一侧）
+            transform.position = trackedImage.transform.position;
+            transform.rotation = trackedImage.transform.rotation;
             transform.localScale = new Vector3(trackedImage.size.x, 1f, trackedImage.size.y);
+            Debug.Log("VideoManager" + trackedImage.transform.position + "rotation" + trackedImage.transform.rotation + "scale" + trackedImage.size);
         }
     }
 

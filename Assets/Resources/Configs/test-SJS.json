@@ -16,8 +16,8 @@
           "y": -1.21,
           "z": -1.71
       }, 
-      "initialIntroduction":"欢迎来到石景山，接下来我将带你参观，请跟我来",
-      "arriveIntroduction":"我们已经到达桌子，石景山的历史",
+      "initialIntroduction":"",
+      "arriveIntroduction":"",
       "thumb":"abc",
       "actions":[{
           "type": "PlayVideo",
@@ -32,7 +32,7 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"video/test",
+          "videoPath":"sjs01",
           "position":{
               "x": 2.5861,
               "y": 0.6083161,
@@ -59,7 +59,7 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"video/sjs01",
+          "videoPath":"test",
           "position":{
               "x": 2.5861,
               "y": 0.6083161,
