@@ -298,7 +298,7 @@ public class SceneController : MonoBehaviour
         {
             yield return new WaitForSeconds(trigger.delay);
         }
-        Debug.Log("ConsoleAction: action id:" + actionData.id + "trigger mode: " + trigger.mode + "isStartAction: " + isStartAction + "arTrackedImage: " + arTrackedImage);
+        Debug.Log("ConsoleAction: action id:" + actionData.id + " trigger mode:" + trigger.mode + " isStartAction:" + isStartAction + " arTrackedImage: " + arTrackedImage);
         switch (actionData.type)
         {
             case ActionType.GenerateObject:
@@ -324,15 +324,7 @@ public class SceneController : MonoBehaviour
                 {
                     var videoPrefab = (GameObject)Resources.Load("Prefab/Prefab-Video");
                     videoScreen = Instantiate(videoPrefab);
-                    videoScreen.transform.SetParent(scene.transform, false);
                 }
-                videoScreen.transform.localPosition = videoAction.position;
-                videoScreen.transform.localRotation = videoAction.GetRotationQuaternion();
-                videoScreen.transform.localScale = videoAction.scale;
-                videoScreen.SetActive(true);
-                var videoManager = FindObjectOfType<VideoManager>();
-                videoManager.PlayVideo(videoAction.videoPath);
-                videoManager.trackedImage = arTrackedImage;
                 if (arTrackedImage != null)
                 {
                     //trackedImage原点：识别图的几何中心
@@ -341,11 +333,22 @@ public class SceneController : MonoBehaviour
                     //trackedImage.transform.forward → 图片的法线（垂直于图片） 法线方向（垂直于图片，指向相机这一侧）
                     // innerObject x 垂直视频向外， y 面向视频的上方, z 面向视频的左向 
                     // reset innerObject's transform to align with ARTrackedImage
+                    videoScreen.transform.SetParent(arTrackedImage.transform, false);
                     var interObject = videoScreen.transform.Find("Screen");
-                    interObject.transform.localScale = new Vector3(1,1,0.001f);
+                    interObject.transform.localScale = new Vector3(1, 1, 0.001f);
                     interObject.transform.localPosition = Vector3.zero;
                     interObject.transform.localRotation = Quaternion.Euler(90, 180, 0);
+                } else
+                {
+                    videoScreen.transform.SetParent(scene.transform, false);
+                    videoScreen.transform.localPosition = videoAction.position;
+                    videoScreen.transform.localRotation = videoAction.GetRotationQuaternion();
+                    videoScreen.transform.localScale = videoAction.scale;
                 }
+                videoScreen.SetActive(true);
+                var videoManager = FindObjectOfType<VideoManager>();
+                videoManager.PlayVideo(videoAction.videoPath);
+                videoManager.trackedImage = arTrackedImage;
                 break;
 
             case ActionType.ObjectVisible:
