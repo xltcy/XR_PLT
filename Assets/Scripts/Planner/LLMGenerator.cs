@@ -12,11 +12,10 @@ using System;
 public class LLMGenerator : MonoBehaviour
 {
     // LLM Configs
-    //private string baseUrl = "http://60.205.232.241:7171/ai_app/chat/";
-    private string baseUrl = "https://api.deepseek.com/chat/completions";
-    //private string modelName = "qwen2.5:72b";
-    private string modelName = "deepseek-chat";
-    private string apiKey = "sk-e7203af36173493d810f16bef38c25ec";
+    public static LLMModelConfig.BaseConfig llmModelConfig = null;
+    private static string modelName;
+    private static string baseUrl;
+    private static string apiKey;
     
     private List<Dictionary<string, string>> messages = new List<Dictionary<string, string>>();
 
@@ -34,12 +33,6 @@ public class LLMGenerator : MonoBehaviour
         messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", systemPrompt } });
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public static LLMGenerator Init()
     {
         string name = nameof(LLMGenerator);
@@ -48,6 +41,20 @@ public class LLMGenerator : MonoBehaviour
             GameObject g = new GameObject(name);
             llmGenerator = g.AddComponent<LLMGenerator>();
         }
+        
+        //load LLM Model Config
+        llmModelConfig = LLMModelConfig.Local;
+        if (llmModelConfig != null)
+        {
+            baseUrl = llmModelConfig.BaseUrl;
+            apiKey = llmModelConfig.APIKey;
+            modelName = llmModelConfig.ModelName;
+        }
+        else
+        {
+            Debug.LogError("LLM Model Config is null, please check LLMGenerator.Init!");
+        }
+        
         return llmGenerator;
     }
 
