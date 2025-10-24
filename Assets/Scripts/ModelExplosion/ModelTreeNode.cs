@@ -27,12 +27,12 @@ public class ModelTreeNode : MonoBehaviour
     #endregion
 
     #region PrivateVar
-    public Vector3 _center;
+    [SerializeField]
+    private Vector3 _center;
     private Vector3 _direction;
     private float _deltaIntensity;
     private float _time;
     private float _deltaTime;
-    [SerializeField]
     private Vector3 _axis;
     private float _intensity;
     #endregion
