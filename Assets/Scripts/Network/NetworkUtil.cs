@@ -17,7 +17,8 @@ public class NetworkUtil
     private const string SEVER_URL = "http://60.205.232.241:7171/";
     private const string RELOCATE_REQUEST_URL_SUFFIX = "media_app/request_NVLAD_redir/?source_location=";
     //todo 修改为正式地址
-    private const string SCENE_JSON_URL = "http://localhost:8000/download/data.json";
+    private const string SCENE_JSON_URL_PREFIX = "http://localhost:8000/download/";
+    private const string SUMMARY_JSON_FILE_NAME = "summary.json";
 
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
@@ -94,7 +95,7 @@ public class NetworkUtil
 
     public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
     {
-        string url = SCENE_JSON_URL;
+        string url = SCENE_JSON_URL_PREFIX + SUMMARY_JSON_FILE_NAME;
         
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
@@ -116,7 +117,7 @@ public class NetworkUtil
             }
             else
             {
-                Debug.Log("下载失败: " + request.error);
+                Debug.Log("下载失败: " + request.error + "使用本地测试数据");
                 
                 // 如果服务器不可用，创建模拟数据
                 string localJsonPath = "test-summary.json";
@@ -158,46 +159,68 @@ public class NetworkUtil
 
     public IEnumerator GetSceneDataRequest(string sceneName, Action<SceneData> onSuccess, Action<string> onFail)
     {
-        // todo
-        yield return new WaitForSeconds(1);
-        string localJsonPath = sceneName;
+        string url = SCENE_JSON_URL_PREFIX + sceneName +".json";
 
-        // Temp logic start
-        var jsonString = Resources.Load<TextAsset>("Configs/" + localJsonPath).text;
-        if (jsonString != null)
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            var settings = new JsonSerializerSettings();
-            settings.Converters.Add(new StringEnumConverter());
-            SceneData data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
-            onSuccess?.Invoke(data);
-            yield break;
-        } else
-        {
-            onFail?.Invoke("jsonFail");
-            yield break;
-        }
-        // temp logic end
+            yield return request.SendWebRequest();
 
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            localJsonPath = Application.persistentDataPath + localJsonPath;
-        }
-        else
-        {
-            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
-        }
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string jsonText = request.downloadHandler.text;
+                Debug.Log("下载成功: " + jsonText);
 
-        if (!File.Exists(localJsonPath))
-        {
-            string error = "找不到 scene.json！Path:" + localJsonPath;
-            Debug.LogError(error);
-            onFail.Invoke(error);
-        } else
-        {
-            string json = File.ReadAllText(localJsonPath);
-            SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
-            Debug.Log("Get Response json: Data:" + data);
-            onSuccess.Invoke(data);
+                // 解析 JSON
+                SceneData data = JsonUtility.FromJson<SceneData>(jsonText);
+
+                // 保存到本地文件
+                string localPath = Path.Combine(Application.persistentDataPath, sceneName + ".json");
+                File.WriteAllText(localPath, jsonText);
+                Debug.Log("文件保存到: " + localPath);
+                onSuccess.Invoke(data);
+            }
+            else
+            {
+                string localJsonPath = sceneName;
+
+                // Temp logic start
+                var jsonString = Resources.Load<TextAsset>("Configs/" + localJsonPath).text;
+                if (jsonString != null)
+                {
+                    var settings = new JsonSerializerSettings();
+                    settings.Converters.Add(new StringEnumConverter());
+                    SceneData data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
+                    onSuccess?.Invoke(data);
+                    yield break;
+                } else
+                {
+                    onFail?.Invoke("jsonFail");
+                    yield break;
+                }
+                // temp logic end
+
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    localJsonPath = Application.persistentDataPath + localJsonPath;
+                }
+                else
+                {
+                    localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
+                }
+
+                if (!File.Exists(localJsonPath))
+                {
+                    string error = "找不到 scene.json！Path:" + localJsonPath;
+                    Debug.LogError(error);
+                    onFail.Invoke(error);
+                } else
+                {
+                    string json = File.ReadAllText(localJsonPath);
+                    SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
+                    Debug.Log("Get Response json: Data:" + data);
+                    onSuccess.Invoke(data);
+                }
+            }
         }
     }
 }
