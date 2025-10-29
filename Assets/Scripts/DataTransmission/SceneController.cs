@@ -89,7 +89,7 @@ public class SceneController : MonoBehaviour
     /**
      * Send API to get summary data.
      */
-    private void RequireSummaryData()
+    public void RequireSummaryData()
     {
         UIManager.SetLoadingStatus(true);
         StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(

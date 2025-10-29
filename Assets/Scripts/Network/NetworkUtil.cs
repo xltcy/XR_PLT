@@ -16,6 +16,8 @@ public class NetworkUtil
  { 
     private const string SEVER_URL = "http://60.205.232.241:7171/";
     private const string RELOCATE_REQUEST_URL_SUFFIX = "media_app/request_NVLAD_redir/?source_location=";
+    //todo 修改为正式地址
+    private const string SCENE_JSON_URL = "http://localhost:8000/download/data.json";
 
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
@@ -92,40 +94,65 @@ public class NetworkUtil
 
     public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
     {
-        // todo
-        yield return new WaitForSeconds(1);
-        string localJsonPath = "test-summary.json";
+        string url = SCENE_JSON_URL;
+        
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            yield return request.SendWebRequest();
+            
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string jsonText = request.downloadHandler.text;
+                Debug.Log("下载成功: " + jsonText);
+                
+                // 解析 JSON
+                SummaryData data = JsonUtility.FromJson<SummaryData>(jsonText);
+                
+                // 保存到本地文件
+                string localPath = Path.Combine(Application.persistentDataPath, "downloaded-test-summary.json");
+                File.WriteAllText(localPath, jsonText);
+                Debug.Log("文件保存到: " + localPath);
+                onSuccess.Invoke(data);
+            }
+            else
+            {
+                Debug.Log("下载失败: " + request.error);
+                
+                // 如果服务器不可用，创建模拟数据
+                string localJsonPath = "test-summary.json";
 
-        // Temp logic start
-        // dont end with .json.
-        var jsonString = Resources.Load<TextAsset>("Configs/" + "test-summary").text;
-        if (jsonString != null)
-        {
-            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(jsonString);
-            onSuccess?.Invoke(data);
-            yield break;
-        }
-        // temp logic end
+                // Temp logic start
+                // dont end with .json.
+                var jsonString = Resources.Load<TextAsset>("Configs/" + "test-summary").text;
+                if (jsonString != null)
+                {
+                    SummaryData data = JsonConvert.DeserializeObject<SummaryData>(jsonString);
+                    onSuccess?.Invoke(data);
+                    yield break;
+                }
+                // temp logic end
 
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            localJsonPath = Application.persistentDataPath + localJsonPath;
-        } else
-        {
-            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
-        }
-        if (!File.Exists(localJsonPath))
-        {
-            string error = "找不到 scene.json！Path:" + localJsonPath;
-            Debug.LogError(error);
-            onFail.Invoke(error);
-        }
-        else
-        {
-            string json = File.ReadAllText(localJsonPath);
-            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(json);
-            Debug.Log("Get Response json: Data:" + data);
-            onSuccess.Invoke(data);
+                if (Application.platform == RuntimePlatform.Android)
+                {
+                    localJsonPath = Application.persistentDataPath + localJsonPath;
+                } else
+                {
+                    localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
+                }
+                if (!File.Exists(localJsonPath))
+                {
+                    string error = "找不到 scene.json！Path:" + localJsonPath;
+                    Debug.LogError(error);
+                    onFail.Invoke(error);
+                }
+                else
+                {
+                    string json = File.ReadAllText(localJsonPath);
+                    SummaryData data = JsonConvert.DeserializeObject<SummaryData>(json);
+                    Debug.Log("Get Response json: Data:" + data);
+                    onSuccess.Invoke(data);
+                }
+            }
         }
     }
 
