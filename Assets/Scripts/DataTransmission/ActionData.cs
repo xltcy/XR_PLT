@@ -20,7 +20,7 @@ public enum ActionType
     AvatarAnim,
 }
 
-[JsonConverter(typeof(ActionConverter))] // ¹Ø¼ü
+[JsonConverter(typeof(ActionConverter))] // å…³é”®
 public abstract class ActionBase
 {
     public ActionType type;

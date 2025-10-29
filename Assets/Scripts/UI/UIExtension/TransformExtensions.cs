@@ -7,7 +7,7 @@ using UnityEngine;
 public static class TransformExtensions
 {
     /// <summary>
-    /// ¸ù¾İ½ÚµãÃû²éÕÒ×Ó½Úµã
+    /// æ ¹æ®èŠ‚ç‚¹åæŸ¥æ‰¾å­èŠ‚ç‚¹
     /// </summary>
     /// <param name="current"></param>
     /// <param name="name"></param>
@@ -21,7 +21,7 @@ public static class TransformExtensions
     }
 
     /// <summary>
-    /// ¸ù¾İÂ·¾¶²éÕÒ×Ó½Úµã£¬Ö§³ÖÏà¶ÔÂ·¾¶ºÍÉî¶È²éÕÒ
+    /// æ ¹æ®è·¯å¾„æŸ¥æ‰¾å­èŠ‚ç‚¹ï¼Œæ”¯æŒç›¸å¯¹è·¯å¾„å’Œæ·±åº¦æŸ¥æ‰¾
     /// </summary>
     /// <param name="current"></param>
     /// <param name="path"></param>
@@ -32,14 +32,14 @@ public static class TransformExtensions
         if (current == null) return null;
         if (string.IsNullOrEmpty(path)) return null;
 
-        // Èç¹û°üº¬ '/' Ê¹ÓÃ Unity µÄÏà¶Ô²éÕÒ£¬·ñÔòÓÃÉî¶È²éÕÒ
+        // å¦‚æœåŒ…å« '/' ä½¿ç”¨ Unity çš„ç›¸å¯¹æŸ¥æ‰¾ï¼Œå¦åˆ™ç”¨æ·±åº¦æŸ¥æ‰¾
         if (path.Contains("/"))
-            return current.Find(path); // ×¢Òâ£ºFind ²»»áËÑË÷·Ç¼¤»î×Ó¶ÔÏó
+            return current.Find(path); // æ³¨æ„ï¼šFind ä¸ä¼šæœç´¢éæ¿€æ´»å­å¯¹è±¡
         return current.FindDeep(path, includeInactive);
     }
 
     /// <summary>
-    /// »ñÈ¡ÍêÕûÂ·¾¶
+    /// è·å–å®Œæ•´è·¯å¾„
     /// </summary>
     /// <param name="current"></param>
     /// <returns></returns>
@@ -58,7 +58,7 @@ public static class TransformExtensions
     }
 
     /// <summary>
-    /// ÉèÖÃ×Ô¼º¼°ËùÓĞ×Ó½ÚµãµÄ¼¤»î×´Ì¬
+    /// è®¾ç½®è‡ªå·±åŠæ‰€æœ‰å­èŠ‚ç‚¹çš„æ¿€æ´»çŠ¶æ€
     /// </summary>
     /// <param name="parent"></param>
     /// <param name="active"></param>
@@ -71,7 +71,7 @@ public static class TransformExtensions
     }
 
     /// <summary>
-    /// ³¡¾°ÄÚ²éÕÒÖ¸¶¨Ãû³ÆµÄTransform
+    /// åœºæ™¯å†…æŸ¥æ‰¾æŒ‡å®šåç§°çš„Transform
     /// </summary>
     /// <param name="name"></param>
     /// <param name="includeInactive"></param>
@@ -89,7 +89,7 @@ public static class TransformExtensions
     }
 
     /// <summary>
-    /// ²éÕÒ×Ó½Úµã£¨µİ¹é£©
+    /// æŸ¥æ‰¾å­èŠ‚ç‚¹ï¼ˆé€’å½’ï¼‰
     /// </summary>
     /// <param name="current"></param>
     /// <param name="targetName"></param>

@@ -5,7 +5,7 @@ using TMPro;
 public static class ComponentExtensions
 {
     /// <summary>
-    /// ÉèÖÃGameObjectµÄÏÔÊ¾/Òş²Ø×´Ì¬
+    /// è®¾ç½®GameObjectçš„æ˜¾ç¤º/éšè—çŠ¶æ€
     /// </summary>
     public static void SetVisible(this Component component, bool visible)
     {
@@ -16,7 +16,7 @@ public static class ComponentExtensions
     }
     
     /// <summary>
-    /// ÉèÖÃCanvasGroupµÄÍ¸Ã÷¶È·½Ê½ÏÔÊ¾/Òş²Ø
+    /// è®¾ç½®CanvasGroupçš„é€æ˜åº¦æ–¹å¼æ˜¾ç¤º/éšè—
     /// </summary>
     public static void SetVisibleAlpha(this CanvasGroup canvasGroup, bool visible, float alpha = 1f)
     {
@@ -29,7 +29,7 @@ public static class ComponentExtensions
     }
     
     /// <summary>
-    /// ÇĞ»»ÏÔÊ¾×´Ì¬
+    /// åˆ‡æ¢æ˜¾ç¤ºçŠ¶æ€
     /// </summary>
     public static void ToggleVisible(this Component component)
     {
@@ -40,7 +40,7 @@ public static class ComponentExtensions
     }
     
     /// <summary>
-    /// ¼ì²éÊÇ·ñ¿É¼û
+    /// æ£€æŸ¥æ˜¯å¦å¯è§
     /// </summary>
     public static bool IsVisible(this Component component)
     {

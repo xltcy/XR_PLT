@@ -86,7 +86,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
             FindObjectOfType<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
-        SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
+        SpeechManager.SayFromStr("娆㈣繋鏉ュ埌宸ヨ妤硷紝鎺ヤ笅鏉ユ垜灏嗗甫浣犲弬瑙備粙缁嶅０鍛愶紝璇疯窡鎴戞潵");
         Invoke("GotoShengNa", 3);
     }
 

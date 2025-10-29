@@ -114,7 +114,7 @@ public class SceneController : MonoBehaviour
         localJsonPath = jsonHomePath + sceneKey;
         if (jsonLocationHint != null)
         {
-            jsonLocationHint.text = "jsonÓ¦¸Ã·ÅÔÚ£º" + localJsonPath;
+            jsonLocationHint.text = "jsonåº”è¯¥æ”¾åœ¨ï¼š" + localJsonPath;
         }
         // TODO API get Response. Get From Local.
         // GetFakeResources();
@@ -327,11 +327,11 @@ public class SceneController : MonoBehaviour
                 }
                 if (arTrackedImage != null)
                 {
-                    //trackedImageÔ­µã£ºÊ¶±ğÍ¼µÄ¼¸ºÎÖĞĞÄ
-                    //trackedImage.transform.right ¡ú Í¼Æ¬µÄË®Æ½·½Ïò Í¼ÏñµÄ¿í¶È·½Ïò
-                    //trackedImage.transform.up ¡ú Í¼Æ¬µÄÊúÖ±·½Ïò Í¼ÏñµÄ¸ß¶È·½Ïò
-                    //trackedImage.transform.forward ¡ú Í¼Æ¬µÄ·¨Ïß£¨´¹Ö±ÓÚÍ¼Æ¬£© ·¨Ïß·½Ïò£¨´¹Ö±ÓÚÍ¼Æ¬£¬Ö¸ÏòÏà»úÕâÒ»²à£©
-                    // innerObject x ´¹Ö±ÊÓÆµÏòÍâ£¬ y ÃæÏòÊÓÆµµÄÉÏ·½, z ÃæÏòÊÓÆµµÄ×óÏò 
+                    //trackedImageåŸç‚¹ï¼šè¯†åˆ«å›¾çš„å‡ ä½•ä¸­å¿ƒ
+                    //trackedImage.transform.right â†’ å›¾ç‰‡çš„æ°´å¹³æ–¹å‘ å›¾åƒçš„å®½åº¦æ–¹å‘
+                    //trackedImage.transform.up â†’ å›¾ç‰‡çš„ç«–ç›´æ–¹å‘ å›¾åƒçš„é«˜åº¦æ–¹å‘
+                    //trackedImage.transform.forward â†’ å›¾ç‰‡çš„æ³•çº¿ï¼ˆå‚ç›´äºå›¾ç‰‡ï¼‰ æ³•çº¿æ–¹å‘ï¼ˆå‚ç›´äºå›¾ç‰‡ï¼ŒæŒ‡å‘ç›¸æœºè¿™ä¸€ä¾§ï¼‰
+                    // innerObject x å‚ç›´è§†é¢‘å‘å¤–ï¼Œ y é¢å‘è§†é¢‘çš„ä¸Šæ–¹, z é¢å‘è§†é¢‘çš„å·¦å‘ 
                     // reset innerObject's transform to align with ARTrackedImage
                     videoScreen.transform.SetParent(arTrackedImage.transform, false);
                     var interObject = videoScreen.transform.Find("Screen");

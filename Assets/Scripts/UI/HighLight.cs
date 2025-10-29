@@ -4,7 +4,7 @@ using UnityEngine;
 public class HighLight : MonoBehaviour
 {
     public Color highlightcolor = Color.yellow; 
-    [Header("·É»úµÄÈý²¿·Ö")]
+    [Header("é£žæœºçš„ä¸‰éƒ¨åˆ†")]
     public Transform p16Left;
     public Transform p16Cockpit;
     public Transform p16Right;
@@ -53,7 +53,7 @@ public class HighLight : MonoBehaviour
     {
         show.gameObject.GetComponent<Outline>().enabled = false;
     }
-    //ÒÔÏÂÊÇ¸ßÁÁº¯Êý£¨½öÏÔÊ¾Ä³²¿·Ö£©
+    //ä»¥ä¸‹æ˜¯é«˜äº®å‡½æ•°ï¼ˆä»…æ˜¾ç¤ºæŸéƒ¨åˆ†ï¼‰
     //public void HighlightAbove() => SetGroupEmission(sonarAboveMats, highlightcolor);
     public void HighlightLeft() => SetGroupEmission(p16Left);
     //public void HighlightMiddle() => SetGroupEmission(boardMiddleMats, highlightcolor);
@@ -62,7 +62,7 @@ public class HighLight : MonoBehaviour
     public void HighlightRight() => SetGroupEmission(p16Right);
 
 
-    //ÒÔÏÂÊÇ»Ö¸´Ô­×´Ì¬º¯Êý£¨Èý¸ö²¿·ÖÈ«²¿ÏÔÊ¾£©
+    //ä»¥ä¸‹æ˜¯æ¢å¤åŽŸçŠ¶æ€å‡½æ•°ï¼ˆä¸‰ä¸ªéƒ¨åˆ†å…¨éƒ¨æ˜¾ç¤ºï¼‰
     //public void ResetAbove() => ResetGroupEmission(sonarAboveMats, sonarAboveOriginal);
     public void ResetLeft() => ResetGroupEmission(p16Left);
     //public void ResetMiddle() => ResetGroupEmission(boardMiddleMats, boardMiddleOriginal);

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ComponentBinder : MonoBehaviour
 {
-    [Header("°ó¶¨ÉèÖÃ")]
+    [Header("ç»‘å®šè®¾ç½®")]
     [SerializeField]
     private bool autoBindOnAwake = true;
 
@@ -15,7 +15,7 @@ public class ComponentBinder : MonoBehaviour
     [SerializeField]
     private bool searchInactiveNodes = true;
     
-    // »º´æ²éÕÒ½á¹ûÒÔÌá¸ßĞÔÄÜ
+    // ç¼“å­˜æŸ¥æ‰¾ç»“æœä»¥æé«˜æ€§èƒ½
     private Dictionary<string, Transform> _transformCache = new Dictionary<string, Transform>();
     
     protected virtual void Awake()
@@ -26,7 +26,7 @@ public class ComponentBinder : MonoBehaviour
         }
     }
     
-    [ContextMenu("²âÊÔ°ó¶¨×é¼ş")]
+    [ContextMenu("æµ‹è¯•ç»‘å®šç»„ä»¶")]
     public void BindComponents()
     {
         _transformCache.Clear();
@@ -34,7 +34,7 @@ public class ComponentBinder : MonoBehaviour
         
         if (logBindResults)
         {
-            Debug.Log($"[ComponentBinder] {gameObject.name} ×é¼ş°ó¶¨Íê³É", this);
+            Debug.Log($"[ComponentBinder] {gameObject.name} ç»„ä»¶ç»‘å®šå®Œæˆ", this);
         }
     }
     
@@ -56,34 +56,34 @@ public class ComponentBinder : MonoBehaviour
     {
         Type componentType = field.FieldType;
         
-        // ²éÕÒ×Ó½Úµã
+        // æŸ¥æ‰¾å­èŠ‚ç‚¹
         Transform childTransform = FindChildByName(attribute.ChildName);
         if (childTransform == null)
         {
-            HandleBindError(field, attribute, $"Î´ÕÒµ½Ãû³ÆÎª '{attribute.ChildName}' µÄ×Ó½Úµã");
+            HandleBindError(field, attribute, $"æœªæ‰¾åˆ°åç§°ä¸º '{attribute.ChildName}' çš„å­èŠ‚ç‚¹");
             return;
         }
         
-        // »ñÈ¡×é¼ş
+        // è·å–ç»„ä»¶
         Component component = childTransform.GetComponent(componentType);
         if (component == null)
         {
             HandleBindError(field, attribute, 
-                $"ÔÚ½Úµã {childTransform.name} ÉÏÎ´ÕÒµ½×é¼ş: {componentType.Name}");
+                $"åœ¨èŠ‚ç‚¹ {childTransform.name} ä¸Šæœªæ‰¾åˆ°ç»„ä»¶: {componentType.Name}");
             return;
         }
         
-        // ÉèÖÃ×Ö¶ÎÖµ
+        // è®¾ç½®å­—æ®µå€¼
         field.SetValue(this, component);
         
         if (logBindResults)
         {
-            Debug.Log($"[ComponentBinder] °ó¶¨³É¹¦: {field.Name} -> {childTransform.name}/{componentType.Name}");
+            Debug.Log($"[ComponentBinder] ç»‘å®šæˆåŠŸ: {field.Name} -> {childTransform.name}/{componentType.Name}");
         }
     }
     
     /// <summary>
-    /// °´Ãû³Æ²éÕÒ×Ó½Úµã
+    /// æŒ‰åç§°æŸ¥æ‰¾å­èŠ‚ç‚¹
     /// </summary>
     private Transform FindChildByName(string childName)
     {
@@ -103,7 +103,7 @@ public class ComponentBinder : MonoBehaviour
     }
     
     /// <summary>
-    /// ÔÚËùÓĞºó´ú½ÚµãÖĞ²éÕÒ
+    /// åœ¨æ‰€æœ‰åä»£èŠ‚ç‚¹ä¸­æŸ¥æ‰¾
     /// </summary>
     private Transform FindInChildren(string childName, bool includeInactive)
     {
@@ -111,7 +111,7 @@ public class ComponentBinder : MonoBehaviour
     }
     
     /// <summary>
-    /// µİ¹é²éÕÒµ¥¸ö½Úµã
+    /// é€’å½’æŸ¥æ‰¾å•ä¸ªèŠ‚ç‚¹
     /// </summary>
     private Transform FindRecursive(Transform current, string targetName)
     {
@@ -135,11 +135,11 @@ public class ComponentBinder : MonoBehaviour
     {
         if (attribute.Required)
         {
-            Debug.LogError($"[ComponentBinder] {errorMessage} (×Ö¶Î: {field.Name})", this);
+            Debug.LogError($"[ComponentBinder] {errorMessage} (å­—æ®µ: {field.Name})", this);
         }
         else
         {
-            Debug.LogWarning($"[ComponentBinder] {errorMessage} (×Ö¶Î: {field.Name})", this);
+            Debug.LogWarning($"[ComponentBinder] {errorMessage} (å­—æ®µ: {field.Name})", this);
         }
     }
 }

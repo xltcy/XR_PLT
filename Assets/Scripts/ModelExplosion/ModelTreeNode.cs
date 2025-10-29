@@ -8,22 +8,22 @@ using UnityEngine;
 public class ModelTreeNode : MonoBehaviour
 {
     #region SerializeVar
-    [Header("±¸×¢")]
-    public string ±¬Õ¨·½Ê½;
+    [Header("å¤‡æ³¨")]
+    public string çˆ†ç‚¸æ–¹å¼;
     [Header("Identity")]
-    // ±ê¼Ç¸Ã½ÚµãÊÇ·ñÎªÒ¶×Ó½áµã
+    // æ ‡è®°è¯¥èŠ‚ç‚¹æ˜¯å¦ä¸ºå¶å­ç»“ç‚¹
     public bool _isLeafNode;
-    // ±ê¼Ç¸Ã½ÚµãÊÇ·ñÎªÄ£ĞÍÖĞµÄ¸ù½Úµã
+    // æ ‡è®°è¯¥èŠ‚ç‚¹æ˜¯å¦ä¸ºæ¨¡å‹ä¸­çš„æ ¹èŠ‚ç‚¹
     public bool _isRoot;
-    // frame±íÊ¾ÔÚ²ã¼¶±¬Õ¨ÖĞ²»·¢Éú±ä»¯µÄ×é¼ş
+    // frameè¡¨ç¤ºåœ¨å±‚çº§çˆ†ç‚¸ä¸­ä¸å‘ç”Ÿå˜åŒ–çš„ç»„ä»¶
     public bool _isFrame;
     [Header("Child")]
     public List<GameObject> _children;
     [Header("Property")]
     public float _mass;
     public Vector3 _standardAxis;
-    public float _standardIntensity;    // Ã¿¸ö×Ó½Úµã±¬Õ¨Ê±ÒÆ¶¯µÄ¾àÀë
-    public float _factor;       // µ±Ç°½Úµã±¬Õ¨Ê±ÒÆ¶¯¾àÀëµÄÈ¨ÖØ
+    public float _standardIntensity;    // æ¯ä¸ªå­èŠ‚ç‚¹çˆ†ç‚¸æ—¶ç§»åŠ¨çš„è·ç¦»
+    public float _factor;       // å½“å‰èŠ‚ç‚¹çˆ†ç‚¸æ—¶ç§»åŠ¨è·ç¦»çš„æƒé‡
     #endregion
 
     #region PrivateVar
@@ -45,10 +45,10 @@ public class ModelTreeNode : MonoBehaviour
     }
 
     /// <summary>
-    /// ³õÊ¼»¯·É»úµÄÎ»ÖÃºÍ±¬Õ¨²ÎÊı
+    /// åˆå§‹åŒ–é£æœºçš„ä½ç½®å’Œçˆ†ç‚¸å‚æ•°
     /// </summary>
-    /// <param name="rotation">¶ÔÓ¦·É»ú¸¸½Úµãtransform.rotationµÄÊıÖµ</param>
-    /// <param name="scale">¶ÔÓ¦·É»ú¸¸½Úµãtransform.localScaleµÄÊıÖµ</param>
+    /// <param name="rotation">å¯¹åº”é£æœºçˆ¶èŠ‚ç‚¹transform.rotationçš„æ•°å€¼</param>
+    /// <param name="scale">å¯¹åº”é£æœºçˆ¶èŠ‚ç‚¹transform.localScaleçš„æ•°å€¼</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void InitPlane(Quaternion rotation, float scale)
     {
@@ -101,12 +101,12 @@ public class ModelTreeNode : MonoBehaviour
 
     #region Initialize
     /// <summary>
-    /// ¸ù¾İ¡°³õÊ¼µã¡±ºÍ¡°Ä¿±êµã¡±·ÅÖÃÄ£ĞÍ£¬Ê¹¶ÔÏó·ÅÖÃµ½¡°³õÊ¼µã¡±µÄÎ»ÖÃ£¬²¢ÇÒÕı·½Ïò³¯Ïò¡°Ä¿±êµã¡±¡£
+    /// æ ¹æ®â€œåˆå§‹ç‚¹â€å’Œâ€œç›®æ ‡ç‚¹â€æ”¾ç½®æ¨¡å‹ï¼Œä½¿å¯¹è±¡æ”¾ç½®åˆ°â€œåˆå§‹ç‚¹â€çš„ä½ç½®ï¼Œå¹¶ä¸”æ­£æ–¹å‘æœå‘â€œç›®æ ‡ç‚¹â€ã€‚
     /// </summary>
-    /// <param name="model">ĞèÒª·ÅÖÃµÄÄ£ĞÍ</param>
-    /// <param name="initPosition">³õÊ¼µãµÄÎ»ÖÃ</param>
-    /// <param name="targetPosition">Ä¿±êµãµÄÎ»ÖÃ</param>
-    /// <param name="forward">Ä£ĞÍ³¯Ç°µÄ·½Ïò</param>
+    /// <param name="model">éœ€è¦æ”¾ç½®çš„æ¨¡å‹</param>
+    /// <param name="initPosition">åˆå§‹ç‚¹çš„ä½ç½®</param>
+    /// <param name="targetPosition">ç›®æ ‡ç‚¹çš„ä½ç½®</param>
+    /// <param name="forward">æ¨¡å‹æœå‰çš„æ–¹å‘</param>
     static public void InitTransformByTarget(GameObject model, Vector3 initPosition, Vector3 targetPosition, Vector3 forward)
     {
         var rotation = Quaternion.LookRotation(forward, targetPosition - initPosition);
@@ -115,17 +115,17 @@ public class ModelTreeNode : MonoBehaviour
     }
 
     /// <summary>
-    /// ¼ÆËãµ±Ç°½ÚµãµÄÖĞĞÄÎ»ÖÃ£¬²¢±£´æµ½±äÁ¿_centerÖĞ
+    /// è®¡ç®—å½“å‰èŠ‚ç‚¹çš„ä¸­å¿ƒä½ç½®ï¼Œå¹¶ä¿å­˜åˆ°å˜é‡_centerä¸­
     /// </summary>
     private void CalculateCenter()
     {
-        // Èç¹ûµ±Ç°½ÚµãÊÇÒ¶×Ó½Úµã£¬ÔòÄ£ĞÍµÄÖĞĞÄ¼´Îªµ±Ç°½ÚµãµÄÖĞĞÄ
+        // å¦‚æœå½“å‰èŠ‚ç‚¹æ˜¯å¶å­èŠ‚ç‚¹ï¼Œåˆ™æ¨¡å‹çš„ä¸­å¿ƒå³ä¸ºå½“å‰èŠ‚ç‚¹çš„ä¸­å¿ƒ
         if (_isLeafNode == true)
         {
             // Debug.Log("[tcluan Debug] " + name + " calcualates center.\n");
             _center = _children[0].GetComponent<ModelComponent>().CalculateCenter();
         }
-        // ·ñÔò£¬µ±Ç°½ÚµãÎªÄÚ²¿½Úµã£¬ÔòÄ£ĞÍµÄÖĞĞÄÎªÆä¸÷¸ö×Ó½ÚµãµÄÖĞĞÄ
+        // å¦åˆ™ï¼Œå½“å‰èŠ‚ç‚¹ä¸ºå†…éƒ¨èŠ‚ç‚¹ï¼Œåˆ™æ¨¡å‹çš„ä¸­å¿ƒä¸ºå…¶å„ä¸ªå­èŠ‚ç‚¹çš„ä¸­å¿ƒ
         else
         {
             float totalMass = 0.0f;
@@ -143,10 +143,10 @@ public class ModelTreeNode : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸ù¾İÄ£ĞÍµÄĞı×ªÓëËõ·Å£¬¸üĞÂ·É»úµÄ±¬Õ¨·½ÏòºÍ±¬Õ¨¾àÀë 
+    /// æ ¹æ®æ¨¡å‹çš„æ—‹è½¬ä¸ç¼©æ”¾ï¼Œæ›´æ–°é£æœºçš„çˆ†ç‚¸æ–¹å‘å’Œçˆ†ç‚¸è·ç¦» 
     /// </summary>
-    /// <param name="rotation">¶ÔÓ¦transform.rotationµÄ¸ü¸Ä</param>
-    /// <param name="scale">¶ÔÓ¦transform.scaleµÄ¸ü¸Ä</param>
+    /// <param name="rotation">å¯¹åº”transform.rotationçš„æ›´æ”¹</param>
+    /// <param name="scale">å¯¹åº”transform.scaleçš„æ›´æ”¹</param>
     private void InitExplosionProperty(Quaternion rotation, float scale)
     {
         if (_isLeafNode == true)
@@ -170,10 +170,10 @@ public class ModelTreeNode : MonoBehaviour
     #region Explosion
 
         /// <summary>
-        /// Ä£ĞÍÑØ×Å¸ø¶¨·½Ïò£¬°´Ö¸¶¨¾àÀëÒÆ¶¯
+        /// æ¨¡å‹æ²¿ç€ç»™å®šæ–¹å‘ï¼ŒæŒ‰æŒ‡å®šè·ç¦»ç§»åŠ¨
         /// </summary>
-        /// <param name="direction">ÒÆ¶¯·½Ïò</param>
-        /// <param name="intensity">ÒÆ¶¯¾àÀë</param>
+        /// <param name="direction">ç§»åŠ¨æ–¹å‘</param>
+        /// <param name="intensity">ç§»åŠ¨è·ç¦»</param>
     private void ModelMovement(Vector3 direction, float intensity)
     {
         _direction = direction;
@@ -183,10 +183,10 @@ public class ModelTreeNode : MonoBehaviour
     }
 
     /// <summary>
-    /// µİ¹éÒÆ¶¯ËùÓĞ×Ó½ÚµãµÄÖĞĞÄÎ»ÖÃ
+    /// é€’å½’ç§»åŠ¨æ‰€æœ‰å­èŠ‚ç‚¹çš„ä¸­å¿ƒä½ç½®
     /// </summary>
-    /// <param name="direction">ÒÆ¶¯·½Ïò</param>
-    /// <param name="intensity">ÒÆ¶¯¾àÀë</param>
+    /// <param name="direction">ç§»åŠ¨æ–¹å‘</param>
+    /// <param name="intensity">ç§»åŠ¨è·ç¦»</param>
     private void CenterMovement(Vector3 direction, float intensity)
     {
         _center += direction * _factor * intensity;
@@ -202,8 +202,8 @@ public class ModelTreeNode : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿ØÖÆÖ¸¶¨ËùÓĞ×Ó½Úµã±¬Õ¨¡£
-    /// ÆäÖĞ£¬±¬Õ¨ÖĞĞÄÓÉ¸¸½ÚµãµÄÖĞĞÄµã£¨center£©¾ö¶¨¡£
+    /// æ§åˆ¶æŒ‡å®šæ‰€æœ‰å­èŠ‚ç‚¹çˆ†ç‚¸ã€‚
+    /// å…¶ä¸­ï¼Œçˆ†ç‚¸ä¸­å¿ƒç”±çˆ¶èŠ‚ç‚¹çš„ä¸­å¿ƒç‚¹ï¼ˆcenterï¼‰å†³å®šã€‚
     /// </summary>
     private void NaiveExplosion(bool recovery=false)
     {
@@ -211,20 +211,20 @@ public class ModelTreeNode : MonoBehaviour
         foreach (GameObject child in _children)
         {
             ModelTreeNode childNode = child.GetComponent<ModelTreeNode>();
-            // frame½ÚµãÔÚ±¬Õ¨Ê±²»ÒÆ¶¯
+            // frameèŠ‚ç‚¹åœ¨çˆ†ç‚¸æ—¶ä¸ç§»åŠ¨
             if (childNode._isFrame == true)
             {
                 continue;
             }
-            // ±¬Õ¨·½ÏòÎª´Ó¸¸½ÚµãÖ¸Ïò×Ó½ÚµãµÄ·½Ïò
+            // çˆ†ç‚¸æ–¹å‘ä¸ºä»çˆ¶èŠ‚ç‚¹æŒ‡å‘å­èŠ‚ç‚¹çš„æ–¹å‘
             Vector3 direction = (childNode.center - _center).normalized;
             childNode.ModelMovement(direction, (recovery==true)?-_intensity:_intensity);
         }
     }
 
     /// <summary>
-    /// ¿ØÖÆËùÓĞ×Ó½Úµã¡¾Æ½ĞĞÓÚ¸ø¶¨Æ½Ãæ¡¿±¬Õ¨¡£
-    /// ÇÒÒÔ¸¸½Úµã±¬Õ¨ÖáÏß£¨explosionAxis£©Îª·¨ÏßµÄÆ½Ãæ¡£
+    /// æ§åˆ¶æ‰€æœ‰å­èŠ‚ç‚¹ã€å¹³è¡Œäºç»™å®šå¹³é¢ã€‘çˆ†ç‚¸ã€‚
+    /// ä¸”ä»¥çˆ¶èŠ‚ç‚¹çˆ†ç‚¸è½´çº¿ï¼ˆexplosionAxisï¼‰ä¸ºæ³•çº¿çš„å¹³é¢ã€‚
     /// </summary>
     private void SurfaceAlignedExplosion(bool recovery=false)
     {
@@ -232,17 +232,17 @@ public class ModelTreeNode : MonoBehaviour
         foreach (GameObject child in _children)
         {
             ModelTreeNode childNode = child.GetComponent<ModelTreeNode>();
-            // frame½ÚµãÔÚ±¬Õ¨Ê±²»ÒÆ¶¯
+            // frameèŠ‚ç‚¹åœ¨çˆ†ç‚¸æ—¶ä¸ç§»åŠ¨
             if (childNode._isFrame == true)
             {
                 continue;
             }
-            // vecParent2ChildµÄ·½ÏòÎª´Ó¸¸½ÚµãÖ¸Ïò×Ó½ÚµãµÄ·½Ïò¡£
+            // vecParent2Childçš„æ–¹å‘ä¸ºä»çˆ¶èŠ‚ç‚¹æŒ‡å‘å­èŠ‚ç‚¹çš„æ–¹å‘ã€‚
             Vector3 vecParent2Child = childNode.center - _center,
-                // vecAlongNormalÎªÏòÁ¿vecParent2ChildÔÚÆ½Ãæ·¨Ïß·½ÏòÉÏµÄÍ¶Ó°¡£
+                // vecAlongNormalä¸ºå‘é‡vecParent2Childåœ¨å¹³é¢æ³•çº¿æ–¹å‘ä¸Šçš„æŠ•å½±ã€‚
                 vecAlongNormal = Vector3.Dot(vecParent2Child, _axis) * _axis;
-            // ±¬Õ¨·½ÏòÆ½ĞĞÓÚ¸ø¶¨Æ½Ãæ£¬¼´´¹Ö±ÓÚÆ½ÃæµÄ·¨Ïß£¬Òà¼´ÔÚ·¨Ïß·½ÏòÉÏµÄ·ÖÁ¿Îª0¡£
-            // Òò´Ë°ÑÑØ·¨Ïß·½Ïò·ÖÁ¿´ÓvecParent2ChildÖĞÈ¥³ı¼´¿É¡£
+            // çˆ†ç‚¸æ–¹å‘å¹³è¡Œäºç»™å®šå¹³é¢ï¼Œå³å‚ç›´äºå¹³é¢çš„æ³•çº¿ï¼Œäº¦å³åœ¨æ³•çº¿æ–¹å‘ä¸Šçš„åˆ†é‡ä¸º0ã€‚
+            // å› æ­¤æŠŠæ²¿æ³•çº¿æ–¹å‘åˆ†é‡ä»vecParent2Childä¸­å»é™¤å³å¯ã€‚
             Vector3 direction = (vecParent2Child - vecAlongNormal).normalized;
             //Debug.Log("[tcluan Debug] " + !recovery + " " + name + " dirction: " + direction + " intensity: " + _intensity);
             childNode.ModelMovement(direction, (recovery==true)?-_intensity:_intensity);
@@ -250,9 +250,9 @@ public class ModelTreeNode : MonoBehaviour
     }
     
     /// <summary>
-    /// ¿ØÖÆÖ¸¶¨¸¸½ÚµãÏÂÒ»²ã¼¶µÄËùÓĞ×Ó½Úµã¡¾Æ½ĞĞÓÚ¸ø¶¨ÖáÏß¡¿±¬Õ¨¡£
-    /// ÆäÖĞ£¬±¬Õ¨µÄÕı·½ÏòÓÉ¸¸½ÚµãµÄ±¬Õ¨ÖáÏß£¨explosionAxis£©·½Ïò¾ö¶¨£»
-    /// ±¬Õ¨·½ÏòµÄÕı¸ºÓÉ¸¸½ÚµãÓë×Ó½ÚµãÏà¶ÔÓÚ±¬Õ¨ÖáÏßµÄÎ»ÖÃ¹ØÏµ¾ö¶¨¡£
+    /// æ§åˆ¶æŒ‡å®šçˆ¶èŠ‚ç‚¹ä¸‹ä¸€å±‚çº§çš„æ‰€æœ‰å­èŠ‚ç‚¹ã€å¹³è¡Œäºç»™å®šè½´çº¿ã€‘çˆ†ç‚¸ã€‚
+    /// å…¶ä¸­ï¼Œçˆ†ç‚¸çš„æ­£æ–¹å‘ç”±çˆ¶èŠ‚ç‚¹çš„çˆ†ç‚¸è½´çº¿ï¼ˆexplosionAxisï¼‰æ–¹å‘å†³å®šï¼›
+    /// çˆ†ç‚¸æ–¹å‘çš„æ­£è´Ÿç”±çˆ¶èŠ‚ç‚¹ä¸å­èŠ‚ç‚¹ç›¸å¯¹äºçˆ†ç‚¸è½´çº¿çš„ä½ç½®å…³ç³»å†³å®šã€‚
     /// </summary>
     private void AxisAlignedExplosion(bool recovery=false)
     {
@@ -260,20 +260,20 @@ public class ModelTreeNode : MonoBehaviour
         foreach (GameObject child in _children)
         {
             ModelTreeNode childNode = child.GetComponent<ModelTreeNode>();
-            // frame½ÚµãÔÚ±¬Õ¨Ê±²»ÒÆ¶¯
+            // frameèŠ‚ç‚¹åœ¨çˆ†ç‚¸æ—¶ä¸ç§»åŠ¨
             if (childNode._isFrame == true)
             {
                 continue;
             }
-            // ±¬Õ¨Æ½ĞĞÓÚ¸¸½ÚµãµÄ±¬Õ¨ÖáÏß
+            // çˆ†ç‚¸å¹³è¡Œäºçˆ¶èŠ‚ç‚¹çš„çˆ†ç‚¸è½´çº¿
             Vector3 direction = _axis;
-            // ±¬Õ¨·½ÏòµÄÕı¸ºÓÉ¸¸£¬×Ó½ÚµãÔÚ±¬Õ¨ÖáÏßµÄÎ»ÖÃ¹ØÏµ¾ö¶¨
+            // çˆ†ç‚¸æ–¹å‘çš„æ­£è´Ÿç”±çˆ¶ï¼Œå­èŠ‚ç‚¹åœ¨çˆ†ç‚¸è½´çº¿çš„ä½ç½®å…³ç³»å†³å®š
             if (Vector3.Dot(childNode.center, _axis) < Vector3.Dot(_center, _axis))
             {
                 direction *= -1.0f;
             }
-            // ÕâÖÖ·½·¨±ÈÉÏÃæµÄ·½·¨¶à¼ÆËãÁËÒ»´Î¿ª¸ùºÅ¡£²¢ÇÒÔÚ·½ÏòÎªÕıÊ±»¹»á¶à¼ÆËãÒ»´ÎÏòÁ¿Êı³Ë¡££¨×¢Òâ£¬normalizedÏàµ±ÓÚÒ»´ÎÏòÁ¿µã»ı+Ò»´Î¿ª¸ùºÅÔËËã£©
-            //// ±¬Õ¨·½ÏòÎªvecParent2ChlidÔÚ±¬Õ¨ÖáÏßÉÏµÄÍ¶Ó°
+            // è¿™ç§æ–¹æ³•æ¯”ä¸Šé¢çš„æ–¹æ³•å¤šè®¡ç®—äº†ä¸€æ¬¡å¼€æ ¹å·ã€‚å¹¶ä¸”åœ¨æ–¹å‘ä¸ºæ­£æ—¶è¿˜ä¼šå¤šè®¡ç®—ä¸€æ¬¡å‘é‡æ•°ä¹˜ã€‚ï¼ˆæ³¨æ„ï¼Œnormalizedç›¸å½“äºä¸€æ¬¡å‘é‡ç‚¹ç§¯+ä¸€æ¬¡å¼€æ ¹å·è¿ç®—ï¼‰
+            //// çˆ†ç‚¸æ–¹å‘ä¸ºvecParent2Chlidåœ¨çˆ†ç‚¸è½´çº¿ä¸Šçš„æŠ•å½±
             //Vector3 vecParent2Chlid = childNode.center - _center;
             //Vector3 direction = (Vector3.Dot(vecParent2Chlid, _explosionAxis) * _explosionAxis).normalized;
 
@@ -292,7 +292,7 @@ public class ModelTreeNode : MonoBehaviour
             //Debug.Log("[tcluan Debug] Plane center: " + _center);
         }
         _deltaTime = 0.05f;
-        _axis = _axis.normalized; // ¡¾èïÌì³Û2024.11.04Áô¡¿³ı·ÇÄÜÈ·¶¨ÌîÈëµÄexplosionAxis¶¼ÊÇµ¥Î»ÏòÁ¿£¬·ñÔò²»ÒªÉ¾µôÕâĞĞ
+        _axis = _axis.normalized; // ã€æ ¾å¤©é©°2024.11.04ç•™ã€‘é™¤éèƒ½ç¡®å®šå¡«å…¥çš„explosionAxiséƒ½æ˜¯å•ä½å‘é‡ï¼Œå¦åˆ™ä¸è¦åˆ æ‰è¿™è¡Œ
     }
 
     private void FixedUpdate()

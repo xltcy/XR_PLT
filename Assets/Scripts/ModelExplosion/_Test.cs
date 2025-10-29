@@ -15,19 +15,19 @@ public class _Test : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // °´J²âÊÔ±¬Õ¨Ð§¹û
+        // æŒ‰Jæµ‹è¯•çˆ†ç‚¸æ•ˆæžœ
         if (Input.GetKeyDown(KeyCode.J))
         {
-            // µ÷ÓÃÕâÐÐ´úÂëÖ´ÐÐ±¬Õ¨
+            // è°ƒç”¨è¿™è¡Œä»£ç æ‰§è¡Œçˆ†ç‚¸
             ModelTreeNode.OneDofExplosion(_snoar);
-            // ±¬Õ¨¾àÀëÍ¨¹ýPrefab-Snoar/snoar Õâ¸ö¶ÔÏó£¬Standard IntensityÕâ¸ö±äÁ¿À´¿ØÖÆ£¨ÔÚÕâÀï===================================>£©
+            // çˆ†ç‚¸è·ç¦»é€šè¿‡Prefab-Snoar/snoar è¿™ä¸ªå¯¹è±¡ï¼ŒStandard Intensityè¿™ä¸ªå˜é‡æ¥æŽ§åˆ¶ï¼ˆåœ¨è¿™é‡Œ===================================>ï¼‰
         }
 
         if (Input.GetKeyDown(KeyCode.K))
         {
-            // µ÷ÓÃÕâÐÐ´úÂëÖ´ÐÐ±¬Õ¨
+            // è°ƒç”¨è¿™è¡Œä»£ç æ‰§è¡Œçˆ†ç‚¸
             ModelTreeNode.OneDofRecovery(_snoar);
-            // ±¬Õ¨¾àÀëÍ¨¹ýPrefab-Snoar/snoar Õâ¸ö¶ÔÏó£¬Standard IntensityÕâ¸ö±äÁ¿À´¿ØÖÆ£¨ÔÚÕâÀï===================================>£©
+            // çˆ†ç‚¸è·ç¦»é€šè¿‡Prefab-Snoar/snoar è¿™ä¸ªå¯¹è±¡ï¼ŒStandard Intensityè¿™ä¸ªå˜é‡æ¥æŽ§åˆ¶ï¼ˆåœ¨è¿™é‡Œ===================================>ï¼‰
         }
     }
 }

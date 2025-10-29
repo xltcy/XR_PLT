@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class LoadingViewController : MonoBehaviour
 {
-    public float loadingRotationSpeed = 200f; // 加载旋转速度
+    public float loadingRotationSpeed = 200f; // 鍔犺浇鏃嬭浆閫熷害
 
     // Start is called before the first frame update
     void Start()
@@ -13,7 +13,7 @@ public class LoadingViewController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 加载旋转动画
+        // 鍔犺浇鏃嬭浆鍔ㄧ敾
         GetComponent<SVGImage>().transform.Rotate(0, 0, -loadingRotationSpeed * Time.deltaTime);
     }
 }

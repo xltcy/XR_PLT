@@ -57,7 +57,7 @@ public class StudioExporter : MonoBehaviour
 
         //string json = JsonUtility.ToJson(data, true);
         //File.WriteAllText(path + "scene.json", json);
-        Debug.Log("µ¼³ö³É¹¦£º" + path + "scene.json");
+        Debug.Log("å¯¼å‡ºæˆåŠŸï¼š" + path + "scene.json");
     }
 
     float[] VecToArr(Vector3 v) => new float[] { v.x, v.y, v.z };

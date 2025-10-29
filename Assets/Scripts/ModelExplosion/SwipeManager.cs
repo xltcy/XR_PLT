@@ -27,10 +27,10 @@ public class SwipeManager : MonoBehaviour
     #region Handler
     private void HandleSwipe(LeanFinger finger)
     {
-        // ¼ì²é»¬¶¯·½Ïò
+        // æ£€æŸ¥æ»‘åŠ¨æ–¹å‘
         if (IsSwipeUp(finger))
         {
-            // µ÷ÓÃÄãµÄº¯Êı
+            // è°ƒç”¨ä½ çš„å‡½æ•°
             _onSwipeUp?.Invoke();
         }
         else if (IsSwipeLeft(finger))
@@ -61,13 +61,13 @@ public class SwipeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // ¶©ÔÄ»¬¶¯ÊÂ¼ş
+        // è®¢é˜…æ»‘åŠ¨äº‹ä»¶
         LeanTouch.OnFingerSwipe += HandleSwipe;
     }
 
     private void OnDisable()
     {
-        // È¡Ïû¶©ÔÄ»¬¶¯ÊÂ¼ş
+        // å–æ¶ˆè®¢é˜…æ»‘åŠ¨äº‹ä»¶
         LeanTouch.OnFingerSwipe -= HandleSwipe;
     }
 
@@ -82,40 +82,40 @@ public class SwipeManager : MonoBehaviour
 
     private bool IsSwipeUp(LeanFinger finger)
     {
-        // »ñÈ¡»¬¶¯µÄ·½Ïò
+        // è·å–æ»‘åŠ¨çš„æ–¹å‘
         var swipeDelta = finger.SwipeScreenDelta;
 
-        // ÅĞ¶Ï»¬¶¯ÊÇ·ñÖ÷ÒªÊÇÏòÉÏµÄ
+        // åˆ¤æ–­æ»‘åŠ¨æ˜¯å¦ä¸»è¦æ˜¯å‘ä¸Šçš„
         return swipeDelta.y > 0 && swipeDelta.y > Math.Abs(swipeDelta.x) && IsTagUI(finger)==false;
     }
 
     private bool IsSwipeLeft(LeanFinger finger)
     {
-        // »ñÈ¡»¬¶¯µÄ·½Ïò
+        // è·å–æ»‘åŠ¨çš„æ–¹å‘
         var swipeDelta = finger.SwipeScreenDelta;
 
-        // ÅĞ¶Ï»¬¶¯ÊÇ·ñÖ÷ÒªÊÇÏò×óµÄ
+        // åˆ¤æ–­æ»‘åŠ¨æ˜¯å¦ä¸»è¦æ˜¯å‘å·¦çš„
         return swipeDelta.x < 0 && -swipeDelta.x > Math.Abs(swipeDelta.y) && IsTagUI(finger)==false;
     }
 
     private bool IsSwipeRight(LeanFinger finger)
     {
-        // »ñÈ¡»¬¶¯µÄ·½Ïò
+        // è·å–æ»‘åŠ¨çš„æ–¹å‘
         var swipeDelta = finger.SwipeScreenDelta;
 
-        // ÅĞ¶Ï»¬¶¯ÊÇ·ñÖ÷ÒªÊÇÏòÓÒµÄ
+        // åˆ¤æ–­æ»‘åŠ¨æ˜¯å¦ä¸»è¦æ˜¯å‘å³çš„
         return swipeDelta.x > 0 && swipeDelta.x > Math.Abs(swipeDelta.y) && IsTagUI(finger)==false;
     }
 
     private bool IsTagUI(LeanFinger finger)
     {
-        // ´´½¨ PointerEventData
+        // åˆ›å»º PointerEventData
         PointerEventData pointerEventData = new PointerEventData(_eventSystem)
         {
             position = finger.StartScreenPosition
         };
 
-        // ´æ´¢ÉäÏß¼ì²â½á¹û
+        // å­˜å‚¨å°„çº¿æ£€æµ‹ç»“æœ
         List<RaycastResult> results = new List<RaycastResult>();
         _graphicRaycaster.Raycast(pointerEventData, results);
 

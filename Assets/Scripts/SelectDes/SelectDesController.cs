@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class SelectDesController : MonoBehaviour
 {
-    public GameObject itemPrefab;           // ÍÏÈë ListItemPrefab
-    public Transform contentParent;         // ÍÏÈë ScrollView/Viewport/Content
+    public GameObject itemPrefab;           // æ‹–å…¥ ListItemPrefab
+    public Transform contentParent;         // æ‹–å…¥ ScrollView/Viewport/Content
     private List<SelectDesModel> desList;
 
     public Sprite[] images;
@@ -17,7 +17,7 @@ public class SelectDesController : MonoBehaviour
     public bool useResources = false;
 
     private string resourceFolder = "SelectDesCoverImages";
-    private string hintString = "»¶Ó­À´µ½¹¤ÑµÂ¥£¬ÇëÑ¡ÔñÏëÒª²Î¹ÛµÄÇøÓò\nµã»÷ÆÁÄ»ÉÏµÄÑ¡Ïî";
+    private string hintString = "æ¬¢è¿æ¥åˆ°å·¥è®­æ¥¼ï¼Œè¯·é€‰æ‹©æƒ³è¦å‚è§‚çš„åŒºåŸŸ\nç‚¹å‡»å±å¹•ä¸Šçš„é€‰é¡¹";
 
     // Start is called before the first frame update
     void Start()
@@ -60,7 +60,7 @@ public class SelectDesController : MonoBehaviour
     {
         string input = testVoiceInputField.textComponent.text;
         Debug.Log($"test voice rec {input}");
-        FindObjectOfType<VoiceController>().ÓïÒôÊ¶±ğ½á¹û(input);
+        FindObjectOfType<VoiceController>().è¯­éŸ³è¯†åˆ«ç»“æœ(input);
     }
 
     public List<SelectDesModel> GetSelectDesList()
@@ -70,18 +70,18 @@ public class SelectDesController : MonoBehaviour
 
     private void GenerateSelectList()
     {
-        // Çå¿Õ¾ÉÏîÄ¿
+        // æ¸…ç©ºæ—§é¡¹ç›®
         foreach (Transform child in contentParent)
             Destroy(child.gameObject);
 
-        // Ìí¼ÓĞÂÏîÄ¿
+        // æ·»åŠ æ–°é¡¹ç›®
         foreach (var item in desList)
         {
             GameObject newItem = Instantiate(itemPrefab, contentParent);
             newItem.transform.Find("Text").GetComponent<Text>().text = item.title;
             newItem.transform.Find("Image").GetComponent<Image>().sprite = item.image;
 
-            // Ìí¼Óµã»÷ÊÂ¼ş
+            // æ·»åŠ ç‚¹å‡»äº‹ä»¶
             Button button = newItem.GetComponent<Button>();
             button.onClick.AddListener(() => item.onClickAction?.Invoke());
         }
@@ -90,8 +90,8 @@ public class SelectDesController : MonoBehaviour
     private void GenerateFakeData()
     {
         List<string> titles = new List<string>();
-        titles.Add("ÖÇ»Ûº£ÑóÏµÍ³");
-        titles.Add("ĞéÊµÈÚºÏÌ«¿ÕÕ¾");
+        titles.Add("æ™ºæ…§æµ·æ´‹ç³»ç»Ÿ");
+        titles.Add("è™šå®èåˆå¤ªç©ºç«™");
         List<Sprite> imageList = LoadAllSpritesFromFolder();
         Debug.Log($"Load from Resource cnt: {imageList.Count}");
         if (!useResources)
@@ -105,10 +105,10 @@ public class SelectDesController : MonoBehaviour
         desList = new List<SelectDesModel>();
         for (int i = 0; i < imageList.Count; i++)
         {
-            int index = i; // ²¶»ñÑ­»·±äÁ¿
+            int index = i; // æ•è·å¾ªç¯å˜é‡
             SelectDesModel item = new SelectDesModel
             {
-                //title = $"Ñ¡Ïî {i + 1}",
+                //title = $"é€‰é¡¹ {i + 1}",
                 title = titles[i % (titles.Count)] + i,
                 image = imageList[i],
                 
@@ -125,7 +125,7 @@ public class SelectDesController : MonoBehaviour
     {
         List<Sprite> sprites = new List<Sprite>();
 
-        // Resources.LoadAll »á×Ô¶¯¼ÓÔØËùÓĞÖ§³ÖµÄ×ÊÔ´ÀàĞÍ
+        // Resources.LoadAll ä¼šè‡ªåŠ¨åŠ è½½æ‰€æœ‰æ”¯æŒçš„èµ„æºç±»å‹
         Object[] loaded = Resources.LoadAll(resourceFolder, typeof(Texture2D));
 
         foreach (Object obj in loaded)
@@ -133,11 +133,11 @@ public class SelectDesController : MonoBehaviour
             Texture2D tex = obj as Texture2D;
             if (tex == null) continue;
 
-            // ´´½¨ Sprite
+            // åˆ›å»º Sprite
             Sprite sprite = Sprite.Create(
                 tex,
                 new Rect(0, 0, tex.width, tex.height),
-                new Vector2(0.5f, 0.5f) // ÖĞĞÄµã
+                new Vector2(0.5f, 0.5f) // ä¸­å¿ƒç‚¹
             );
 
             sprites.Add(sprite);
@@ -148,7 +148,7 @@ public class SelectDesController : MonoBehaviour
 
     private void ListItemClickAction(SelectDesModel item)
     {
-        Debug.Log($"Msg: µã»÷ÁËÑ¡Ïî {item.title}");
+        Debug.Log($"Msg: ç‚¹å‡»äº†é€‰é¡¹ {item.title}");
         selectDesInterface?.OnSelectDesAt(item);
     }
 
@@ -161,7 +161,7 @@ public class SelectDesController : MonoBehaviour
     {
         var sceneData = FindObjectOfType<SceneController>().sceneData;
         // generate hint string
-        hintString = "»¶Ó­À´µ½" + sceneData.sceneName +"£¬ÇëÑ¡ÔñÏëÒª²Î¹ÛµÄÇøÓò\nµã»÷ÆÁÄ»ÉÏµÄÑ¡Ïî";
+        hintString = "æ¬¢è¿æ¥åˆ°" + sceneData.sceneName +"ï¼Œè¯·é€‰æ‹©æƒ³è¦å‚è§‚çš„åŒºåŸŸ\nç‚¹å‡»å±å¹•ä¸Šçš„é€‰é¡¹";
 
         // generate list
         var points = sceneData.explanationPoints;
@@ -170,10 +170,10 @@ public class SelectDesController : MonoBehaviour
         List<Sprite> imageList = LoadAllSpritesFromFolder();
         foreach(var p in points)
         {
-            int index = points.IndexOf(p); // ²¶»ñÑ­»·±äÁ¿
+            int index = points.IndexOf(p); // æ•è·å¾ªç¯å˜é‡
             SelectDesModel item = new SelectDesModel
             {
-                //title = $"Ñ¡Ïî {i + 1}",
+                //title = $"é€‰é¡¹ {i + 1}",
                 pointId = p.id,
                 title = p.title,
                 image = imageList[index % imageList.Count],

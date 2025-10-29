@@ -3,7 +3,7 @@ using UnityEngine;
 public static class GameObjectExtensions
 {
     /// <summary>
-    /// »ñÈ¡»òÌí¼Ó×é¼ş
+    /// è·å–æˆ–æ·»åŠ ç»„ä»¶
     /// </summary>
     public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
     {

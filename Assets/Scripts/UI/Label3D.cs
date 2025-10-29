@@ -9,19 +9,19 @@ public class Label3D : MonoBehaviour
 
     void Start()
     {
-        // ´´½¨¿ÕÈİÆ÷
+        // åˆ›å»ºç©ºå®¹å™¨
         GameObject container = new GameObject("SpeechBubble");
         label = container;
         container.transform.SetParent(transform, false);
 
-        // 1. ±³¾°Í¼£¨Quad£©
+        // 1. èƒŒæ™¯å›¾ï¼ˆQuadï¼‰
         GameObject bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
         bg.name = "BubbleBG";
         bg.transform.SetParent(container.transform, false);
-        bg.transform.localPosition = new Vector3(0, 0, 0.01f); // ÉÔºóÃæÒ»µã
-        bg.transform.localScale = new Vector3(4f, 2.5f, 1f); // ´óĞ¡°´ÌùÍ¼À´µ÷
+        bg.transform.localPosition = new Vector3(0, 0, 0.01f); // ç¨åé¢ä¸€ç‚¹
+        bg.transform.localScale = new Vector3(4f, 2.5f, 1f); // å¤§å°æŒ‰è´´å›¾æ¥è°ƒ
 
-        // ¼ÓÔØÃûÎª"3DLabel"µÄ²ÄÖÊ
+        // åŠ è½½åä¸º"3DLabel"çš„æè´¨
         Material labelMat = Resources.Load<Material>("Materials/3DLabel");
         if (labelMat != null)
         {
@@ -29,7 +29,7 @@ public class Label3D : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ÕÒ²»µ½ÃûÎª '3DLabel' µÄ²ÄÖÊ£¬Çë¼ì²éResourcesÎÄ¼ş¼ĞÀïÊÇ·ñ´æÔÚ¡£");
+            Debug.LogWarning("æ‰¾ä¸åˆ°åä¸º '3DLabel' çš„æè´¨ï¼Œè¯·æ£€æŸ¥Resourcesæ–‡ä»¶å¤¹é‡Œæ˜¯å¦å­˜åœ¨ã€‚");
         }
 
         // 2. TextMeshPro

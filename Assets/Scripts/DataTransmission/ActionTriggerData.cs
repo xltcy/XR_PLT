@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-// ---------- Trigger ĞÅÏ¢ ----------
+// ---------- Trigger ä¿¡æ¯ ----------
 [Serializable]
 public class ActionTriggerData
 {
@@ -16,7 +16,7 @@ public class ActionTriggerData
 
     //-------------Optional------------//
     // AfterAction mode
-    public int afterActionId; // ¹Ø¼ü×Ö»ò¶¯×÷Ãû
+    public int afterActionId; // å…³é”®å­—æˆ–åŠ¨ä½œå
     public bool isWhenActionStart = true; // true follow startTrigger;false stopTrigger
     // VoiceKeyword mode
     public string matchPattern;

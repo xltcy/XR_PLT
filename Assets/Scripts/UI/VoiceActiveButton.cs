@@ -15,7 +15,7 @@ using UnityEngine.UI;
 /// </summary>
 public class VoiceActiveButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    // ½«Ã¶¾ÙÒÆµ½Àà¶¨ÒåµÄ¿ªÊ¼´¦
+    // å°†æžšä¸¾ç§»åˆ°ç±»å®šä¹‰çš„å¼€å§‹å¤„
     public enum State
     {
         NORMAL,
@@ -32,9 +32,9 @@ public class VoiceActiveButton : MonoBehaviour, IPointerDownHandler, IPointerUpH
     public Sprite[] spritePressing;
     public Sprite spriteLoading;
 
-    [Header("¶¯»­²ÎÊý")]
-    public float recordingFrameRate = 0.1f; // Â¼Òô¶¯»­Ö¡¼ä¸ô
-    public float loadingRotationSpeed = 200f; // ¼ÓÔØÐý×ªËÙ¶È
+    [Header("åŠ¨ç”»å‚æ•°")]
+    public float recordingFrameRate = 0.1f; // å½•éŸ³åŠ¨ç”»å¸§é—´éš”
+    public float loadingRotationSpeed = 200f; // åŠ è½½æ—‹è½¬é€Ÿåº¦
 
     private bool errorHasOccur = false;
 
@@ -83,9 +83,9 @@ public class VoiceActiveButton : MonoBehaviour, IPointerDownHandler, IPointerUpH
         this.enabled = state != State.CONSOLING;
         string text = state switch
         {
-            State.NORMAL => "ÓïÒôÃüÁî",
-            State.PRESSED => "Çë½²»°...",
-            State.CONSOLING => "ÕýÔÚ´¦Àí",
+            State.NORMAL => "è¯­éŸ³å‘½ä»¤",
+            State.PRESSED => "è¯·è®²è¯...",
+            State.CONSOLING => "æ­£åœ¨å¤„ç†",
             _ => ""
         };
 
@@ -108,18 +108,18 @@ public class VoiceActiveButton : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     private IEnumerator MockIconAnimate()
     {
-        // Â¼Òô¶¯»­
+        // å½•éŸ³åŠ¨ç”»
         int currentFrame = 0;
         while (state == State.PRESSED)
         {
-            // Ñ­»·²¥·Å¶¯»­Ö¡
+            // å¾ªçŽ¯æ’­æ”¾åŠ¨ç”»å¸§
             svgImage.sprite = spritePressing[currentFrame];
             currentFrame = (currentFrame + 1) % spritePressing.Length;
 
             yield return new WaitForSeconds(recordingFrameRate);
         }
 
-        // ¼ÓÔØÐý×ª¶¯»­
+        // åŠ è½½æ—‹è½¬åŠ¨ç”»
         svgImage.sprite = spriteLoading;
         svgImage.transform.localRotation = Quaternion.identity;
         while (state == State.CONSOLING)

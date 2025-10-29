@@ -12,7 +12,7 @@ public class VoiceController : MonoBehaviour
     public VoiceActiveButton voiceActiveButton;
     public SMPLController smplController;
 
-    [Header("Ä£ÄâÓïÒôÊ¶±ğ½á¹û")]
+    [Header("æ¨¡æ‹Ÿè¯­éŸ³è¯†åˆ«ç»“æœ")]
     public Text fakeVoiceText;
 
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
@@ -21,10 +21,10 @@ public class VoiceController : MonoBehaviour
     void Start()
     {
         voiceActiveButton.ResetBtn();
-        voiceActiveButton.onPointerDown.AddListener(¿ªÊ¼ÓïÒôÊ¶±ğ);
-        voiceActiveButton.onPointerUp.AddListener(Í£Ö¹ÓïÒôÊ¶±ğ);
+        voiceActiveButton.onPointerDown.AddListener(å¼€å§‹è¯­éŸ³è¯†åˆ«);
+        voiceActiveButton.onPointerUp.AddListener(åœæ­¢è¯­éŸ³è¯†åˆ«);
         xunfei = XunFeiYuYin.Init("5c81de59", "ea4d5e9b06f8cfb0deae4d5360e7f8a7", "94348d7a6d5f3807176cb1f4923efa5c", "c6ea43c9e7b14d163bdeb4e51d2e564d");
-        xunfei.ÓïÒôÊ¶±ğÍê³ÉÊÂ¼ş += ÓïÒôÊ¶±ğ½á¹û;
+        xunfei.è¯­éŸ³è¯†åˆ«å®Œæˆäº‹ä»¶ += è¯­éŸ³è¯†åˆ«ç»“æœ;
 
         llmGenerator = LLMGenerator.Init();
 
@@ -59,30 +59,30 @@ public class VoiceController : MonoBehaviour
         voiceRecCommands.Clear();
     }
 
-    public void ¿ªÊ¼ÓïÒôÊ¶±ğ()
+    public void å¼€å§‹è¯­éŸ³è¯†åˆ«()
     {
-        xunfei.¿ªÊ¼ÓïÒôÊ¶±ğ();
+        xunfei.å¼€å§‹è¯­éŸ³è¯†åˆ«();
         SpeechManager.ForceStop();
     }
-    public void Í£Ö¹ÓïÒôÊ¶±ğ()
+    public void åœæ­¢è¯­éŸ³è¯†åˆ«()
     {
-        StartCoroutine(xunfei.Í£Ö¹ÓïÒôÊ¶±ğ());
+        StartCoroutine(xunfei.åœæ­¢è¯­éŸ³è¯†åˆ«());
     }
 
 
-    public void Çå¿ÕÎÄ×Ö()
+    public void æ¸…ç©ºæ–‡å­—()
     {
         debugText.text = "";
     }
 
-    public void ÓïÒôÊ¶±ğ½á¹û(string result)
+    public void è¯­éŸ³è¯†åˆ«ç»“æœ(string result)
     {
         if (result == null || result == "")
         {
             CommandFail();
             return;
         }
-        debugText.text += "\nÓïÒôÊ¶±ğ½áÊø£¬½á¹û:" + result;
+        debugText.text += "\nè¯­éŸ³è¯†åˆ«ç»“æŸï¼Œç»“æœ:" + result;
         VoiceRecCommand resCommand = new VoiceRecCommand("");
         foreach (var command in voiceRecCommands)
         {
@@ -110,8 +110,8 @@ public class VoiceController : MonoBehaviour
                     break;
                 default:
                     matchFail = true;
-                    //todo ÒÆ¶¯µ½³¡¾°Ïà¹ØµÄÅäÖÃÎÄ¼ş
-                    RemoteChat($"ÏÖÔÚÄãÃÇÕıÎ»ÓÚÊ¯¾°É½Ê×¸Ö£¬ÓÃ»§ÌáÎÊµÄÎÊÌâÊÇ{result},ÇëÒÔÒ»¸ö¾«Í¨ÀúÊ·µÄ×¨¼ÒÉí·İ»Ø´ğ£¬Ã¿´Î»Ø´ğ¾¡Á¿²»Òª³¬¹ıÎåÊ®×Ö¡£");
+                    //todo ç§»åŠ¨åˆ°åœºæ™¯ç›¸å…³çš„é…ç½®æ–‡ä»¶
+                    RemoteChat($"ç°åœ¨ä½ ä»¬æ­£ä½äºçŸ³æ™¯å±±é¦–é’¢ï¼Œç”¨æˆ·æé—®çš„é—®é¢˜æ˜¯{result},è¯·ä»¥ä¸€ä¸ªç²¾é€šå†å²çš„ä¸“å®¶èº«ä»½å›ç­”ï¼Œæ¯æ¬¡å›ç­”å°½é‡ä¸è¦è¶…è¿‡äº”åå­—ã€‚");
                     break;
             }
         }
@@ -130,7 +130,7 @@ public class VoiceController : MonoBehaviour
     public void FakeGetVoiceResult(string result)
     {
         result = fakeVoiceText.text.ToString();
-        ÓïÒôÊ¶±ğ½á¹û(result);
+        è¯­éŸ³è¯†åˆ«ç»“æœ(result);
     }
 
     public void VirHumanAction(VirHumanVoiceRecCommand command)
@@ -177,23 +177,23 @@ public class VoiceController : MonoBehaviour
 
     public void Reset()
     {
-        Çå¿ÕÎÄ×Ö();
+        æ¸…ç©ºæ–‡å­—();
     }
 
     public void Test()
     {
-        Çå¿ÕÎÄ×Ö();
+        æ¸…ç©ºæ–‡å­—();
     }
 
     private void ReconizeFail()
     {
-        SpeechManager.SayFromStr("Ê¶±ğÊ§°Ü ÇëÖØĞÂ³¢ÊÔ");
+        SpeechManager.SayFromStr("è¯†åˆ«å¤±è´¥ è¯·é‡æ–°å°è¯•");
         voiceActiveButton.ResetBtn();
     }
 
     private void CommandFail()
     {
-        SpeechManager.SayFromStr("³öÏÖ´íÎó ÇëÖØĞÂ³¢ÊÔ");
+        SpeechManager.SayFromStr("å‡ºç°é”™è¯¯ è¯·é‡æ–°å°è¯•");
         voiceActiveButton.ResetBtn();
     }
 

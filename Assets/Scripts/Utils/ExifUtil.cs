@@ -9,15 +9,15 @@ public class ExifUtil
     {
         using (var ms = new System.IO.MemoryStream(jpegBytes))
         {
-            // ExifLib ¶ÁÈ¡Ê¾Àı
+            // ExifLib è¯»å–ç¤ºä¾‹
             var reader = new ExifReader(ms);
             var res =  reader.GetTagValue(ExifTags.Orientation, out ushort ori)
                    ? ori : (ushort)1;
             switch(res)
             {
                 case 3: return ExifOrientation.ROTATE180;
-                case 6: return ExifOrientation.ROTATE90; // Ë³Ê±Õë 90¡ã
-                case 8: return ExifOrientation.ROTATE270;  // ÄæÊ±Õë 90¡ã
+                case 6: return ExifOrientation.ROTATE90; // é¡ºæ—¶é’ˆ 90Â°
+                case 8: return ExifOrientation.ROTATE270;  // é€†æ—¶é’ˆ 90Â°
                 default: return ExifOrientation.NORMAL;
             }
         }
@@ -31,15 +31,15 @@ public class ExifUtil
         return FixOrientation(texture, ori);
     }
 
-    // ¸ù¾İ Orientation °Ñ Texture2D Ğı×ªµ½ÕıÈ··½Ïò
+    // æ ¹æ® Orientation æŠŠ Texture2D æ—‹è½¬åˆ°æ­£ç¡®æ–¹å‘
     public static Texture2D FixOrientation(Texture2D tex, ExifOrientation ori)
     {
         switch (ori)
         {
             case ExifOrientation.ROTATE180: return Texture2DRotateUtil.Rotate180(tex);
-            case ExifOrientation.ROTATE270: return Texture2DRotateUtil.Rotate270(tex); // Ë³Ê±Õë 90¡ã
-            case ExifOrientation.ROTATE90: return Texture2DRotateUtil.Rotate90(tex);  // ÄæÊ±Õë 90¡ã
-            default: return tex;                                // 1 = Õı³£
+            case ExifOrientation.ROTATE270: return Texture2DRotateUtil.Rotate270(tex); // é¡ºæ—¶é’ˆ 90Â°
+            case ExifOrientation.ROTATE90: return Texture2DRotateUtil.Rotate90(tex);  // é€†æ—¶é’ˆ 90Â°
+            default: return tex;                                // 1 = æ­£å¸¸
         }
     }
 

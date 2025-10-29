@@ -6,9 +6,9 @@ public class ModelComponent : MonoBehaviour
 {
     #region Interface
     /// <summary>
-    /// ¸ù¾İmeshµÄ¶¥µã×ø±ê£¬¼ÆËãµ±Ç°Ä£ĞÍµÄÖĞĞÄÎ»ÖÃ
+    /// æ ¹æ®meshçš„é¡¶ç‚¹åæ ‡ï¼Œè®¡ç®—å½“å‰æ¨¡å‹çš„ä¸­å¿ƒä½ç½®
     /// </summary>
-    /// <returns>µ±Ç°Ä£ĞÍµÄÖĞĞÄÎ»ÖÃ</returns>
+    /// <returns>å½“å‰æ¨¡å‹çš„ä¸­å¿ƒä½ç½®</returns>
     public Vector3 CalculateCenter()
     {
         // Debug.Log(transform.name + " " + transform.childCount);
@@ -24,7 +24,7 @@ public class ModelComponent : MonoBehaviour
 
                 foreach (Vector3 vertex in vertices)
                 {
-                    tmp += transform.TransformPoint(vertex); // ×ª»»µ½ÊÀ½ç×ø±ê
+                    tmp += transform.TransformPoint(vertex); // è½¬æ¢åˆ°ä¸–ç•Œåæ ‡
                 }
 
                 tmp /= vertices.Length;
@@ -49,7 +49,7 @@ public class ModelComponent : MonoBehaviour
 
         ClickableObject clickableObject = gameObject.AddComponent<ClickableObject>();
         // TBD.
-        clickableObject.objIntroduction = "²âÊÔµã»÷" + this.name;
+        clickableObject.objIntroduction = "æµ‹è¯•ç‚¹å‡»" + this.name;
 
         FindObjectOfType<Click3DObjectManager>().AddClickableObjs(clickableObject);*/
     }

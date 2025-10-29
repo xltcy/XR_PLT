@@ -16,7 +16,7 @@ public class NetworkUtil
  { 
     private const string SEVER_URL = "http://60.205.232.241:7171/";
     private const string RELOCATE_REQUEST_URL_SUFFIX = "media_app/request_NVLAD_redir/?source_location=";
-    //todo ĞŞ¸ÄÎªÕıÊ½µØÖ·
+    //todo ä¿®æ”¹ä¸ºæ­£å¼åœ°å€
     private const string SCENE_JSON_URL = "http://localhost:8000/download/data.json";
 
     private static NetworkUtil _instance;
@@ -39,14 +39,14 @@ public class NetworkUtil
         // send HTTP request
         yield return req.SendWebRequest();
 
-        // ´¦ÀíÇëÇó½á¹û
+        // å¤„ç†è¯·æ±‚ç»“æœ
         if (req.result == UnityWebRequest.Result.Success)
         {
             string response = req.downloadHandler.text;
             Debug.Log("Request succeeded. Response: " + response);
             float[,] num = new float[3, 4];
 
-            // ¼ÙÉè receivedJson ÊÇ½ÓÊÕµ½µÄ JSON ×Ö·û´®
+            // å‡è®¾ receivedJson æ˜¯æ¥æ”¶åˆ°çš„ JSON å­—ç¬¦ä¸²
             int startIndex = response.IndexOf("[[");
             int endIndex = response.IndexOf("]]");
 
@@ -54,8 +54,8 @@ public class NetworkUtil
 
             Debug.Log("Truncated JSON: " + truncatedJson);
 
-            string outerPattern = @"\[.*?\]"; // Æ¥Åä×îÍâ²ãµÄ·½À¨ºÅÄÚµÄÄÚÈİ
-            string innerPattern = @"-?\d+\.\d+"; // Æ¥ÅäÒ»¸ö¸¡µãÊı
+            string outerPattern = @"\[.*?\]"; // åŒ¹é…æœ€å¤–å±‚çš„æ–¹æ‹¬å·å†…çš„å†…å®¹
+            string innerPattern = @"-?\d+\.\d+"; // åŒ¹é…ä¸€ä¸ªæµ®ç‚¹æ•°
 
             MatchCollection outerMatches = Regex.Matches(truncatedJson, outerPattern);
 
@@ -73,7 +73,7 @@ public class NetworkUtil
                 {
                     string numberString = innerMatch.Value;
 
-                    // ½âÎö¸¡µãÊı²¢ÉèÖÃµ½¾ØÕó
+                    // è§£ææµ®ç‚¹æ•°å¹¶è®¾ç½®åˆ°çŸ©é˜µ
                     float number = float.Parse(numberString);
                     num[rowIndex, columnIndex] = number;
 
@@ -103,22 +103,22 @@ public class NetworkUtil
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonText = request.downloadHandler.text;
-                Debug.Log("ÏÂÔØ³É¹¦: " + jsonText);
+                Debug.Log("ä¸‹è½½æˆåŠŸ: " + jsonText);
                 
-                // ½âÎö JSON
+                // è§£æ JSON
                 SummaryData data = JsonUtility.FromJson<SummaryData>(jsonText);
                 
-                // ±£´æµ½±¾µØÎÄ¼ş
+                // ä¿å­˜åˆ°æœ¬åœ°æ–‡ä»¶
                 string localPath = Path.Combine(Application.persistentDataPath, "downloaded-test-summary.json");
                 File.WriteAllText(localPath, jsonText);
-                Debug.Log("ÎÄ¼ş±£´æµ½: " + localPath);
+                Debug.Log("æ–‡ä»¶ä¿å­˜åˆ°: " + localPath);
                 onSuccess.Invoke(data);
             }
             else
             {
-                Debug.Log("ÏÂÔØÊ§°Ü: " + request.error);
+                Debug.Log("ä¸‹è½½å¤±è´¥: " + request.error);
                 
-                // Èç¹û·şÎñÆ÷²»¿ÉÓÃ£¬´´½¨Ä£ÄâÊı¾İ
+                // å¦‚æœæœåŠ¡å™¨ä¸å¯ç”¨ï¼Œåˆ›å»ºæ¨¡æ‹Ÿæ•°æ®
                 string localJsonPath = "test-summary.json";
 
                 // Temp logic start
@@ -141,7 +141,7 @@ public class NetworkUtil
                 }
                 if (!File.Exists(localJsonPath))
                 {
-                    string error = "ÕÒ²»µ½ scene.json£¡Path:" + localJsonPath;
+                    string error = "æ‰¾ä¸åˆ° scene.jsonï¼Path:" + localJsonPath;
                     Debug.LogError(error);
                     onFail.Invoke(error);
                 }
@@ -189,7 +189,7 @@ public class NetworkUtil
 
         if (!File.Exists(localJsonPath))
         {
-            string error = "ÕÒ²»µ½ scene.json£¡Path:" + localJsonPath;
+            string error = "æ‰¾ä¸åˆ° scene.jsonï¼Path:" + localJsonPath;
             Debug.LogError(error);
             onFail.Invoke(error);
         } else

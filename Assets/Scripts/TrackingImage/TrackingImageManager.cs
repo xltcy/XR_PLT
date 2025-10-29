@@ -20,7 +20,7 @@ public class TrackingImageManager : MonoBehaviour
         if (trackedImageManager != null)
         {
             trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
-            Debug.Log("trackedImageManager×¢²á");
+            Debug.Log("trackedImageManageræ³¨å†Œ");
         }    
         //DisableTrackImage();
     }
@@ -50,11 +50,11 @@ public class TrackingImageManager : MonoBehaviour
         EnableTrackImage();
         foreach(var trigger in triggers)
         {
-            // ´Ó Resources ¼ÓÔØ
-            Texture2D tex = Resources.Load<Texture2D>(trigger.imagePath); // ²»ÒªĞ´À©Õ¹Ãû
+            // ä» Resources åŠ è½½
+            Texture2D tex = Resources.Load<Texture2D>(trigger.imagePath); // ä¸è¦å†™æ‰©å±•å
             if (tex != null)
             {
-                AddImage(tex, trigger.imageName, 0.1f); // 0.1f = Êµ¼ÊÎïÀí³ß´ç (Ã×)
+                AddImage(tex, trigger.imageName, 0.1f); // 0.1f = å®é™…ç‰©ç†å°ºå¯¸ (ç±³)
             }
             else
             {
@@ -102,20 +102,20 @@ public class TrackingImageManager : MonoBehaviour
         var debugMode = true;
         if (debugMode)
         {
-            // ¼ì²é¹ÜÀíÆ÷
+            // æ£€æŸ¥ç®¡ç†å™¨
             if (trackedImageManager == null)
             {
                 Debug.LogError("ARTrackedImageManager is null!");
                 return;
             }
             
-            // ¼ì²éÊÇ·ñÆôÓÃ
+            // æ£€æŸ¥æ˜¯å¦å¯ç”¨
             if (!trackedImageManager.enabled)
             {
                 Debug.LogWarning("ARTrackedImageManager is disabled!");
             }
             
-            // ¼ì²é²Î¿¼Í¼Ïñ¿â
+            // æ£€æŸ¥å‚è€ƒå›¾åƒåº“
             if (trackedImageManager.referenceLibrary == null)
             {
                 Debug.LogError("Reference Image Library is null!");
@@ -125,7 +125,7 @@ public class TrackingImageManager : MonoBehaviour
                 Debug.Log($"Reference Library has {trackedImageManager.referenceLibrary.count} images");
             }
             
-            // ¼ì²éAR»á»°
+            // æ£€æŸ¥ARä¼šè¯
             var arSession = FindObjectOfType<ARSession>();
             if (arSession == null)
             {
@@ -182,7 +182,7 @@ public class TrackingImageManager : MonoBehaviour
      */
     public void EnableTrackImage()
     {
-        // È¡µ½Ò»¸ö¿ÉĞŞ¸ÄµÄ runtime library
+        // å–åˆ°ä¸€ä¸ªå¯ä¿®æ”¹çš„ runtime library
         if (trackedImageManager.referenceLibrary is MutableRuntimeReferenceImageLibrary mutableLib)
         {
             runtimeLibrary = mutableLib;

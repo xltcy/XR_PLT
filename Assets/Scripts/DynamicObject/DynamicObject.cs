@@ -236,7 +236,7 @@ public class DynamicObject : MonoBehaviour
                 {
                     if (child.name == part)
                     {
-                        Debug.Log("ÕÒµ½×ÓÎïÌå: " + child.name);
+                        Debug.Log("æ‰¾åˆ°å­ç‰©ä½“: " + child.name);
                         rotateParts.Add(child);
                         break;
                     }
@@ -307,23 +307,23 @@ public class DynamicObject : MonoBehaviour
     }
 
     /// <summary>
-    /// Í¨ÓÃĞı×ª·½·¨£º¿ÉÖ¸¶¨ÖĞĞÄµã¡¢Ğı×ªÖá¡¢½Ç¶È¡¢ÊÇ·ñÊ¹ÓÃÊÀ½ç×ø±êÖá
+    /// é€šç”¨æ—‹è½¬æ–¹æ³•ï¼šå¯æŒ‡å®šä¸­å¿ƒç‚¹ã€æ—‹è½¬è½´ã€è§’åº¦ã€æ˜¯å¦ä½¿ç”¨ä¸–ç•Œåæ ‡è½´
     /// </summary>
-    /// <param name="target">ÒªĞı×ªµÄÎïÌå</param>
-    /// <param name="pivot">Ğı×ªÖĞĞÄµã£¨ÊÀ½ç×ø±ê£©</param>
-    /// <param name="axis">Ğı×ªÖá£¨µ¥Î»ÏòÁ¿£©</param>
-    /// <param name="angle">Ğı×ª½Ç¶È£¨¶È£©</param>
-    /// <param name="useWorldAxis">ÊÇ·ñÊ¹ÓÃÊÀ½ç×ø±êÖá</param>
+    /// <param name="target">è¦æ—‹è½¬çš„ç‰©ä½“</param>
+    /// <param name="pivot">æ—‹è½¬ä¸­å¿ƒç‚¹ï¼ˆä¸–ç•Œåæ ‡ï¼‰</param>
+    /// <param name="axis">æ—‹è½¬è½´ï¼ˆå•ä½å‘é‡ï¼‰</param>
+    /// <param name="angle">æ—‹è½¬è§’åº¦ï¼ˆåº¦ï¼‰</param>
+    /// <param name="useWorldAxis">æ˜¯å¦ä½¿ç”¨ä¸–ç•Œåæ ‡è½´</param>
     public void RotateObject(Transform target, Vector3 pivot, Vector3 axis, float angle, bool useWorldAxis = true)
     {
         if (pivot == target.position)
         {
-            // ×ÔÉíÎªĞı×ªÖĞĞÄ
+            // è‡ªèº«ä¸ºæ—‹è½¬ä¸­å¿ƒ
             target.Rotate(axis, angle, useWorldAxis ? Space.World : Space.Self);
         }
         else
         {
-            // Ö¸¶¨µãÎªĞı×ªÖĞĞÄ
+            // æŒ‡å®šç‚¹ä¸ºæ—‹è½¬ä¸­å¿ƒ
             target.RotateAround(pivot, axis, angle);
         }
     }

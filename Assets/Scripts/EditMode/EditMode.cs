@@ -8,19 +8,19 @@ using UnityEngine.UI;
 public class EditMode : MonoBehaviour
 {
     // Start is called before the first frame update
-    public Slider ÆÁÄ»´óĞ¡µ÷½Ú;
+    public Slider å±å¹•å¤§å°è°ƒèŠ‚;
 
-    public Slider Ä£ĞÍ´óĞ¡µ÷½Ú;
+    public Slider æ¨¡å‹å¤§å°è°ƒèŠ‚;
 
     public GameObject screen;
 
     private Vector3 screenScale;
 
-    public Dropdown ÒÆ¶¯0Ğı×ª1;
+    public Dropdown ç§»åŠ¨0æ—‹è½¬1;
 
-    public Dropdown ²Ù×÷·ù¶È;
+    public Dropdown æ“ä½œå¹…åº¦;
 
-    public Dropdown ²Ù×÷¶ÔÏó;
+    public Dropdown æ“ä½œå¯¹è±¡;
 
     private float trans_amp = 0.01f;
     
@@ -34,7 +34,7 @@ public class EditMode : MonoBehaviour
 
     public TMP_InputField focal_Input;
 
-    public Slider cy»¬¶¯Ìõ;
+    public Slider cyæ»‘åŠ¨æ¡;
 
     public Text cx_cy_focal;
 
@@ -48,23 +48,23 @@ public class EditMode : MonoBehaviour
 
     public Camera arCamera;
 
-    public GameObject UI_µ÷ÊÔ_Mesh;
-    public GameObject UI_µ÷ÊÔ_ÆÁÄ»;
-    public GameObject UI_µ÷ÊÔ_Ïà»ú;
+    public GameObject UI_è°ƒè¯•_Mesh;
+    public GameObject UI_è°ƒè¯•_å±å¹•;
+    public GameObject UI_è°ƒè¯•_ç›¸æœº;
 
     public Toggle Toggle_Mesh;
-    public Toggle Toggle_ÆÁÄ»;
-    public Toggle Toggle_Ïà»ú;
+    public Toggle Toggle_å±å¹•;
+    public Toggle Toggle_ç›¸æœº;
 
     void Start()
     {
-        SetSliderValueChangeListener(ÆÁÄ»´óĞ¡µ÷½Ú, ÆÁÄ»Resize);
-        SetSliderValueChangeListener(Ä£ĞÍ´óĞ¡µ÷½Ú, Ä£ĞÍResize);
-        SetDropDownValueChangeListener(²Ù×÷·ù¶È, ·ù¶ÈÇĞ»»);
+        SetSliderValueChangeListener(å±å¹•å¤§å°è°ƒèŠ‚, å±å¹•Resize);
+        SetSliderValueChangeListener(æ¨¡å‹å¤§å°è°ƒèŠ‚, æ¨¡å‹Resize);
+        SetDropDownValueChangeListener(æ“ä½œå¹…åº¦, å¹…åº¦åˆ‡æ¢);
         SetInputFieldValueChangeListener(cx_Input, cxChange);
         SetInputFieldValueChangeListener(cy_Input, cyChange);
         SetInputFieldValueChangeListener(focal_Input, focalChange);
-        SetSliderValueChangeListener(cy»¬¶¯Ìõ, cySlide);
+        SetSliderValueChangeListener(cyæ»‘åŠ¨æ¡, cySlide);
 
         if (screen != null)
         {
@@ -75,13 +75,13 @@ public class EditMode : MonoBehaviour
         }
 
         Toggle_Mesh.onValueChanged.AddListener(value => {
-            UI_µ÷ÊÔ_Mesh.SetActive(value);
+            UI_è°ƒè¯•_Mesh.SetActive(value);
         });
-        Toggle_ÆÁÄ».onValueChanged.AddListener(value => {
-            UI_µ÷ÊÔ_ÆÁÄ».SetActive(value);
+        Toggle_å±å¹•.onValueChanged.AddListener(value => {
+            UI_è°ƒè¯•_å±å¹•.SetActive(value);
         });
-        Toggle_Ïà»ú.onValueChanged.AddListener(value => {
-            UI_µ÷ÊÔ_Ïà»ú.SetActive(value);
+        Toggle_ç›¸æœº.onValueChanged.AddListener(value => {
+            UI_è°ƒè¯•_ç›¸æœº.SetActive(value);
         });
     }
 
@@ -94,12 +94,12 @@ public class EditMode : MonoBehaviour
         }
     }
 
-    void ÆÁÄ»Resize(float value)
+    void å±å¹•Resize(float value)
     {
         screen.transform.localScale = screenScale * value;
     }
 
-    void Ä£ĞÍResize(float value)
+    void æ¨¡å‹Resize(float value)
     {
         GameObject meshObj = GetMeshObj();
         if(meshObj != null)
@@ -153,7 +153,7 @@ public class EditMode : MonoBehaviour
         arCamera.GetComponent<Camera>().sensorSize = new Vector2(cx, cy);
     }
 
-    void ·ù¶ÈÇĞ»»(int v)
+    void å¹…åº¦åˆ‡æ¢(int v)
     {
         switch (v)
         {
@@ -200,7 +200,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if(ÒÆ¶¯0Ğı×ª1.value == 0)
+            if(ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(-trans_amp * ratio, 0, 0));
             }
@@ -216,7 +216,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (ÒÆ¶¯0Ğı×ª1.value == 0)
+            if (ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(trans_amp * ratio, 0, 0));
             }
@@ -233,7 +233,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (ÒÆ¶¯0Ğı×ª1.value == 0)
+            if (ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, trans_amp * ratio, 0));
             }
@@ -249,7 +249,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (ÒÆ¶¯0Ğı×ª1.value == 0)
+            if (ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, -trans_amp * ratio, 0));
             }
@@ -265,7 +265,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (ÒÆ¶¯0Ğı×ª1.value == 0)
+            if (ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, 0, trans_amp * ratio));
             }
@@ -281,7 +281,7 @@ public class EditMode : MonoBehaviour
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (ÒÆ¶¯0Ğı×ª1.value == 0)
+            if (ç§»åŠ¨0æ—‹è½¬1.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, 0, -trans_amp * ratio));
             }
@@ -295,7 +295,7 @@ public class EditMode : MonoBehaviour
     private GameObject GetMeshObj()
     {
         string tag = "Mesh";
-        if (²Ù×÷¶ÔÏó.value == 1)
+        if (æ“ä½œå¯¹è±¡.value == 1)
         {
             tag = "ground";
         }

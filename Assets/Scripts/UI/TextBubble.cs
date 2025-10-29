@@ -22,7 +22,7 @@ public class TextBubble : MonoBehaviour
 
     private static int lineCount = 4;
 
-    public int lineNum = 0;    //ÏÔÊ¾¼¸ĞĞ
+    public int lineNum = 0;    //æ˜¾ç¤ºå‡ è¡Œ
 
     private float speed = 0f;
 
@@ -76,7 +76,7 @@ public class TextBubble : MonoBehaviour
 
     public void StartShowText(string text)
     {
-        //ÖØ¸´µ÷ÓÃ ÎÄ×Ö´òÓ¡»ú ·½·¨.
+        //é‡å¤è°ƒç”¨ æ–‡å­—æ‰“å°æœº æ–¹æ³•.
         tempText = text;
         nowText = "";
         lineNum = 0;

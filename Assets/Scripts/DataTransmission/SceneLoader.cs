@@ -37,7 +37,7 @@ public class SceneLoader : MonoBehaviour
         string path = Application.dataPath + "/ExportedScenes/scene.json";
         if (!File.Exists(path))
         {
-            Debug.LogError("ÕÒ²»µ½ scene.json£¡");
+            Debug.LogError("æ‰¾ä¸åˆ° scene.jsonï¼");
             return;
         }
 
@@ -56,7 +56,7 @@ public class SceneLoader : MonoBehaviour
 
             if (model == null)
             {
-                Debug.LogError("Ä£ĞÍ¼ÓÔØÊ§°Ü£¬model Îª null");
+                Debug.LogError("æ¨¡å‹åŠ è½½å¤±è´¥ï¼Œmodel ä¸º null");
                 return;
             }
 
@@ -69,21 +69,21 @@ public class SceneLoader : MonoBehaviour
             model.transform.localScale = scale;
             model.name = obj.name;
 
-            Debug.Log($"¼ÓÔØÄ£ĞÍ {obj.name} Íê³É");
+            Debug.Log($"åŠ è½½æ¨¡å‹ {obj.name} å®Œæˆ");
         }
 
-        // ¿ÉÊÓ»¯ÆğµãÖÕµã
+        // å¯è§†åŒ–èµ·ç‚¹ç»ˆç‚¹
         GameObject start = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         start.transform.position = ArrToVec(data.startPoint);
         start.transform.localScale = Vector3.one * 0.3f;
         start.GetComponent<Renderer>().material.color = Color.green;
-        start.name = "Æğµã";
+        start.name = "èµ·ç‚¹";
 
         GameObject end = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         end.transform.position = ArrToVec(data.endPoint);
         end.transform.localScale = Vector3.one * 0.3f;
         end.GetComponent<Renderer>().material.color = Color.red;
-        end.name = "ÖÕµã";
+        end.name = "ç»ˆç‚¹";
     }
 
     Vector3 ArrToVec(float[] arr) => new Vector3(arr[0], arr[1], arr[2]);
