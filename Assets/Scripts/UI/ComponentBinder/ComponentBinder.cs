@@ -1,22 +1,27 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class ComponentBinder : MonoBehaviour
 {
-    [Header("绑定设置")]
-    [SerializeField]
+    [SerializeField, HideInInspector]
     private bool autoBindOnAwake = true;
-
-    [SerializeField]
+    [SerializeField, HideInInspector]
     private bool logBindResults = true;
-
-    [SerializeField]
+    [SerializeField, HideInInspector]
     private bool searchInactiveNodes = true;
     
     // 缓存查找结果以提高性能
-    private Dictionary<string, Transform> _transformCache = new Dictionary<string, Transform>();
+    private Dictionary<string, Transform> transformCache = new Dictionary<string, Transform>();
+
+    [SerializeField, HideInInspector]
+    private List<Component> componentListCache = new List<Component>();
+    public Dictionary<Button, MethodInfo> btnActionCache = new Dictionary<Button, MethodInfo>();
     
     protected virtual void Awake()
     {
@@ -25,13 +30,18 @@ public class ComponentBinder : MonoBehaviour
             BindComponents();
         }
     }
+
+    protected void OnDestroy()
+    {
+        DestroyAllButtonCallback();
+        ClearCache();
+    }
     
-    [ContextMenu("测试绑定组件")]
     public void BindComponents()
     {
-        _transformCache.Clear();
+        DestroyAllButtonCallback();
+        ClearCache();
         BindChildComponents();
-        
         if (logBindResults)
         {
             Debug.Log($"[ComponentBinder] {gameObject.name} 组件绑定完成", this);
@@ -49,6 +59,11 @@ public class ComponentBinder : MonoBehaviour
             if (attribute == null) continue;
             
             BindSingleChildComponent(field, attribute);
+            
+            ButtonCallbackAttribute btnAttribute = field.GetCustomAttribute<ButtonCallbackAttribute>();
+            if (btnAttribute == null) continue;
+            
+            BindSingleButtonCallback(field, attribute, btnAttribute);
         }
     }
     
@@ -60,7 +75,7 @@ public class ComponentBinder : MonoBehaviour
         Transform childTransform = FindChildByName(attribute.ChildName);
         if (childTransform == null)
         {
-            HandleBindError(field, attribute, $"未找到名称为 '{attribute.ChildName}' 的子节点");
+            HandleBindError(field, attribute.Required, $"未找到名称为 '{attribute.ChildName}' 的子节点");
             return;
         }
         
@@ -68,19 +83,56 @@ public class ComponentBinder : MonoBehaviour
         Component component = childTransform.GetComponent(componentType);
         if (component == null)
         {
-            HandleBindError(field, attribute, 
+            HandleBindError(field, attribute.Required, 
                 $"在节点 {childTransform.name} 上未找到组件: {componentType.Name}");
             return;
         }
+        componentListCache.Add(component);
         
         // 设置字段值
         field.SetValue(this, component);
+    }
+
+    private void BindSingleButtonCallback(FieldInfo fieldInfo, BindChildAttribute attribute, ButtonCallbackAttribute btnAttribute)
+    {
+        Type fieldType = fieldInfo.FieldType;
+        if (fieldType != typeof(Button))
+        {
+            HandleBindError(fieldInfo, btnAttribute.Required, $"[ComponentBinder] 字段 {fieldInfo.Name} 的类型必须是 Button");
+            return;
+        }
+        
+        // 查找按钮节点
+        Transform buttonTransform = FindChildByName(attribute.ChildName);
+        Button button = buttonTransform.GetComponent<Button>();
+        if (button == null)
+        {
+            HandleBindError(fieldInfo, btnAttribute.Required, $"[ComponentBinder] 在节点 {buttonTransform.name} 上未找到 Button 组件 (字段: {fieldInfo.Name})");
+            return;
+        }
+        
+        // 通过反射获取回调方法
+        MethodInfo method = GetType().GetMethod(btnAttribute.MethodName, 
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+    
+        if (method == null)
+        {
+            HandleBindError(fieldInfo, btnAttribute.Required, 
+                $"[ComponentBinder] 未找到方法: {btnAttribute.MethodName}");
+            return;
+        }
+    
+        // 创建委托并绑定
+        UnityAction callback = () => method.Invoke(this, null);
+        button.onClick.AddListener(callback);
+        btnActionCache.Add(button, method);
         
         if (logBindResults)
         {
-            Debug.Log($"[ComponentBinder] 绑定成功: {field.Name} -> {childTransform.name}/{componentType.Name}");
+            Debug.Log($"[ComponentBinder] 绑定按钮回调成功: {fieldInfo.Name} -> {buttonTransform.name}", this);
         }
     }
+    
     
     /// <summary>
     /// 按名称查找子节点
@@ -91,49 +143,38 @@ public class ComponentBinder : MonoBehaviour
             return transform;
             
         string cacheKey = $"{childName}";
-        if (_transformCache.ContainsKey(cacheKey))
-            return _transformCache[cacheKey];
+        if (transformCache.TryGetValue(cacheKey, out Transform value))
+            return value;
         
-        Transform result = null;
-        
-        result = FindInChildren(childName, searchInactiveNodes);
-        
-        _transformCache[cacheKey] = result;
+        Transform result = transform.FindRecursive(childName, searchInactiveNodes);
+        transformCache.Add(cacheKey, result);
         return result;
     }
     
-    /// <summary>
-    /// 在所有后代节点中查找
-    /// </summary>
-    private Transform FindInChildren(string childName, bool includeInactive)
+    private void DestroyAllButtonCallback()
     {
-        return transform.FindRecursive(childName, includeInactive);
-    }
-    
-    /// <summary>
-    /// 递归查找单个节点
-    /// </summary>
-    private Transform FindRecursive(Transform current, string targetName)
-    {
-        if (current.name == targetName)
-            return current;
-            
-        foreach (Transform child in current)
+        foreach (var pair in btnActionCache)
         {
-            if (!searchInactiveNodes && !child.gameObject.activeInHierarchy)
+            var btn = pair.Key;
+            if (btn == null || btn.onClick == null)
+            {
                 continue;
-                
-            Transform result = FindRecursive(child, targetName);
-            if (result != null)
-                return result;
+            }
+            btn.onClick.RemoveAllListeners();
         }
-        
-        return null;
+    }
+
+    private void ClearCache()
+    {
+        componentListCache.Clear();
+        transformCache.Clear();
+        btnActionCache.Clear();
     }
     
-    private void HandleBindError(FieldInfo field, BindChildAttribute attribute, string errorMessage)
+    private void HandleBindError(FieldInfo field, bool required, string errorMessage)
     {
-        if (attribute.Required)
+        if (!logBindResults) return;
+        if (required)
         {
             Debug.LogError($"[ComponentBinder] {errorMessage} (字段: {field.Name})", this);
         }

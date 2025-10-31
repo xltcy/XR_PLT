@@ -5,24 +5,15 @@ using UnityEngine.UI;
 
 public class DebugUIMediator : BaseUIMediator
 {
-    [BindChild("p_scene_json_btn")]
+    [BindChild("p_scene_json_btn"), ButtonCallback("OnRequestSceneJsonButtonClick")]
     private Button requestSceneJsonButton;
 
     public void OnEnable()
     {
-        UIUtils.SetVisible(requestSceneJsonButton, true);
-        if (requestSceneJsonButton != null)
-        {
-            requestSceneJsonButton.onClick.AddListener(OnRequestSceneJsonButtonClick);
-        }
     }
 
     public void OnDisable()
     {
-        if (requestSceneJsonButton != null)
-        {
-            requestSceneJsonButton.onClick.RemoveListener(OnRequestSceneJsonButtonClick);
-        }
     }
 
     private void OnRequestSceneJsonButtonClick()

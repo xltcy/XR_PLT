@@ -2189,6 +2189,7 @@ MonoBehaviour:
   autoBindOnAwake: 1
   logBindResults: 1
   searchInactiveNodes: 1
+  componentListCache: []
 --- !u!1 &312112174
 GameObject:
   m_ObjectHideFlags: 0
