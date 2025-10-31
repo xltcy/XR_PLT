@@ -2534,6 +2534,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 353603105}
+  - component: {fileID: 353603106}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -2565,6 +2566,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &353603106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 353603104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d55997e4444ec3930eae291bdfc4cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logInitialization: 1
+  warnInitialization: 1
+  errorInitialization: 1
+  controllers:
+    m_Values: []
 --- !u!1 &365593958
 GameObject:
   m_ObjectHideFlags: 0
@@ -3527,7 +3545,7 @@ GameObject:
   - component: {fileID: 698180111}
   - component: {fileID: 698180112}
   m_Layer: 0
-  m_Name: MeshController
+  m_Name: MeshManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4636,7 +4654,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugText: {fileID: 266939818}
   voiceActiveButton: {fileID: 1014693568}
-  smplController: {fileID: 1914045658}
+  smplController: {fileID: 0}
   fakeVoiceText: {fileID: 104764210}
 --- !u!4 &930431121
 Transform:
@@ -5739,7 +5757,7 @@ GameObject:
   - component: {fileID: 1183033216}
   - component: {fileID: 1183033217}
   m_Layer: 0
-  m_Name: speech2blendshape
+  m_Name: Speech2blendshapeController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7870,7 +7888,7 @@ GameObject:
   - component: {fileID: 1454047320}
   - component: {fileID: 1454047321}
   m_Layer: 0
-  m_Name: SceneController
+  m_Name: SceneManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10073,7 +10091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab30f9ea7388ab4d999bf714f24bbea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speech2Blendshape: {fileID: 1183033217}
+  speech2BlendshapeController: {fileID: 0}
 --- !u!4 &1823502598
 Transform:
   m_ObjectHideFlags: 0

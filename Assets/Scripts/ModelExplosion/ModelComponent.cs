@@ -51,6 +51,6 @@ public class ModelComponent : MonoBehaviour
         // TBD.
         clickableObject.objIntroduction = "测试点击" + this.name;
 
-        FindObjectOfType<Click3DObjectManager>().AddClickableObjs(clickableObject);*/
+        ControllerRegister.Instance.GetController<Click3DObjectManager>().AddClickableObjs(clickableObject);*/
     }
 }

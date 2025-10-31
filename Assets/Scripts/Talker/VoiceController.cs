@@ -106,7 +106,7 @@ public class VoiceController : BaseController
                     SceneAction(sceneCommand);
                     break;
                 case ActionTriggerCommand triggerCommand:
-                    FindObjectOfType<SceneController>().ConsoleVoiceTrigger(triggerCommand);
+                    ControllerRegister.Instance.GetController<SceneController>().ConsoleVoiceTrigger(triggerCommand);
                     break;
                 default:
                     matchFail = true;

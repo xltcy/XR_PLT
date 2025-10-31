@@ -95,7 +95,7 @@ public class SceneController : BaseController
         StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(
             onSuccess: (res) => {
                 summaryData = res;
-                FindObjectOfType<MeshController>().InitSceneSummary(res.items);
+                ControllerRegister.Instance.GetController<MeshController>().InitSceneSummary(res.items);
                 UIManager.SetLoadingStatus(false);
             },
             onFail: (errorText) => {
@@ -223,7 +223,7 @@ public class SceneController : BaseController
      */
     public void SetSelectedExplainationPoint(String explainationPointId)
     {
-        var voiceController = FindObjectOfType<VoiceController>();
+        var voiceController = ControllerRegister.Instance.GetController<VoiceController>();
         if (selectedExplainationPointId.Length != 0)
         {
             // clear old info
@@ -237,7 +237,7 @@ public class SceneController : BaseController
         // init image Recognition triggers.
         imageRecognitionTrigggers.Clear();
         imageRecognitionTrigggers.AddRange(GetImageRecognitionTriggers(allActions));
-        FindObjectOfType<TrackingImageManager>().InitTriggeredImage(imageRecognitionTrigggers);
+        ControllerRegister.Instance.GetController<TrackingImageManager>().InitTriggeredImage(imageRecognitionTrigggers);
 
         // Immidiate Action
         allActions.ForEach(item =>
@@ -252,7 +252,7 @@ public class SceneController : BaseController
             }
         });
 
-        FindObjectOfType<SMPLController>().SetDestination(selectedPoint.position, selectedPoint.initialIntroduction, selectedPoint.arriveIntroduction);
+        ControllerRegister.Instance.GetController<SMPLController>().SetDestination(selectedPoint.position, selectedPoint.initialIntroduction, selectedPoint.arriveIntroduction);
     }
 
     public void ConsoleVoiceTrigger(ActionTriggerCommand command)
@@ -314,7 +314,7 @@ public class SceneController : BaseController
                 addedObjects[addAction.id] = addObject;
                 if (clickTriggerActions.ContainsKey(addAction.id))
                 {
-                    FindObjectOfType<Click3DObjectManager>().RegisteClickableObject(dynamicObject);
+                    ControllerRegister.Instance.GetController<Click3DObjectManager>().RegisteClickableObject(dynamicObject);
                 }
                 break;
             case ActionType.PlayVideo:
@@ -346,7 +346,7 @@ public class SceneController : BaseController
                     videoScreen.transform.localScale = videoAction.scale;
                 }
                 videoScreen.SetActive(true);
-                var videoManager = FindObjectOfType<VideoManager>();
+                var videoManager = ControllerRegister.Instance.GetController<VideoManager>();
                 videoManager.PlayVideo(videoAction.videoPath);
                 videoManager.trackedImage = arTrackedImage;
                 break;
@@ -362,7 +362,7 @@ public class SceneController : BaseController
                 break;
             case ActionType.Introduce:
                 var introduroduceAction = actionData as IntroduceAction;
-                var smplController = FindObjectOfType<SMPLController>();
+                var smplController = ControllerRegister.Instance.GetController<SMPLController>();
                 if (smplController != null && introduroduceAction != null && isStartAction)
                 {
                     // only use in start action;stop action do nothing.
@@ -374,7 +374,7 @@ public class SceneController : BaseController
                 break;
             case ActionType.AvatarAnim:
                 var avatarAnimAction = actionData as AvatarAnimAction;
-                var smplCtrl = FindObjectOfType<SMPLController>();
+                var smplCtrl = ControllerRegister.Instance.GetController<SMPLController>();
                 if (smplCtrl != null && avatarAnimAction != null)
                 {
                     smplCtrl.AvatarAnim(avatarAnimAction.animTrigger);

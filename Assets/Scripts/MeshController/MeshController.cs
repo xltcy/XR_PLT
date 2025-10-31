@@ -74,7 +74,7 @@ public class MeshController : BaseController
         SetStartState(StartState.Summoning);
 
         // init modelInstance
-        modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
+        modelInstance = ControllerRegister.Instance.GetController<SceneController>().AnalysisSceneData();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
@@ -153,7 +153,7 @@ public class MeshController : BaseController
                 countdownEvent.Signal();
             }));
 
-        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
+        ControllerRegister.Instance.GetController<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
             onComplete: isError =>
             {
                 hasError = isError;
@@ -247,7 +247,7 @@ public class MeshController : BaseController
             }
             UIManager.SetLoadingStatus(false);
         }));
-        FindObjectOfType<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
+        ControllerRegister.Instance.GetController<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex].sceneKey,
             onComplete: isError =>
             {
                 hasError = isError;
@@ -259,7 +259,7 @@ public class MeshController : BaseController
     {
         SetStartState(StartState.Summoning);
         // init modelInstance
-        modelInstance = FindObjectOfType<SceneController>().AnalysisSceneData();
+        modelInstance = ControllerRegister.Instance.GetController<SceneController>().AnalysisSceneData();
         relocatedPose = testPose();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;

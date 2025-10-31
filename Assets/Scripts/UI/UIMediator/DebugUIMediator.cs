@@ -21,7 +21,7 @@ public class DebugUIMediator : BaseUIMediator
     private void OnRequestSceneJsonButtonClick()
     {
         Debug.Log("Request Scene Json Button Clicked");
-        var sceneController = FindObjectOfType<SceneController>();
+        var sceneController = ControllerRegister.Instance.GetController<SceneController>();
         if (sceneController != null)
         {
             sceneController.RequireSummaryData();

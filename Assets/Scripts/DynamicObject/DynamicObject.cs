@@ -93,14 +93,14 @@ public class DynamicObject : MonoBehaviour
             while(clickActionStack.Peek() != newAction)
             {
                 var dispatchAction = clickActionStack.Pop();
-                FindObjectOfType<SceneController>().ConsoleClickTrigger(generateActionId, dispatchAction, true);
+                ControllerRegister.Instance.GetController<SceneController>().ConsoleClickTrigger(generateActionId, dispatchAction, true);
             }
             clickActionStack.Pop();
         } else
         {
             clickActionStack.Push(newAction);
         }
-        FindObjectOfType<SceneController>().ConsoleClickTrigger(generateActionId, newAction, isExit);
+        ControllerRegister.Instance.GetController<SceneController>().ConsoleClickTrigger(generateActionId, newAction, isExit);
     }
 
     private void SetVisible(bool isStartAction)

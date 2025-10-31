@@ -143,7 +143,7 @@ public class TrackingImageManager : BaseController
         {
             return trackedImage.transform.position.sqrMagnitude > float.Epsilon;
         });
-        triggers.ForEach(trigger => FindObjectOfType<SceneController>().ConsoleImageRecognizeTrigger(trigger, trackedImage));
+        triggers.ForEach(trigger => ControllerRegister.Instance.GetController<SceneController>().ConsoleImageRecognizeTrigger(trigger, trackedImage));
     }
 
     // use to console when a image is tracked.

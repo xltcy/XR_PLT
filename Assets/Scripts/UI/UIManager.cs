@@ -36,7 +36,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
 
     public void TransToSelectDesUI()
     {
-        var sceneData = FindObjectOfType<SceneController>()?.sceneData;
+        var sceneData = ControllerRegister.Instance.GetController<SceneController>()?.sceneData;
         if (sceneData == null)
         {
             // Error
@@ -46,7 +46,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
         if (!initPos)
         {
             smplController.SetActive(true);
-            FindObjectOfType<SMPLController>().InitializeSmplPosition();
+            ControllerRegister.Instance.GetController<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
         if (sceneData.explanationPoints.Count == 1)
@@ -61,7 +61,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
 
     public void TransToVirtualManIntroUI(string pointId)
     {
-        FindObjectOfType<SceneController>().SetSelectedExplainationPoint(pointId);
+        ControllerRegister.Instance.GetController<SceneController>().SetSelectedExplainationPoint(pointId);
         SwitchRunState(RunState.VirtualManIntro);
     }
 
@@ -83,7 +83,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
         if (!initPos)
         {
             smplController.SetActive(true);
-            FindObjectOfType<SMPLController>().InitializeSmplPosition();
+            ControllerRegister.Instance.GetController<SMPLController>().InitializeSmplPosition();
             initPos = true;
         }
         SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
@@ -107,7 +107,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
         SelectDesView.SetActive(setActive);
         if (setActive)
         {
-            SelectDesController selectDesCtrl = FindObjectOfType<SelectDesController>();
+            SelectDesController selectDesCtrl = ControllerRegister.Instance.GetController<SelectDesController>();
             selectDesCtrl.InitState();
             selectDesCtrl.selectDesInterface = this;
         }
@@ -133,7 +133,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
 
     public static void SetLoadingStatus(bool setStart)
     {
-        FindObjectOfType<UIManager>().RequestLoadingStatus(setStart);
+        ControllerRegister.Instance.GetController<UIManager>().RequestLoadingStatus(setStart);
     }
 
     public enum RunState

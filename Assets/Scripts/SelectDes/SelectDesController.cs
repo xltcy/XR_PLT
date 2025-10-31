@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SelectDesController : MonoBehaviour
+public class SelectDesController : BaseController
 {
     public GameObject itemPrefab;           // 拖入 ListItemPrefab
     public Transform contentParent;         // 拖入 ScrollView/Viewport/Content
@@ -60,7 +60,7 @@ public class SelectDesController : MonoBehaviour
     {
         string input = testVoiceInputField.textComponent.text;
         Debug.Log($"test voice rec {input}");
-        FindObjectOfType<VoiceController>().语音识别结果(input);
+        ControllerRegister.Instance.GetController<VoiceController>().语音识别结果(input);
     }
 
     public List<SelectDesModel> GetSelectDesList()
@@ -159,7 +159,7 @@ public class SelectDesController : MonoBehaviour
 
     public void GenerateDesList()
     {
-        var sceneData = FindObjectOfType<SceneController>().sceneData;
+        var sceneData = ControllerRegister.Instance.GetController<SceneController>().sceneData;
         // generate hint string
         hintString = "欢迎来到" + sceneData.sceneName +"，请选择想要参观的区域\n点击屏幕上的选项";
 
