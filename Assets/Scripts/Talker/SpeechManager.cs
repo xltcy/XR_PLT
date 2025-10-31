@@ -10,7 +10,7 @@ using System;
  * Use SayFromStr to speak a sentence from string param.
  * Function SpeakText & OnlySpeakText will be set private in future versions.
  */
-public class SpeechManager : MonoBehaviour
+public class SpeechManager : BaseController
 {
     // public VirtualManController controller;
     private static readonly bool ShouldLoop = true;
@@ -26,7 +26,7 @@ public class SpeechManager : MonoBehaviour
     //Is virHuman speaking
     private static bool isSpeaking;
     public static bool IsSpeaking => isSpeaking;
-    public Speech2Blendshape speech2Blendshape;
+    public Speech2BlendshapeController speech2BlendshapeController;
 
 private bool IsRecognizing;
     // Start is called before the first frame update
@@ -70,7 +70,7 @@ private bool IsRecognizing;
             // 必须在主线程设置 BlendShape（Unity 限制）
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
-                speech2Blendshape.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
+                speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
             });
         };
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInterface
+public class UIManager : BaseController, SelectDesController.SelectDesActionInterface
 {
     public GameObject StartView;
     public GameObject SelectDesView;

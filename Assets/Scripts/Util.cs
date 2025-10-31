@@ -69,5 +69,21 @@ public static class Util
     {
         self.StartCoroutine(task.AsCoroutine());
     }
+
+    public static void LogMessage(LogType logType, bool condition, string message)
+    {
+        switch (logType)
+        {
+            case LogType.Log:
+                if (condition) Debug.Log(message);
+                break;
+            case LogType.Warning:
+                if (condition) Debug.LogWarning(message);
+                break;
+            case LogType.Error:
+                if (condition) Debug.LogError(message);
+                break;
+        }
+    }
 }
 

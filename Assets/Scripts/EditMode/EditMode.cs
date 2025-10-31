@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class EditMode : MonoBehaviour
+public class EditMode : BaseController
 {
     // Start is called before the first frame update
     public Slider 屏幕大小调节;

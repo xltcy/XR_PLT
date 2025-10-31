@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using static VirHumanVoiceRecCommand;
 
-public class SMPLController : MonoBehaviour
+public class SMPLController : BaseController
 {
     //Audio
     private Dictionary<string, VirHumanVoiceRecCommand> desCommand = new Dictionary<string, VirHumanVoiceRecCommand>

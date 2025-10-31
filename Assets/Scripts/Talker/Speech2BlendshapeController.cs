@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Speech2Blendshape : MonoBehaviour
+public class Speech2BlendshapeController : BaseController
 {
     public GameObject guideHead;
     private SkinnedMeshRenderer smr;

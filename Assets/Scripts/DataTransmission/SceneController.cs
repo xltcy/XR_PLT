@@ -10,7 +10,7 @@ using UnityEngine.XR.ARFoundation;
 /**
  * Use to read json auto generate everything.
  */
-public class SceneController : MonoBehaviour
+public class SceneController : BaseController
 {
     public enum GameObjectTag
     {

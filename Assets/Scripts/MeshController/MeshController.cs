@@ -10,7 +10,7 @@ using UnityEngine.XR.ARSubsystems;
 using System.Threading;
 using Unity.Collections;
 
-public class MeshController : MonoBehaviour
+public class MeshController : BaseController
 {
     public Camera arCamera;
     private GameObject modelInstance;

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VoiceController : MonoBehaviour
+public class VoiceController : BaseController
 {
     // Start is called before the first frame update
     XunFeiYuYin xunfei;

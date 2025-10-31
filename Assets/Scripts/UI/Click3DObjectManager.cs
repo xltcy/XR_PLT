@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Click3DObjectManager : MonoBehaviour
+public class Click3DObjectManager : BaseController
 {
     // use to signal action to DynamicObject to control state change.
     [JsonConverter(typeof(StringEnumConverter))]

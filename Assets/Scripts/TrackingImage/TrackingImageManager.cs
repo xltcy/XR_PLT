@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class TrackingImageManager : MonoBehaviour
+public class TrackingImageManager : BaseController
 {
     public ARTrackedImageManager trackedImageManager;
 
