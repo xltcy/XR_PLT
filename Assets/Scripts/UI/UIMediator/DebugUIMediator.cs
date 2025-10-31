@@ -10,10 +10,12 @@ public class DebugUIMediator : BaseUIMediator
 
     public void OnEnable()
     {
+        
     }
 
     public void OnDisable()
     {
+        
     }
 
     private void OnRequestSceneJsonButtonClick()

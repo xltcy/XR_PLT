@@ -57,7 +57,7 @@ public class ComponentBinderEditor : Editor
             showButtonActionCache = EditorGUILayout.Foldout(showButtonActionCache, "按钮信息", true, EditorStyles.foldoutHeader);
             if (showButtonActionCache)
             {
-                ShowButtonActionCacheSection("Button Action缓存", binder.btnActionCache, ref buttonActionScrollPos);
+                ShowButtonActionCacheSection("Button Action缓存", binder.BtnActionCache, ref buttonActionScrollPos);
             }
             
             EditorGUILayout.Space();

@@ -5,10 +5,22 @@ public class UIUtils
 {
     public static void SetVisible(Component component, bool visible)
     {
-        if (component != null)
-        {
-            component.SetVisible(visible);
-        }
+        SetVisible(component?.gameObject, visible);
+    }
+    
+    public static void SetVisible(GameObject go, bool visible)
+    {
+        go?.SetVisible(visible);
+    }
+    
+    public static void ToggleVisible(Component component)
+    {
+        ToggleVisible(component?.gameObject);
+    }
+
+    public static void ToggleVisible(GameObject go)
+    {
+        go?.ToggleVisible();
     }
 
     private static readonly Dictionary<string, string> TypeNameDic = new Dictionary<string, string>()

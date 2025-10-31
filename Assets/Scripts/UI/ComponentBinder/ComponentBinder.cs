@@ -21,7 +21,7 @@ public class ComponentBinder : MonoBehaviour
 
     [SerializeField, HideInInspector]
     private List<Component> componentListCache = new List<Component>();
-    public Dictionary<Button, MethodInfo> btnActionCache = new Dictionary<Button, MethodInfo>();
+    public Dictionary<Button, MethodInfo> BtnActionCache = new Dictionary<Button, MethodInfo>();
     
     protected virtual void Awake()
     {
@@ -125,7 +125,7 @@ public class ComponentBinder : MonoBehaviour
         // 创建委托并绑定
         UnityAction callback = () => method.Invoke(this, null);
         button.onClick.AddListener(callback);
-        btnActionCache.Add(button, method);
+        BtnActionCache.Add(button, method);
         
         if (logBindResults)
         {
@@ -153,7 +153,7 @@ public class ComponentBinder : MonoBehaviour
     
     private void DestroyAllButtonCallback()
     {
-        foreach (var pair in btnActionCache)
+        foreach (var pair in BtnActionCache)
         {
             var btn = pair.Key;
             if (btn == null || btn.onClick == null)
@@ -168,7 +168,7 @@ public class ComponentBinder : MonoBehaviour
     {
         componentListCache.Clear();
         transformCache.Clear();
-        btnActionCache.Clear();
+        BtnActionCache.Clear();
     }
     
     private void HandleBindError(FieldInfo field, bool required, string errorMessage)

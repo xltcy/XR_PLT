@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-public static class TransformExtensions
+public static class UIElementExtensions
 {
+    #region Transform Extensions
     /// <summary>
     /// 根据节点名查找子节点
     /// </summary>
@@ -17,7 +18,7 @@ public static class TransformExtensions
     {
         if (current == null) return null;
         if (string.IsNullOrEmpty(name)) return null;
-        return FindRecursive(current, name, includeInactive);
+        return current.FindRecursive(name, includeInactive);
     }
 
     /// <summary>
@@ -73,10 +74,11 @@ public static class TransformExtensions
     /// <summary>
     /// 场景内查找指定名称的Transform
     /// </summary>
+    /// <param name="current"></param>
     /// <param name="name"></param>
     /// <param name="includeInactive"></param>
     /// <returns></returns>
-    public static Transform FindInScene(string name, bool includeInactive = true)
+    public static Transform FindInScene(this Transform current, string name, bool includeInactive = true)
     {
         if (string.IsNullOrEmpty(name)) return null;
         var all = UnityEngine.Object.FindObjectsOfType<GameObject>(includeInactive);
@@ -102,10 +104,55 @@ public static class TransformExtensions
         {
             if (!includeInactive && !child.gameObject.activeInHierarchy) continue;
             if (child.name == targetName) return child;
-            var found = FindRecursive(child, targetName, includeInactive);
+            var found = child.FindRecursive(targetName, includeInactive);
             if (found != null) return found;
         }
         return null;
     }
+    #endregion Transform Extensions
+    
+    #region GameObject Extensions
+    
+    /// <summary>
+    /// 设置GameObject的显示/隐藏状态
+    /// </summary>
+    public static void SetVisible(this GameObject go, bool visible)
+    {
+        go?.SetActive(visible);
+    }
+    
+    /// <summary>
+    /// 切换显示状态
+    /// </summary>
+    public static void ToggleVisible(this GameObject go)
+    {
+        go?.SetActive(!go.activeSelf);
+    }
+    
+    /// <summary>
+    /// 检查是否可见
+    /// </summary>
+    public static bool IsVisible(this GameObject go)
+    {
+        return go != null && go.gameObject != null && go.gameObject.activeInHierarchy;
+    }
+    
+    #endregion GameObject Extensions
 
+    #region Canvas Extensions
+    
+    /// <summary>
+    /// 设置CanvasGroup的透明度方式显示/隐藏
+    /// </summary>
+    public static void SetVisibleAlpha(this CanvasGroup canvasGroup, bool visible, float alpha = 1f)
+    {
+        if (canvasGroup)
+        {
+            canvasGroup.alpha = visible ? alpha : 0f;
+            canvasGroup.blocksRaycasts = visible;
+            canvasGroup.interactable = visible;
+        }
+    }
+    
+    #endregion Canvas Extensions
 }
