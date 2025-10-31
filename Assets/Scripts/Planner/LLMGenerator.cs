@@ -60,7 +60,7 @@ public class LLMGenerator : MonoBehaviour
 
     private IEnumerator getLLMResponse()
     {
-        // ������������
+        // 准备请求数据
         var requestData = new
         {
             model = modelName,  
@@ -70,7 +70,7 @@ public class LLMGenerator : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(requestData);
 
-        // ���� UnityWebRequest
+        // 创建 UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(baseUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -78,7 +78,7 @@ public class LLMGenerator : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("Authorization", "Bearer " + apiKey);
 
-        // ��������
+        // 发送请求
         yield return request.SendWebRequest();
 
         Debug.Log("LLM in sent message after");
@@ -86,15 +86,15 @@ public class LLMGenerator : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             Debug.Log("LLM: " + request);
-            // ������Ӧ
+            // 解析响应
             var response = JsonConvert.DeserializeObject<LLMResponse>(request.downloadHandler.text);
             string botMessage = response.choices[0].message.content;
 
-            // ��ʾ��Ӧ
+            // 显示响应
             LLMOutput.text += "\nAI: " + botMessage;
             userInput.text = "";
 
-            // ���� AI ��Ϣ���Ի���ʷ
+            // 添加 AI 信息到对话历史
             messages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", botMessage } });
         }
         else

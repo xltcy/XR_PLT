@@ -11,7 +11,7 @@ public class IssueController : MonoBehaviour
 
     #region Stage1
     /// <summary>
-    /// һ�׶η���
+    /// 一阶段发射
     /// Step 1. 3dof explosion
     /// Step 2. Call animation "Stage1"
     /// </summary>

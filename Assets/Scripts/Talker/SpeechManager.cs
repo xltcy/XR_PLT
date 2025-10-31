@@ -36,7 +36,7 @@ private bool IsRecognizing;
         _audioSource = GetComponent<AudioSource>();
         if (Microphone.devices.IsEmpty())
         {
-            TextBubble.SetGlobalText("û����˷�");
+            TextBubble.SetGlobalText("没有麦克风");
             Debug.LogWarning("[SR] No input devices found.", gameObject);
         }
         else
@@ -140,12 +140,13 @@ private bool IsRecognizing;
         // });
     }
 
+    //todo 此函数内的文本由乱码转化而来，需要确认
     void ProcessRecognizedText(string text)
     {
-        if (text.Contains("���ת"))
+        if (text.Contains("向后转"))
         {
             //controlled.GetComponent<IHumanControl>().TurnBack();
-            this.RunTask(SpeakText("�õ�"));
+            this.RunTask(SpeakText("好的"));
         }
     }
 
