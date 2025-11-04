@@ -109,9 +109,15 @@ public class SceneController : BaseController
      * OnComplete only use to notify complete event.Param means hasError in http request.
      * All dispositions should be dispose in onSuccess/onError.
      */
-    public void RequestSceneDataByKey(string sceneKey, Action<bool> onComplete = null)
+    public void RequestSceneDataByKey(SummaryItemData sceneItemData , Action<bool> onComplete = null)
     {
-        localJsonPath = jsonHomePath + sceneKey;
+        if (sceneItemData == null)
+        {
+            Debug.LogError("sceneItemData为空，无法请求SceneData！请检查场景List");
+            return;
+        }
+        
+        localJsonPath = jsonHomePath + sceneItemData.sceneKey;
         if (jsonLocationHint != null)
         {
             jsonLocationHint.text = "json应该放在：" + localJsonPath;
@@ -119,7 +125,7 @@ public class SceneController : BaseController
         // TODO API get Response. Get From Local.
         // GetFakeResources();
         // get json
-        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(sceneKey,
+        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(sceneItemData,
             onSuccess: (res) => {
                 if (sceneData == null || sceneData.timestampMs < res.timestampMs)
                 {
