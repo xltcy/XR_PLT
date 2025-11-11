@@ -157,7 +157,7 @@ public class ControllerRegister : MonoBehaviour
     /// <summary>
     /// 创建指定类型的Controller
     /// </summary>
-    public T CreateController<T>() where T : BaseController
+    private T CreateController<T>() where T : BaseController
     {
         Type controllerType = typeof(T);
         

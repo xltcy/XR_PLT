@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class DebugUIMediator : BaseUIMediator
 {
-    [BindChild("p_scene_json_btn"), ButtonCallback("OnRequestSceneJsonButtonClick")]
+    [BindChild("p_btn_scene_json"), ButtonCallback("OnRequestSceneJsonButtonClick")]
     private Button requestSceneJsonButton;
 
+    [BindChild("p_btn_scene_upload"), ButtonCallback("OnRequestSceneUploadButtonClick")]
+    private Button requestSceneUploadButton;
+    
     public void OnEnable()
     {
         
@@ -27,6 +30,13 @@ public class DebugUIMediator : BaseUIMediator
             sceneController.RequireSummaryData();
             Debug.Log("Request Summary Data");
         }
+    }
+
+    private void OnRequestSceneUploadButtonClick()
+    {
+        Debug.Log("Request Scene Upload Button Clicked");
+        StartCoroutine(NetworkUtil.Instance.UploadSummaryData());
+        Debug.Log("Upload Scene Data");
     }
     
 }

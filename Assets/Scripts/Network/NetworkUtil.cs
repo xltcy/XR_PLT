@@ -19,6 +19,7 @@ public class NetworkUtil
     private const string RELOCATE_REQUEST_URL_SUFFIX_INTERFACE = "media_app/request_NVLAD_redir/?source_location=";
     private const string GET_SCENE_LIST_INTERFACE = "media_app/get_scence_list/";
     private const string GET_SCENE_CONFIG_INTERFACE = "media_app/get_config/";
+    private const string UPLOAD_SCENE_CONFIG_INTERFACE = "/media_app/update_config/";
     
     public static bool DEBUG_USING_NETWORK_JSON = false;
 
@@ -258,6 +259,52 @@ public class NetworkUtil
             SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
             Debug.Log("Get Response json: Data:" + data);
             onSuccess.Invoke(data);
+        }
+    }
+
+    public IEnumerator UploadSummaryData()
+    {
+        if (!DEBUG_USING_NETWORK_JSON)
+        {
+            yield break;
+        }
+        //get summary data
+        var url = SERVER_URL + UPLOAD_SCENE_CONFIG_INTERFACE;
+        
+        var sceneItemData = ControllerRegister.Instance.GetController<MeshController>().GetCurrentSceneData();
+        string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
+        // 将数据对象转换为JSON字符串
+        string json = "";
+        if (File.Exists(localPath))
+        {
+            json = File.ReadAllText(localPath);
+        }
+        
+        
+        json = Resources.Load<TextAsset>("Configs/" + "test-HKG").text;
+        
+        
+        // 使用WWWForm构建multipart/form-data
+        WWWForm form = new WWWForm();
+        // 添加config字段，值是JSON字符串
+        form.AddField("config", json);
+        
+        
+        // 创建UnityWebRequest，设置URL和方法
+        using (UnityWebRequest request = UnityWebRequest.Post(url + "?key=5", form))
+        {
+            
+            // 发送请求并等待响应
+            yield return request.SendWebRequest();
+            
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("上传成功: " + request.downloadHandler.text);
+            }
+            else
+            {
+                Debug.LogError("上传失败: " + request.error);
+            }
         }
     }
     #endregion 获取某一场景数据

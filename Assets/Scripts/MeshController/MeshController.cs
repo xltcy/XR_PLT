@@ -71,8 +71,6 @@ public class MeshController : BaseController
         if (DEBUG_USING_NETWORK_JSON != NetworkUtil.DEBUG_USING_NETWORK_JSON)
         {
             NetworkUtil.DEBUG_USING_NETWORK_JSON = DEBUG_USING_NETWORK_JSON; 
-            //自动刷新数据
-            ControllerRegister.Instance.GetController<SceneController>()?.RequireSummaryData();
         }
     }
 
@@ -397,5 +395,13 @@ public class MeshController : BaseController
         Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
         world2Camera = world2Camera * rotationMatrixTest;
         return world2Camera;
+    }
+    
+    
+        
+    //todo delete temp function
+    public SummaryItemData GetCurrentSceneData()
+    {
+        return summary[selectedSceneIndex];
     }
 }
