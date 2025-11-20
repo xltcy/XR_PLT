@@ -18,6 +18,7 @@ public enum ActionType
     Explosion,
     WaveGenerate,
     AvatarAnim,
+    CustomFunction,
 }
 
 [JsonConverter(typeof(ActionConverter))] // 关键
@@ -146,6 +147,9 @@ public class ActionConverter : JsonConverter
                 break;
             case ActionType.AvatarAnim:
                 action = new AvatarAnimAction();
+                break;
+            case ActionType.CustomFunction:
+                action = new CustomFunctionAction();
                 break;
             default:
                 throw new Exception($"Unknown action type: {type}");

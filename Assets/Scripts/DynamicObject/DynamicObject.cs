@@ -71,6 +71,10 @@ public class DynamicObject : MonoBehaviour
             case ActionType.Explosion:
                 SetExplosion(isStartAction);
                 break;
+            case ActionType.CustomFunction:
+                var customObjectAction = action as CustomFunctionAction;
+                ExecuteCustomAction(customObjectAction, isStartAction);
+                break;
             default:
                 // nothing
                 break;
@@ -355,5 +359,50 @@ public class DynamicObject : MonoBehaviour
     private Vector3 GetCenterPosInWorldSpace()
     {
         return transform.TransformPoint(gameObject.GetComponent<BoxCollider>().center);
+    }
+
+
+    /// <summary>
+    /// 调用自定义函数
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="isStartAction">是开始还是结束</param>
+    private bool ExecuteCustomAction(CustomFunctionAction action, bool isStartAction)
+    {
+        var functionName = action.customFunctionName;
+        if (string.IsNullOrEmpty(functionName))
+        {
+            Debug.LogWarning($"action id:{action.id}-{functionName}为空");
+            return false;
+        }
+        
+        var scripts = gameObject.GetComponents<MonoBehaviour>();
+
+        try
+        {
+            foreach (var script in scripts)
+            {
+                //不调用自己
+                if (!script || script == this)
+                {
+                    continue;
+                }
+                
+                var method = script.GetType().GetMethod(functionName);
+                if (method != null)
+                {
+                    method.Invoke(script, new object[] { isStartAction });
+                    return true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"调用失败: action id{action.id}-{functionName}() - {e.Message}");
+            return false;
+        }
+        
+        Debug.LogWarning($"调用失败: action id:{action.id}-{functionName}() - 未找到对应函数");
+        return false;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,10 +13,11 @@ public class MoveCamera : MonoBehaviour
 
     public Camera camera;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        
+#if !UNITY_EDITOR
+        gameObject.SetVisible(false);
+#endif    
     }
 
     // Update is called once per frame

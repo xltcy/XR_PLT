@@ -177,6 +177,10 @@ public class SceneController : BaseController
         foreach (var objectData in sceneData.objects)
         {
             GameObject prefab = (GameObject)Resources.Load("Prefab/" + objectData.url);
+            if (!prefab)
+            {
+                prefab = (GameObject)Resources.Load(objectData.url);
+            }
             prefabs[objectData.id] = prefab;
         }
         // explanationPoints. Use in selectDesController
@@ -362,6 +366,7 @@ public class SceneController : BaseController
             case ActionType.RotateObject:
             case ActionType.HighlightObject:
             case ActionType.Explosion:
+            case ActionType.CustomFunction:
                 var objectAction = actionData as ObjectActionBase;
                 var addedModel = addedObjects[objectAction.generateActionId];
                 addedModel.GetComponent<DynamicObject>().ConsoleActions(objectAction, isStartAction, onComplete: () => { });

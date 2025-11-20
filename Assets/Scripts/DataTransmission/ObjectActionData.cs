@@ -117,3 +117,8 @@ public class WaveGenerateAction : ObjectActionBase
     // TODO
 }
 
+public class CustomFunctionAction : ObjectActionBase
+{
+    public string customFunctionName;
+}
+

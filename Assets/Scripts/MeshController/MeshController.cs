@@ -116,6 +116,9 @@ public class MeshController : BaseController
 
     public void ClickToGetPoseByCapture()
     {
+#if UNITY_EDITOR
+        tempGetPose();
+#else
         SetStartState(StartState.GettingPos);
         UIManager.SetLoadingStatus(true);
 
@@ -136,6 +139,7 @@ public class MeshController : BaseController
         }
         SendImageAndReadJson(rawData);
         Debug.Log(testImagePath.ToString());
+#endif
     }
 
     private void SendImageAndReadJson(byte[] rawData)
