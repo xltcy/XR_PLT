@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class Texture2DRotateUtil
 {
-    // Ë³Ê±ÕëĞı×ª90¡ã
+    // é¡ºæ—¶é’ˆæ—‹è½¬90Â°
     public static Texture2D Rotate90(Texture2D src)
     {
         int width = src.width;
@@ -27,7 +27,7 @@ public static class Texture2DRotateUtil
         return rotated;
     }
 
-    // Ë³Ê±ÕëĞı×ª180¡ã
+    // é¡ºæ—¶é’ˆæ—‹è½¬180Â°
     public static Texture2D Rotate180(Texture2D src)
     {
         int width = src.width;
@@ -47,7 +47,7 @@ public static class Texture2DRotateUtil
         return rotated;
     }
 
-    // Ë³Ê±ÕëĞı×ª270¡ã
+    // é¡ºæ—¶é’ˆæ—‹è½¬270Â°
     public static Texture2D Rotate270(Texture2D src)
     {
         int width = src.width;
@@ -87,7 +87,7 @@ public static class Texture2DRotateUtil
                 return Rotate180(src);
 
             default:
-                // Èç¹ûÎŞ·¨ÅĞ¶Ï£¬±£ÊØÊ¹ÓÃ Rotate90£¨iPhone Ä¬ÈÏ portrait£©
+                // å¦‚æœæ— æ³•åˆ¤æ–­ï¼Œä¿å®ˆä½¿ç”¨ Rotate90ï¼ˆiPhone é»˜è®¤ portraitï¼‰
                 return Rotate90(src);
         }
     }

@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright © 2009 Simon McKenzie, released under the Code Project Open License (CPOL) 1.02")]
+[assembly: AssemblyCopyright("Copyright  2009 Simon McKenzie, released under the Code Project Open License (CPOL) 1.02")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

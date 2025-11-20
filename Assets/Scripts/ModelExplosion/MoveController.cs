@@ -31,12 +31,12 @@ public class MoveController : MonoBehaviour
     {
         if (isMoving)
         {
-            // ¼ÆËãÃ¿Ö¡ĞèÒªÒÆ¶¯µÄ¾àÀë
+            // è®¡ç®—æ¯å¸§éœ€è¦ç§»åŠ¨çš„è·ç¦»
             float step = speed * Time.deltaTime;
-            // ÒÆ¶¯Ä£ĞÍ
+            // ç§»åŠ¨æ¨¡å‹
             transform.position = Vector3.MoveTowards(transform.position, target, step);
 
-            // ¼ì²éÊÇ·ñµ½´ïÄ¿±êÎ»ÖÃ
+            // æ£€æŸ¥æ˜¯å¦åˆ°è¾¾ç›®æ ‡ä½ç½®
             if (Vector3.Distance(transform.position, target)<=1e-2)
             {
                 isMoving = false;

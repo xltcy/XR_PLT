@@ -22,19 +22,19 @@ public class Label3D : MonoBehaviour
 
     public void ShowLable()
     {
-        // ´´½¨¿ÕÈİÆ÷
+        // åˆ›å»ºç©ºå®¹å™¨
         GameObject container = new GameObject("SpeechBubble");
         label = container;
         container.transform.SetParent(labelTarget.transform, false);
 
-        // 1. ±³¾°Í¼£¨Quad£©
+        // 1. èƒŒæ™¯å›¾ï¼ˆQuadï¼‰
         GameObject bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
         bg.name = "BubbleBG";
         bg.transform.SetParent(container.transform, false);
-        bg.transform.localPosition = new Vector3(0, 0, 0.01f); // ÉÔºóÃæÒ»µã
-        bg.transform.localScale = new Vector3(1.2f, 0.4f, 0.1f); // ´óĞ¡°´ÌùÍ¼À´µ÷
+        bg.transform.localPosition = new Vector3(0, 0, 0.01f); // ç¨åé¢ä¸€ç‚¹
+        bg.transform.localScale = new Vector3(1.2f, 0.4f, 0.1f); // å¤§å°æŒ‰è´´å›¾æ¥è°ƒ
 
-        // ¼ÓÔØÃûÎª"3DLabel"µÄ²ÄÖÊ
+        // åŠ è½½åä¸º"3DLabel"çš„æè´¨
         Material labelMat = Resources.Load<Material>("Materials/3DLabel");
         if (labelMat != null)
         {
@@ -42,7 +42,7 @@ public class Label3D : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ÕÒ²»µ½ÃûÎª '3DLabel' µÄ²ÄÖÊ£¬Çë¼ì²éResourcesÎÄ¼ş¼ĞÀïÊÇ·ñ´æÔÚ¡£");
+            Debug.LogWarning("æ‰¾ä¸åˆ°åä¸º '3DLabel' çš„æè´¨ï¼Œè¯·æ£€æŸ¥Resourcesæ–‡ä»¶å¤¹é‡Œæ˜¯å¦å­˜åœ¨ã€‚");
         }
 
         // 2. TextMeshPro
@@ -50,7 +50,7 @@ public class Label3D : MonoBehaviour
         textObj.transform.SetParent(container.transform, false);
 
         var textMesh = textObj.AddComponent<TextMeshPro>();
-        textMesh.text = "C750DË«ÆÁÍ¼ÏñÉùÄÅ";
+        textMesh.text = "C750DåŒå±å›¾åƒå£°å‘";
         textMesh.fontSize = 1;
         textMesh.alignment = TextAlignmentOptions.Center;
         textMesh.color = Color.black;
@@ -64,7 +64,7 @@ public class Label3D : MonoBehaviour
         //}
         //else
         //{
-        //    Debug.LogWarning("Î´ÄÜ¼ÓÔØ simhei SDF ×ÖÌå£¬Çë¼ì²é Resources Â·¾¶ÊÇ·ñÕıÈ·¡£");
+        //    Debug.LogWarning("æœªèƒ½åŠ è½½ simhei SDF å­—ä½“ï¼Œè¯·æ£€æŸ¥ Resources è·¯å¾„æ˜¯å¦æ­£ç¡®ã€‚");
         //}
 
 

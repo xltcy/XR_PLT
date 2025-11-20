@@ -81,7 +81,7 @@ public class VideoManager : MonoBehaviour
 
     void OnVideoFinish(VideoPlayer vp)
     {
-        Debug.Log("ÊÓÆµ²¥·Å½áÊø");
+        Debug.Log("è§†é¢‘æ’­æ”¾ç»“æŸ");
 
         gameObject.SetActive(false);
         // todo 

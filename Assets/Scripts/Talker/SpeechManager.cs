@@ -35,7 +35,7 @@ private bool IsRecognizing;
         _audioSource = GetComponent<AudioSource>();
         if (Microphone.devices.IsEmpty())
         {
-            TextBubble.SetGlobalText("û����˷�");
+            TextBubble.SetGlobalText("未找到麦克风");
             Debug.LogWarning("[SR] No input devices found.", gameObject);
         }
         else
@@ -141,10 +141,10 @@ private bool IsRecognizing;
 
     void ProcessRecognizedText(string text)
     {
-        if (text.Contains("���ת"))
+        if (text.Contains("转身"))
         {
             //controlled.GetComponent<IHumanControl>().TurnBack();
-            this.RunTask(SpeakText("�õ�"));
+            this.RunTask(SpeakText("好的"));
         }
     }
 

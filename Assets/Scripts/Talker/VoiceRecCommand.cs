@@ -38,17 +38,17 @@ public class IRVVoiceRecCommand: VoiceRecCommand
         switch(type)
         {
             case IRVCommandType.TRACK_ENABLE:
-                matchPattern = "¿ªÊ¼Ê¶±ğ(?!²¢²¥·Å)";break;
+                matchPattern = "å¼€å§‹è¯†åˆ«(?!å¹¶æ’­æ”¾)";break;
             case IRVCommandType.TRACK_DISABLE:
-                matchPattern = "¹Ø±ÕÊ¶±ğ";break;
+                matchPattern = "å…³é—­è¯†åˆ«";break;
             case IRVCommandType.VIDEO_PLAY:
-                matchPattern = "¿ªÊ¼²¥·Å"; break;
+                matchPattern = "å¼€å§‹æ’­æ”¾"; break;
             case IRVCommandType.VIDEO_PAUSE:
-                matchPattern = "ÔİÍ£²¥·Å"; break;
+                matchPattern = "æš‚åœæ’­æ”¾"; break;
             case IRVCommandType.VIDEO_STOP:
-                matchPattern = "Í£Ö¹²¥·Å"; break;
+                matchPattern = "åœæ­¢æ’­æ”¾"; break;
             case IRVCommandType.TRACK_ENABLE_AUTO_PLAY_VIDEO:
-                matchPattern = "¿ªÊ¼Ê¶±ğ²¢²¥·Å"; break;
+                matchPattern = "å¼€å§‹è¯†åˆ«å¹¶æ’­æ”¾"; break;
         }
         commandType = type;
     }
@@ -91,7 +91,7 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
         switch (type)
         {
             case VirHumanCommandType.initPos:
-                matchPattern = "¿ªÊ¼²Î¹Û";
+                matchPattern = "å¼€å§‹å‚è§‚";
                 desLocalPosition = new Vector3(-1.179f, -0.709f, -15.45f);
                 introduction = "";
                 break;
@@ -99,7 +99,7 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
                 matchPattern = "qidong";
                 //desLocalPosition = new Vector3(1.455281f, -1.048873f, -8.3174285f);
                 desLocalPosition = new Vector3(2.02800012f, -0.943000019f, -8.32299995f);
-                introduction = "ÎÒÃÇÒÑ¾­µ½´ïÉùÄÅ´¦£¬Í¨¹ıÓïÒô½²½âÔ­Àí¿ÉÒÔ¹Û¿´ÉùÄÅ½éÉÜ£¬Èç¹ûÓĞÊ²Ã´ÏëÁË½âµÄµã»÷ÖĞ¼äµÄ°´Å¥ÏòÎÒÌáÎÊ";
+                introduction = "æˆ‘ä»¬å·²ç»åˆ°è¾¾å£°å‘å¤„ï¼Œé€šè¿‡è¯­éŸ³è®²è§£åŸç†å¯ä»¥è§‚çœ‹å£°å‘ä»‹ç»ï¼Œå¦‚æœæœ‰ä»€ä¹ˆæƒ³äº†è§£çš„ç‚¹å‡»ä¸­é—´çš„æŒ‰é’®å‘æˆ‘æé—®";
                 break;
 
         }
@@ -143,29 +143,29 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         switch (type)
         {
             case SceneCommandType.hideScene:
-                matchPattern = "Òş²ØÄ£ĞÍ"; break;
+                matchPattern = "éšè—æ¨¡å‹"; break;
             case SceneCommandType.showScene:
-                matchPattern = "ÏÔÊ¾Ä£ĞÍ"; break;
+                matchPattern = "æ˜¾ç¤ºæ¨¡å‹"; break;
             case SceneCommandType.hideButton:
-                matchPattern = "Òş²Ø°´Å¥"; break;
+                matchPattern = "éšè—æŒ‰é’®"; break;
             case SceneCommandType.showButton:
-                matchPattern = "ÏÔÊ¾°´Å¥"; break;
+                matchPattern = "æ˜¾ç¤ºæŒ‰é’®"; break;
             case SceneCommandType.screen:
-                matchPattern = "½²½âÔ­Àí"; break;
+                matchPattern = "è®²è§£åŸç†"; break;
             case SceneCommandType.sonar:
-                matchPattern = "Õ¹Ê¾Ä£ĞÍ"; break;
+                matchPattern = "å±•ç¤ºæ¨¡å‹"; break;
             case SceneCommandType.separateSonar:
-                matchPattern = "Ä£ĞÍ·Ö½â"; break;
+                matchPattern = "æ¨¡å‹åˆ†è§£"; break;
             case SceneCommandType.recoverSonar:
-                matchPattern = "Ä£ĞÍ»Ö¸´"; break;
+                matchPattern = "æ¨¡å‹æ¢å¤"; break;
             case SceneCommandType.showSonarWave:
-                matchPattern = "Éù²¨"; break;
+                matchPattern = "å£°æ³¢"; break;
             case SceneCommandType.showSonarLabel:
-                matchPattern = "ĞÍºÅ"; break;
+                matchPattern = "å‹å·"; break;
             case SceneCommandType.showFinding:
-                matchPattern = "ÑĞ¾¿³É¹û"; break;
+                matchPattern = "ç ”ç©¶æˆæœ"; break;
             case SceneCommandType.end:
-                matchPattern = "Ã»ÓĞ"; break;
+                matchPattern = "æ²¡æœ‰"; break;
         }
         commandType = type;
     }
@@ -207,7 +207,7 @@ public class SceneVoiceRecCommand : VoiceRecCommand
 }
 
 /// <summary>
-/// ·É»ú¡°³öÏÖ¡±ºÍ¡°Õ¹Ê¾¡±Ïà¹ØµÄÃüÁî
+/// é£æœºâ€œå‡ºç°â€å’Œâ€œå±•ç¤ºâ€ç›¸å…³çš„å‘½ä»¤
 /// </summary>
 public class PlaneRelatedCommand : VoiceRecCommand
 {
@@ -218,31 +218,31 @@ public class PlaneRelatedCommand : VoiceRecCommand
         switch(type)
         {
             //case PlaneRelatedCommandType.showPlane:
-            //    base.matchPattern = "·É»ú³öÏÖ";
+            //    base.matchPattern = "é£æœºå‡ºç°";
             //    break;
             case PlaneRelatedCommandType.explodePlane:
-                base.matchPattern = "»úÉíÕ¹¿ª";
+                base.matchPattern = "æœºèº«å±•å¼€";
                 break;
             //case PlaneRelatedCommandType.explodeMid:
-            //    base.matchPattern = "¶ş¼¶±¬Õ¨";
+            //    base.matchPattern = "äºŒçº§çˆ†ç‚¸";
             //    break;
             case PlaneRelatedCommandType.explodeBody:
-                base.matchPattern = "»úÉí¶ş´ÎÕ¹¿ª";
+                base.matchPattern = "æœºèº«äºŒæ¬¡å±•å¼€";
                 break;
             //case PlaneRelatedCommandType.explodeWingLeft:
-            //    base.matchPattern = "×ó³á°ò±¬Õ¨";
+            //    base.matchPattern = "å·¦ç¿…è†€çˆ†ç‚¸";
             //    break;
             //case PlaneRelatedCommandType.explodeWingRight:
-            //    base.matchPattern = "ÓÒ³á°ò±¬Õ¨";
+            //    base.matchPattern = "å³ç¿…è†€çˆ†ç‚¸";
             //    break;
             case PlaneRelatedCommandType.explodWing:
-                base.matchPattern = "²àÒí±¬Õ¨";
+                base.matchPattern = "ä¾§ç¿¼çˆ†ç‚¸";
                 break;
             //case PlaneRelatedCommandType.debug:
-            //    base.matchPattern = "µ÷ÊÔ·É»ú";
+            //    base.matchPattern = "è°ƒè¯•é£æœº";
             //    break;
             default:
-                string logInfo = "[tcluan Debug] PlaneRelatedCommand ÓĞÎ´³õÊ¼»¯µÄÃüÁîÀàĞÍ";
+                string logInfo = "[tcluan Debug] PlaneRelatedCommand æœ‰æœªåˆå§‹åŒ–çš„å‘½ä»¤ç±»å‹";
                 Debug.Log(logInfo);
                 break;
         }

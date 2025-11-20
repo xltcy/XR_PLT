@@ -28,9 +28,9 @@ public class SMPLController : MonoBehaviour
 
     private AnimatorStateInfo animState;
 
-    //�����������л�ģ��
-    private bool isWalking; //�������Ƿ�������״̬
-    private bool isInitPos; //���������ó�ʼλ��
+    //控制角色移动的模型
+    private bool isWalking; //判断角色是否在移动状态
+    private bool isInitPos; //检查是否到达初始位置
     private Quaternion desRotation;
 
     private bool hasRemind = false;
@@ -102,7 +102,7 @@ public class SMPLController : MonoBehaviour
             animState = talkAnim.GetCurrentAnimatorStateInfo(0);
         }
 
-        //������߼�
+        //行走检查逻辑
         if (!isInitPos)
         {
             foreach (var cmd in desCommand)
@@ -120,8 +120,8 @@ public class SMPLController : MonoBehaviour
             isInitPos = false;
         }
 
-        //Ѱ·���߼�
-        //isWalking, nearEnough, isInitPos����bool����
+        //寻路逻辑
+        //isWalking, nearEnough, isInitPos都是bool类型
         if (!isInitPos)
         {
             if (isWalking)
@@ -240,27 +240,27 @@ public class SMPLController : MonoBehaviour
             talkingModel.transform.rotation = Quaternion.Slerp(talkingModel.transform.rotation, desRotation, 0.05f);
         }
     }
-    private void CopyTransformState(Transform from, Transform to) // walkģ�ͺ�talkģ�͵ĳ���ͬ�������Ҫת���������0.213������Դ��ϵǰ��ʺɽ��
+    private void CopyTransformState(Transform from, Transform to) // walk模型和talk模型的比例不同，需要转换坐标，乘以0.213比例系数，确保两个模型位置同步
     {
         to.position = from.position;
         to.localRotation = from.localRotation;
     }
 
-    // �л���walkģ��
+    // 切换到Walk模式
     public void SwitchToWalkMode() 
     {
         isWalking = true;
-        CopyTransformState(talkingModel.transform, walkingModel.transform); // ��talkģ�͵�λ�˸��Ƹ�walkģ��
+        CopyTransformState(talkingModel.transform, walkingModel.transform); // 将talk模型的位置信息复制给walk模型
         walkingModel.SetActive(true);
         talkingModel.SetActive(false);
     }
 
-    private void SwitchToTalkMode(bool lookAtInSmooth = false) // �л���talkģ��
+    private void SwitchToTalkMode(bool lookAtInSmooth = false) // 切换到talk模式
     {
         //StopWalking();
 
         isWalking = false;
-        CopyTransformState(walkingModel.transform, talkingModel.transform); // ��walkģ�͵�λ�˸��Ƹ�talkģ��
+        CopyTransformState(walkingModel.transform, talkingModel.transform); // 将walk模型的位置信息复制给talk模型
         walkingModel.SetActive(false);
         talkingModel.SetActive(true);
         //LookAtMe(lookAtInSmooth);
@@ -291,12 +291,12 @@ public class SMPLController : MonoBehaviour
         SwitchToWalkMode();
         destination.transform.position = des;
         StartWalking(0.7f);
-        UnityEngine.Debug.Log("Msg in SMPL: ������·");
+        UnityEngine.Debug.Log("Msg in SMPL: 开始寻路");
         yield return new WaitUntil(() => NearEnough(walkingModel.transform.position, destination.transform.position));
         StopWalking();
         // yield return new WaitUntil(() => animState.IsName("Base Layer.Idle"));
         //
-        UnityEngine.Debug.Log("Msg in SMPL: ������������վ��״̬����");
+        UnityEngine.Debug.Log("Msg in SMPL: 已经到达并进入站立状态");
         SwitchToTalkMode();
         LookAtMe(true);
         talkAnim.SetBool("Talk", SpeechManager.IsSpeaking);
@@ -313,12 +313,12 @@ public class SMPLController : MonoBehaviour
         SwitchToWalkMode();
         destination.transform.position = desCmd.desLocalPosition;
         StartWalking(0.7f);
-        UnityEngine.Debug.Log("Msg in SMPL: ������·ȥ" + desCmd.commandType);
+        UnityEngine.Debug.Log("Msg in SMPL: 开始寻路去" + desCmd.commandType);
         yield return new WaitUntil(() => NearEnough(walkingModel.transform.position, destination.transform.position));
         StopWalking();
         // yield return new WaitUntil(() => animState.IsName("Base Layer.Idle"));
         //
-        UnityEngine.Debug.Log("Msg in SMPL: ����" + desCmd.commandType);
+        UnityEngine.Debug.Log("Msg in SMPL: 到达" + desCmd.commandType);
         SwitchToTalkMode();
         LookAtMe(true);
         talkAnim.SetBool("Talk", SpeechManager.IsSpeaking);

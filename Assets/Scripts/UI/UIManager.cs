@@ -83,7 +83,7 @@ public class UIManager : MonoBehaviour, SelectDesController.SelectDesActionInter
         //    initPos = true;
         //}
         FindObjectOfType<SMPLController>().InitializeSmplPosition();
-        SpeechManager.SayFromStr("欢迎来到VR实验室科教平台，接下来我将带你参观介绍水下装备数字孪生底座系统，请跟我来");
+        SpeechManager.SayFromStr("娆㈣繋鏉ュ埌VR瀹為獙瀹ょ鏁欏钩鍙帮紝鎺ヤ笅鏉ユ垜灏嗗甫浣犲弬瑙備粙缁嶆按涓嬭澶囨暟瀛楀鐢熷簳搴х郴缁燂紝璇疯窡鎴戞潵");
         Invoke("GotoShengNa", 12);
     }
 

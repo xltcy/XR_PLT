@@ -16,7 +16,7 @@ public class VoiceController : MonoBehaviour
     [Header("Prefabs")]
     public GameObject _prefabOfPlane;
 
-    [Header("Ä£ÄâÓïÒôÊ¶±ğ½á¹û")]
+    [Header("æ¨¡æ‹Ÿè¯­éŸ³è¯†åˆ«ç»“æœ")]
     public Text fakeVoiceText;
 
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
@@ -51,10 +51,10 @@ public class VoiceController : MonoBehaviour
     void Start()
     {
         voiceActiveButton.ResetBtn();
-        voiceActiveButton.onPointerDown.AddListener(¿ªÊ¼ÓïÒôÊ¶±ğ);
-        voiceActiveButton.onPointerUp.AddListener(Í£Ö¹ÓïÒôÊ¶±ğ);
+        voiceActiveButton.onPointerDown.AddListener(å¼€å§‹è¯­éŸ³è¯†åˆ«);
+        voiceActiveButton.onPointerUp.AddListener(åœæ­¢è¯­éŸ³è¯†åˆ«);
         xunfei = XunFeiYuYin.Init("5c81de59", "ea4d5e9b06f8cfb0deae4d5360e7f8a7", "94348d7a6d5f3807176cb1f4923efa5c", "c6ea43c9e7b14d163bdeb4e51d2e564d");
-        xunfei.ÓïÒôÊ¶±ğÍê³ÉÊÂ¼ş += ÓïÒôÊ¶±ğ½á¹û;
+        xunfei.è¯­éŸ³è¯†åˆ«å®Œæˆäº‹ä»¶ += è¯­éŸ³è¯†åˆ«ç»“æœ;
 
         llmGenerator = LLMGenerator.Init();
 
@@ -86,30 +86,30 @@ public class VoiceController : MonoBehaviour
         voiceRecCommands.Clear();
     }
 
-    public void ¿ªÊ¼ÓïÒôÊ¶±ğ()
+    public void å¼€å§‹è¯­éŸ³è¯†åˆ«()
     {
-        xunfei.¿ªÊ¼ÓïÒôÊ¶±ğ();
+        xunfei.å¼€å§‹è¯­éŸ³è¯†åˆ«();
         SpeechManager.ForceStop();
     }
-    public void Í£Ö¹ÓïÒôÊ¶±ğ()
+    public void åœæ­¢è¯­éŸ³è¯†åˆ«()
     {
-        StartCoroutine(xunfei.Í£Ö¹ÓïÒôÊ¶±ğ());
+        StartCoroutine(xunfei.åœæ­¢è¯­éŸ³è¯†åˆ«());
     }
 
 
-    public void Çå¿ÕÎÄ×Ö()
+    public void æ¸…ç©ºæ–‡å­—()
     {
         debugText.text = "";
     }
 
-    public void ÓïÒôÊ¶±ğ½á¹û(string result)
+    public void è¯­éŸ³è¯†åˆ«ç»“æœ(string result)
     {
         if (result == null || result == "")
         {
             CommandFail();
             return;
         }
-        debugText.text += "\nÓïÒôÊ¶±ğ½áÊø£¬½á¹û:" + result;
+        debugText.text += "\nè¯­éŸ³è¯†åˆ«ç»“æŸï¼Œç»“æœ:" + result;
         VoiceRecCommand resCommand = new VoiceRecCommand("");
         foreach (var command in voiceRecCommands)
         {
@@ -140,7 +140,7 @@ public class VoiceController : MonoBehaviour
                 //    break;
                 default:
                     matchFail = true;
-                    RemoteChat($"ÏÖÔÚÃæÇ°µÄÊÇÒ»¸öÉùÄÅ£¬ÓÃ»§ÌáÎÊµÄÎÊÌâÊÇ{result},ÇëÒÔÒ»¸ö¾«Í¨ÉùÄÅµÄ×¨¼ÒÉí·İ»Ø´ğ");
+                    RemoteChat($"ç°åœ¨é¢å‰çš„æ˜¯ä¸€ä¸ªå£°å‘ï¼Œç”¨æˆ·æé—®çš„é—®é¢˜æ˜¯{result},è¯·ä»¥ä¸€ä¸ªç²¾é€šå£°å‘çš„ä¸“å®¶èº«ä»½å›ç­”");
                     break;
             }
         }
@@ -159,7 +159,7 @@ public class VoiceController : MonoBehaviour
     public void FakeGetVoiceResult(string result)
     {
         result = fakeVoiceText.text.ToString();
-        debugText.text += "\nÓïÒôÊ¶±ğ½áÊø£¬½á¹û:" + result;
+        debugText.text += "\nè¯­éŸ³è¯†åˆ«ç»“æŸï¼Œç»“æœ:" + result;
         VoiceRecCommand resCommand = new VoiceRecCommand("");
         foreach (var command in voiceRecCommands)
         {
@@ -190,7 +190,7 @@ public class VoiceController : MonoBehaviour
                 //    break;
                 default:
                     matchFail = true;
-                    RemoteChat($"ÏÖÔÚÃæÇ°µÄÊÇÒ»¸öÉùÄÅ£¬ÓÃ»§ÌáÎÊµÄÎÊÌâÊÇ{result},ÇëÒÔÒ»¸ö¾«Í¨ÉùÄÅµÄ×¨¼ÒÉí·İ»Ø´ğ");
+                    RemoteChat($"ç°åœ¨é¢å‰çš„æ˜¯ä¸€ä¸ªå£°å‘ï¼Œç”¨æˆ·æé—®çš„é—®é¢˜æ˜¯{result},è¯·ä»¥ä¸€ä¸ªç²¾é€šå£°å‘çš„ä¸“å®¶èº«ä»½å›ç­”");
                     break;
             }
         }
@@ -270,7 +270,7 @@ public class VoiceController : MonoBehaviour
             case SceneVoiceRecCommand.SceneCommandType.showFinding:
                 mediaManager.SummonFindingsVideo();  break;
             case SceneVoiceRecCommand.SceneCommandType.end:
-                SpeechManager.SayFromStr("ºÃµÄ£¬Èç¹ûÄú»¹ÓĞĞËÈ¤ÁË½â¸ü¶àÄÚÈİ£¬»¶Ó­Ñ¡Ôñ×ÔÓÉ²Î¹Û»òÏòÎÒÌáÎÊ"); break;
+                SpeechManager.SayFromStr("å¥½çš„ï¼Œå¦‚æœæ‚¨è¿˜æœ‰å…´è¶£äº†è§£æ›´å¤šå†…å®¹ï¼Œæ¬¢è¿é€‰æ‹©è‡ªç”±å‚è§‚æˆ–å‘æˆ‘æé—®"); break;
             default: ReconizeFail(); break;
         }
     }
@@ -282,7 +282,7 @@ public class VoiceController : MonoBehaviour
     //        //case PlaneRelatedCommand.PlaneRelatedCommandType.showPlane:
     //        //    if (_plane == null)
     //        //    {
-    //        //        SpeechManager.SayFromStr("·É»ú³öÏÖ");
+    //        //        SpeechManager.SayFromStr("é£æœºå‡ºç°");
     //        //        _plane = Instantiate(_prefabOfPlane);
     //        //        _mid = _plane.transform.Find("Mid").gameObject;
     //        //        _body = _mid.transform.Find("Body").gameObject;
@@ -291,62 +291,62 @@ public class VoiceController : MonoBehaviour
     //        //    }
     //        //    else
     //        //    {
-    //        //        SpeechManager.SayFromStr("·É»úÒÑ¾­³öÏÖ");
+    //        //        SpeechManager.SayFromStr("é£æœºå·²ç»å‡ºç°");
     //        //    }
     //        //    break;
     //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodePlane:
     //            if (_plane != null)
     //            {
-    //                //SpeechManager.SayFromStr("Ò»¼¶±¬Õ¨");
+    //                //SpeechManager.SayFromStr("ä¸€çº§çˆ†ç‚¸");
     //                ModelTreeNode.OneDofExplosion(_plane);
     //                ModelTreeNode.OneDofExplosion(_mid);
     //            }
     //            else
     //            {
-    //                SpeechManager.SayFromStr("·É»ú»¹Ã»³öÏÖ");
+    //                SpeechManager.SayFromStr("é£æœºè¿˜æ²¡å‡ºç°");
     //            }
     //            break;
     //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeMid:
-    //        //    SpeechManager.SayFromStr("¶ş¼¶±¬Õ¨");
+    //        //    SpeechManager.SayFromStr("äºŒçº§çˆ†ç‚¸");
     //        //    ModelTreeNode.OneDofExplosion(_mid);
     //        //    break;
     //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodeBody:
     //            if (_plane != null)
     //            {
-    //                //SpeechManager.SayFromStr("»úÉí±¬Õ¨");
+    //                //SpeechManager.SayFromStr("æœºèº«çˆ†ç‚¸");
     //                ModelTreeNode.TwoDofExplosion(_body);
     //            }
     //            else
     //            {
-    //                SpeechManager.SayFromStr("·É»ú»¹Ã»³öÏÖ");
+    //                SpeechManager.SayFromStr("é£æœºè¿˜æ²¡å‡ºç°");
     //            }
     //            break;
     //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingLeft:
-    //        //    SpeechManager.SayFromStr("×óÒí±¬Õ¨");
+    //        //    SpeechManager.SayFromStr("å·¦ç¿¼çˆ†ç‚¸");
     //        //    ModelTreeNode.TwoDofExplosion(_wingLeft);
     //        //    break;
     //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingRight:
-    //        //    SpeechManager.SayFromStr("ÓÒÒí±¬Õ¨");
+    //        //    SpeechManager.SayFromStr("å³ç¿¼çˆ†ç‚¸");
     //        //    ModelTreeNode.TwoDofExplosion(_wingRight);
     //        //    break;
     //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodWing:
     //            if (_plane != null)
     //            {
-    //                //SpeechManager.SayFromStr("²àÒí±¬Õ¨");
+    //                //SpeechManager.SayFromStr("ä¾§ç¿¼çˆ†ç‚¸");
     //                ModelTreeNode.TwoDofExplosion(_wingLeft);
     //                ModelTreeNode.TwoDofExplosion(_wingRight);
     //            }
     //            else
     //            {
-    //                SpeechManager.SayFromStr("·É»ú»¹Ã»³öÏÖ");
+    //                SpeechManager.SayFromStr("é£æœºè¿˜æ²¡å‡ºç°");
     //            }
     //            break;
     //        //case PlaneRelatedCommand.PlaneRelatedCommandType.debug:
     //        //    string debugStr;
     //        //    if (_plane.activeSelf == true)
-    //        //        debugStr = "·É»úÒÑ¾­¼¤»îÁË£¬Î»ÖÃÊÇ" + _plane.transform.position.ToString();
+    //        //        debugStr = "é£æœºå·²ç»æ¿€æ´»äº†ï¼Œä½ç½®æ˜¯" + _plane.transform.position.ToString();
     //        //    else
-    //        //        debugStr = "·É»ú»¹Ã»¼¤»îÄØ";
+    //        //        debugStr = "é£æœºè¿˜æ²¡æ¿€æ´»å‘¢";
     //        //    SpeechManager.SayFromStr(debugStr);
     //        //    break;
     //        default:
@@ -366,12 +366,12 @@ public class VoiceController : MonoBehaviour
 
     public void Reset()
     {
-        Çå¿ÕÎÄ×Ö();
+        æ¸…ç©ºæ–‡å­—();
     }
 
     public void Test()
     {
-        Çå¿ÕÎÄ×Ö();
+        æ¸…ç©ºæ–‡å­—();
     }
 
     //private void RemoteChat(string userInput)
@@ -393,13 +393,13 @@ public class VoiceController : MonoBehaviour
 
     private void ReconizeFail()
     {
-        SpeechManager.SayFromStr("Ê¶±ğÊ§°Ü ÇëÖØĞÂ³¢ÊÔ");
+        SpeechManager.SayFromStr("è¯†åˆ«å¤±è´¥ è¯·é‡æ–°å°è¯•");
         voiceActiveButton.ResetBtn();
     }
 
     private void CommandFail()
     {
-        SpeechManager.SayFromStr("³öÏÖ´íÎó ÇëÖØĞÂ³¢ÊÔ");
+        SpeechManager.SayFromStr("å‡ºç°é”™è¯¯ è¯·é‡æ–°å°è¯•");
         voiceActiveButton.ResetBtn();
     }
 

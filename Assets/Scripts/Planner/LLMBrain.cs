@@ -107,7 +107,7 @@ public class LLMBrain : MonoBehaviour
         function = new Function
         {
             name = "GetPositon",
-            description = "ÓÃ»§Ñ¯ÎÊ·¿¼äµÄÎïÌå£¬·µ»ØÎïÌåµÄ×ø±ê£¬ e.g. (1,2,1), µ±ÎÊµ½ÃÅÊ±ºò£¬ĞèÒª·­ÒëÎªDoor½øĞĞ²éÑ¯",
+            description = "ç”¨æˆ·è¯¢é—®æˆ¿é—´çš„ç‰©ä½“ï¼Œè¿”å›ç‰©ä½“çš„åæ ‡ï¼Œ e.g. (1,2,1), å½“é—®åˆ°é—¨æ—¶å€™ï¼Œéœ€è¦ç¿»è¯‘ä¸ºDoorè¿›è¡ŒæŸ¥è¯¢",
             parameters = new Parameters
             {
                 type = "object",
@@ -116,7 +116,7 @@ public class LLMBrain : MonoBehaviour
                         {"name", new Property
                             {
                                 type = "string",
-                                description = "±íÊ¾·¿¼äÄÚÎïÌåµÄÃû×Ö"
+                                description = "è¡¨ç¤ºæˆ¿é—´å†…ç‰©ä½“çš„åå­—"
                             }
                         }
                     },
@@ -131,7 +131,7 @@ public class LLMBrain : MonoBehaviour
         function = new Function
         {
             name = "TakeMeTo",
-            description = "ÓÃ»§·¢³öÖ¸ÁîÈÃĞéÄâÈË´øÁì²Î¹Û£¬ĞéÄâÈË½«Ä¿µÄµØÉèÖÃÎªÓÃ»§ÏëÈ¥µÄµØ·½",
+            description = "ç”¨æˆ·å‘å‡ºæŒ‡ä»¤è®©è™šæ‹Ÿäººå¸¦é¢†å‚è§‚ï¼Œè™šæ‹Ÿäººå°†ç›®çš„åœ°è®¾ç½®ä¸ºç”¨æˆ·æƒ³å»çš„åœ°æ–¹",
             parameters = new Parameters
             {
                 type = "object",
@@ -140,7 +140,7 @@ public class LLMBrain : MonoBehaviour
                         {"name", new Property
                             {
                                 type = "string",
-                                description = "±íÊ¾Òª²Î¹Û¶ÔÏóµÄÃû×Ö£¬ÏÖÔÚÖ§³ÖµÄµØ·½ÓĞ{Door£¬BlackWillow£¬BeiJing1£¬ C919}"
+                                description = "è¡¨ç¤ºè¦å‚è§‚å¯¹è±¡çš„åå­—ï¼Œç°åœ¨æ”¯æŒçš„åœ°æ–¹æœ‰{Doorï¼ŒBlackWillowï¼ŒBeiJing1ï¼Œ C919}"
                             }
                         }
                     },
@@ -155,7 +155,7 @@ public class LLMBrain : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", "ÄãÊÇÒ»¸öµ¼ÓÎ£¬¿ÉÒÔ´øÁìÎÒ²Î¹Û·¿¼ä£¬µ±ÎÒ¸øÄã·¢³öÖ¸ÁîÊ±ºò£¬ÄãÒªÏÈ·Ö½â³É×ÓÈÎÎñ£¬È»ºóÒÀ´ÎÖ´ĞĞ£¬·Ö½âµÄ×ÓÈÎÎñÀàĞÍÎªÏÈÕÒµ½Ä¿±ê×ø±ê£¬ÔÙµ÷ÓÃÑ°Â·Ëã·¨´øÂ·,...£¬ËùÓĞµÄÈÎÎñ·Ö½â³ÉÈı¸ö×ÓÈÎÎñ" } });
+        messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", "ä½ æ˜¯ä¸€ä¸ªå¯¼æ¸¸ï¼Œå¯ä»¥å¸¦é¢†æˆ‘å‚è§‚æˆ¿é—´ï¼Œå½“æˆ‘ç»™ä½ å‘å‡ºæŒ‡ä»¤æ—¶å€™ï¼Œä½ è¦å…ˆåˆ†è§£æˆå­ä»»åŠ¡ï¼Œç„¶åä¾æ¬¡æ‰§è¡Œï¼Œåˆ†è§£çš„å­ä»»åŠ¡ç±»å‹ä¸ºå…ˆæ‰¾åˆ°ç›®æ ‡åæ ‡ï¼Œå†è°ƒç”¨å¯»è·¯ç®—æ³•å¸¦è·¯,...ï¼Œæ‰€æœ‰çš„ä»»åŠ¡åˆ†è§£æˆä¸‰ä¸ªå­ä»»åŠ¡" } });
     }
 
     public void OnSendButtonClicked()
@@ -204,7 +204,7 @@ public class LLMBrain : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(requestData);
 
-        // ´´½¨ UnityWebRequest
+        // åˆ›å»º UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(doubaoApiUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -214,22 +214,22 @@ public class LLMBrain : MonoBehaviour
 
         Debug.Log("Msg in sent message before: " + messages.ToString());
 
-        // ·¢ËÍÇëÇó
+        // å‘é€è¯·æ±‚
         yield return request.SendWebRequest();
 
         Debug.Log("Msg in sent message after: " + request.downloadHandler.text);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // ½âÎöÏìÓ¦
+            // è§£æå“åº”
             var response = JsonConvert.DeserializeObject<LLMResponse>(request.downloadHandler.text);
             string botMessage = response.choices[0].message.content;
 
-            // ÏÔÊ¾ÏìÓ¦
+            // æ˜¾ç¤ºå“åº”
             LLMOutput.text += "\nAI: " + botMessage;
             userInput.text = "";
 
-            // Ìí¼Ó AI ÏûÏ¢µ½¶Ô»°ÀúÊ·
+            // æ·»åŠ  AI æ¶ˆæ¯åˆ°å¯¹è¯å†å²
             messages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", botMessage } });
         }
         else
@@ -254,7 +254,7 @@ public class LLMBrain : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(requestData);
 
-        // ´´½¨ UnityWebRequest
+        // åˆ›å»º UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(doubaoApiUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -264,26 +264,26 @@ public class LLMBrain : MonoBehaviour
 
         //Debug.Log("Msg in sent message before: " + messages.ToString());
 
-        // ·¢ËÍÇëÇó
+        // å‘é€è¯·æ±‚
         yield return request.SendWebRequest();
 
         Debug.Log("Msg in sent message after: " + request.downloadHandler.text);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // ½âÎöÏìÓ¦
+            // è§£æå“åº”
             var response = JsonConvert.DeserializeObject<LLMResponse>(request.downloadHandler.text);
             //responses.Add(response);
             string botMessage = response.choices[0].message.content;
 
-            // ÏÔÊ¾ÏìÓ¦
+            // æ˜¾ç¤ºå“åº”
             LLMOutput.text += "\nAI: " + botMessage;
             userInput.text = "";
 
-            // Ìí¼Ó AI ÏûÏ¢µ½¶Ô»°ÀúÊ·
+            // æ·»åŠ  AI æ¶ˆæ¯åˆ°å¯¹è¯å†å²
             messages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", botMessage } });
 
-            //µ÷ÓÃº¯Êı
+            //è°ƒç”¨å‡½æ•°
             if (response.choices[0].message.tool_calls != null)
             {
                 if (response.choices[0].message.tool_calls[0].function.name == "TakeMeTo")
@@ -305,7 +305,7 @@ public class LLMBrain : MonoBehaviour
 
     private IEnumerator CallDeepSeekAPI()
     {
-        // ´´½¨ÇëÇóÊı¾İ
+        // åˆ›å»ºè¯·æ±‚æ•°æ®
         var requestData = new
         {
             model = "deepseek-chat",
@@ -315,7 +315,7 @@ public class LLMBrain : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(requestData);
 
-        // ´´½¨ UnityWebRequest
+        // åˆ›å»º UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(deepseekApiUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -325,22 +325,22 @@ public class LLMBrain : MonoBehaviour
 
         //Debug.Log("Msg in sent message before: ");
 
-        // ·¢ËÍÇëÇó
+        // å‘é€è¯·æ±‚
         yield return request.SendWebRequest();
 
         Debug.Log("Msg in sent message after: " + request.downloadHandler.text);
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // ½âÎöÏìÓ¦
+            // è§£æå“åº”
             var response = JsonConvert.DeserializeObject<LLMResponse>(request.downloadHandler.text);
             string botMessage = response.choices[0].message.content;
 
-            // ÏÔÊ¾ÏìÓ¦
+            // æ˜¾ç¤ºå“åº”
             LLMOutput.text += "\nAI: " + botMessage;
             userInput.text = "";
 
-            // Ìí¼Ó AI ÏûÏ¢µ½¶Ô»°ÀúÊ·
+            // æ·»åŠ  AI æ¶ˆæ¯åˆ°å¯¹è¯å†å²
             messages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", botMessage } });
         }
         else
@@ -351,7 +351,7 @@ public class LLMBrain : MonoBehaviour
 
     private IEnumerator CallDeepSeekAPIWithTools()
     {
-        // ´´½¨ÇëÇóÊı¾İ
+        // åˆ›å»ºè¯·æ±‚æ•°æ®
         Tool getPositionTool = new Tool
         {
             type = "funtion",
@@ -386,7 +386,7 @@ public class LLMBrain : MonoBehaviour
 
         string jsonData = JsonConvert.SerializeObject(requestData);
 
-        // ´´½¨ UnityWebRequest
+        // åˆ›å»º UnityWebRequest
         UnityWebRequest request = new UnityWebRequest(deepseekApiUrl, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -396,22 +396,22 @@ public class LLMBrain : MonoBehaviour
 
         //Debug.Log("Msg in sent message before: " + messages);
 
-        // ·¢ËÍÇëÇó
+        // å‘é€è¯·æ±‚
         yield return request.SendWebRequest();
 
         Debug.Log("Msg in sent message after");
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            // ½âÎöÏìÓ¦
+            // è§£æå“åº”
             var response = JsonConvert.DeserializeObject<LLMResponse>(request.downloadHandler.text);
             string botMessage = response.choices[0].message.content;
 
-            // ÏÔÊ¾ÏìÓ¦
+            // æ˜¾ç¤ºå“åº”
             LLMOutput.text += "\nAI: " + botMessage;
             userInput.text = "";
 
-            // Ìí¼Ó AI ÏûÏ¢µ½¶Ô»°ÀúÊ·
+            // æ·»åŠ  AI æ¶ˆæ¯åˆ°å¯¹è¯å†å²
             messages.Add(new Dictionary<string, string> { { "role", "assistant" }, { "content", botMessage } });
         }
         else

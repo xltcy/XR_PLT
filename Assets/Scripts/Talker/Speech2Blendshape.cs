@@ -50,11 +50,11 @@ public class Speech2Blendshape : MonoBehaviour
 
         if (string.IsNullOrEmpty(blendShapeName))
         {
-            // ¶ÔÓ¦blendshapeÎª¿Õ£¬¿ÉÄÜ²»ĞèÒª¶¯×÷
+            // å¯¹åº”blendshapeä¸ºç©ºï¼Œå¯èƒ½ä¸éœ€è¦åŠ¨ä½œ
             return;
         }
 
-        // ÕÒblendshapeÃû×Ö¶ÔÓ¦µÄË÷Òı
+        // æ‰¾blendshapeåå­—å¯¹åº”çš„ç´¢å¼•
         int index = smr.sharedMesh.GetBlendShapeIndex(blendShapeName);
         if (index < 0)
         {
