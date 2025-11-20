@@ -366,6 +366,7 @@ public class SceneController : BaseController
             case ActionType.RotateObject:
             case ActionType.HighlightObject:
             case ActionType.Explosion:
+            case ActionType.WaveGenerate:
             case ActionType.CustomFunction:
                 var objectAction = actionData as ObjectActionBase;
                 var addedModel = addedObjects[objectAction.generateActionId];

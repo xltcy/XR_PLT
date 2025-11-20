@@ -68,6 +68,9 @@ public class DynamicObject : MonoBehaviour
                 var highlightObjectAction = action as HighlightObjectAction;
                 SetHighlight(highlightObjectAction, isStartAction);
                 break;
+            case ActionType.WaveGenerate:
+                GenerateWave(isStartAction);
+                break;
             case ActionType.Explosion:
                 SetExplosion(isStartAction);
                 break;
@@ -285,6 +288,19 @@ public class DynamicObject : MonoBehaviour
         else
         {
             otl.OutlineWidth = 0f;
+        }
+    }
+
+    private void GenerateWave(bool isStartAction)
+    {
+        var generator = gameObject.GetComponent<SonarWaveManager>();
+        if (isStartAction)
+        {
+            generator.StartGenerate();
+        }
+        else
+        {
+            generator.StopGenerateAndDestroyWave();
         }
     }
 
