@@ -157,23 +157,23 @@ public class VoiceController : BaseController
                 smplController.HideButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
-            case SceneVoiceRecCommand.SceneCommandType.screen:
-                mediaManager.SummonCurtain();
-                break;
+            //case SceneVoiceRecCommand.SceneCommandType.screen:
+            //    mediaManager.SummonCurtain();
+            //    break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
                  break;
             case SceneVoiceRecCommand.SceneCommandType.separateSonar:
                 break;
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
                 break;
-            case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
-                mediaManager.SummonSonarWithWave();
-                mediaManager.SummonWall();
-                break;
-            case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
-                mediaManager.SummonSonarWithLabel(); break;
-            case SceneVoiceRecCommand.SceneCommandType.showFinding:
-                mediaManager.SummonFindingsVideo();  break;
+            //case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
+            //    mediaManager.SummonSonarWithWave();
+            //    mediaManager.SummonWall();
+            //    break;
+            //case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
+            //    mediaManager.SummonSonarWithLabel(); break;
+            //case SceneVoiceRecCommand.SceneCommandType.showFinding:
+            //    mediaManager.SummonFindingsVideo();  break;
             case SceneVoiceRecCommand.SceneCommandType.end:
                 SpeechManager.SayFromStr("好的，如果您还有兴趣了解更多内容，欢迎选择自由参观或向我提问"); break;
             default: ReconizeFail(); break;
@@ -260,14 +260,14 @@ public class VoiceController : BaseController
     //    }
     //}
 
-    public void TestAddPlane()
-    {
-        if (Plane == null)
-        {
-            Plane = Instantiate(_prefabOfPlane);
-            Plane.transform.position = Camera.main.transform.position;
-        }
-    }
+    //public void TestAddPlane()
+    //{
+    //    if (Plane == null)
+    //    {
+    //        Plane = Instantiate(_prefabOfPlane);
+    //        Plane.transform.position = Camera.main.transform.position;
+    //    }
+    //}
 
     public void Reset()
     {

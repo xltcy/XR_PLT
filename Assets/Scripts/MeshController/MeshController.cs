@@ -65,8 +65,8 @@ public class MeshController : BaseController
 
     void Start()
     {
-        modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
-        SetDropDownAddListener(模型切换);
+        //modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
+        //SetDropDownAddListener(模型切换);
         // 模型选择.value = 1;
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
@@ -138,19 +138,19 @@ public class MeshController : BaseController
         buttonHideSonar.gameObject.SetActive(true);
     }
 
-    public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
-    {
-        GameObject obj = GameObject.FindGameObjectWithTag(tag);
-        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer meshRenderer in meshRenderers)
-        {
-            Material[] materials = meshRenderer.materials;
-            foreach (Material material in materials)
-            {
-                material.shader = targetShader;
-            }
-        }
-    }
+    //public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
+    //{
+    //    GameObject obj = GameObject.FindGameObjectWithTag(tag);
+    //    MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
+    //    foreach (MeshRenderer meshRenderer in meshRenderers)
+    //    {
+    //        Material[] materials = meshRenderer.materials;
+    //        foreach (Material material in materials)
+    //        {
+    //            material.shader = targetShader;
+    //        }
+    //    }
+    //}
 
     public void ClickToSummonAtCamera()
     {
@@ -276,33 +276,35 @@ public class MeshController : BaseController
         return renderTexture.EncodeToJPG();
     }
 
-    public void ClickToGetPoseWithImage()
-    {
-        buttonGetPose.GetComponent<Button>().interactable = false;
-        buttonSummonAtCamera.gameObject.SetActive(false);
+    //todo 好像是合并到ClickToGetPoseByCapture()里面？
+    //public void ClickToGetPoseWithImage()
+    //{
+    //    buttonGetPose.GetComponent<Button>().interactable = false;
+    //    buttonSummonAtCamera.gameObject.SetActive(false);
 
-        string url = serverUrl;
+    //    string url = serverUrl;
 
-        // Record Camera Pose
-        Vector3 camPosition = arCamera.transform.position;
-        Quaternion camRotation = arCamera.transform.rotation;
-        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+    //    // Record Camera Pose
+    //    Vector3 camPosition = arCamera.transform.position;
+    //    Quaternion camRotation = arCamera.transform.rotation;
+    //    camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
 
-        string imagePath = testImagePath;
-        byte[] fileData = File.ReadAllBytes(imagePath);
-        var texture = ExifUtil.FixOrientation(fileData);
+    //    string imagePath = testImagePath;
+    //    byte[] fileData = File.ReadAllBytes(imagePath);
+    //    var texture = ExifUtil.FixOrientation(fileData);
 
-        Debug.Log(imagePath.ToString());
+    //    Debug.Log(imagePath.ToString());
 
 
-        if (datasetLoc != null)
-        {
-            url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
-        }
+    //    if (datasetLoc != null)
+    //    {
+    //        url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
+    //    }
 
-        StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
+    //    StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
 
-    }
+    //}
+
 
     public Pose TransArrayToWorldPose(float[,] num)
     {
@@ -419,21 +421,21 @@ public class MeshController : BaseController
         rotation = GetRotation(pose);
     }
 
-    public void HideMeshRender()
-    {
-        ChangeMeshShaderWithTag("Mesh", hideShader);
+    //public void HideMeshRender()
+    //{
+    //    ChangeMeshShaderWithTag("Mesh", hideShader);
 
-        buttonShowMesh.gameObject.SetActive(true);
-        buttonHideMesh.gameObject.SetActive(false);
-    }
+    //    buttonShowMesh.gameObject.SetActive(true);
+    //    buttonHideMesh.gameObject.SetActive(false);
+    //}
 
-    public void ShowMeshRender()
-    {
-        ChangeMeshShaderWithTag("Mesh", defaultShader);
+    //public void ShowMeshRender()
+    //{
+    //    ChangeMeshShaderWithTag("Mesh", defaultShader);
 
-        buttonShowMesh.gameObject.SetActive(false);
-        buttonHideMesh.gameObject.SetActive(true);
-    }
+    //    buttonShowMesh.gameObject.SetActive(false);
+    //    buttonHideMesh.gameObject.SetActive(true);
+    //}
 
     public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
     {
@@ -490,13 +492,13 @@ public class MeshController : BaseController
         onComplete?.Invoke();
     }
 
-    public void ClickToSummonSonar()
-    {
-        Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
-        Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
-        world2Camera = world2Camera * rotationMatrixTest;
-        return world2Camera;
-    }
+    //public void ClickToSummonSonar()
+    //{
+    //    Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
+    //    Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
+    //    world2Camera = world2Camera * rotationMatrixTest;
+    //    return world2Camera;
+    //}
     
     
         
