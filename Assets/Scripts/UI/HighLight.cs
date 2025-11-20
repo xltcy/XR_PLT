@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//todo SetGroupEmission()添加outline隐藏list
 public class HighLight : MonoBehaviour
 {
     public Color highlightcolor = Color.yellow; 

@@ -158,6 +158,7 @@ public class VoiceController : BaseController
             case SceneVoiceRecCommand.SceneCommandType.showButton:
                 smplController.ShowButton(); break;
             case SceneVoiceRecCommand.SceneCommandType.screen:
+                mediaManager.SummonCurtain();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.sonar:
                  break;
@@ -166,12 +167,105 @@ public class VoiceController : BaseController
             case SceneVoiceRecCommand.SceneCommandType.recoverSonar:
                 break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarWave:
+                mediaManager.SummonSonarWithWave();
+                mediaManager.SummonWall();
                 break;
             case SceneVoiceRecCommand.SceneCommandType.showSonarLabel:
-                break;
+                mediaManager.SummonSonarWithLabel(); break;
             case SceneVoiceRecCommand.SceneCommandType.showFinding:
-                break;
+                mediaManager.SummonFindingsVideo();  break;
+            case SceneVoiceRecCommand.SceneCommandType.end:
+                SpeechManager.SayFromStr("好的，如果您还有兴趣了解更多内容，欢迎选择自由参观或向我提问"); break;
             default: ReconizeFail(); break;
+        }
+    }
+
+    //public void PlaneRelatedAction(PlaneRelatedCommand command)
+    //{
+    //    switch (command._commandType)
+    //    {
+    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.showPlane:
+    //        //    if (_plane == null)
+    //        //    {
+    //        //        SpeechManager.SayFromStr("飞机出现");
+    //        //        _plane = Instantiate(_prefabOfPlane);
+    //        //        _mid = _plane.transform.Find("Mid").gameObject;
+    //        //        _body = _mid.transform.Find("Body").gameObject;
+    //        //        _wingLeft = _mid.transform.Find("WingLeft").gameObject;
+    //        //        _wingRight = _mid.transform.Find("WingRight").gameObject;
+    //        //    }
+    //        //    else
+    //        //    {
+    //        //        SpeechManager.SayFromStr("飞机已经出现");
+    //        //    }
+    //        //    break;
+    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodePlane:
+    //            if (_plane != null)
+    //            {
+    //                //SpeechManager.SayFromStr("一级爆炸");
+    //                ModelTreeNode.OneDofExplosion(_plane);
+    //                ModelTreeNode.OneDofExplosion(_mid);
+    //            }
+    //            else
+    //            {
+    //                SpeechManager.SayFromStr("飞机还没出现");
+    //            }
+    //            break;
+    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeMid:
+    //        //    SpeechManager.SayFromStr("二级爆炸");
+    //        //    ModelTreeNode.OneDofExplosion(_mid);
+    //        //    break;
+    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodeBody:
+    //            if (_plane != null)
+    //            {
+    //                //SpeechManager.SayFromStr("机身爆炸");
+    //                ModelTreeNode.TwoDofExplosion(_body);
+    //            }
+    //            else
+    //            {
+    //                SpeechManager.SayFromStr("飞机还没出现");
+    //            }
+    //            break;
+    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingLeft:
+    //        //    SpeechManager.SayFromStr("左翼爆炸");
+    //        //    ModelTreeNode.TwoDofExplosion(_wingLeft);
+    //        //    break;
+    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.explodeWingRight:
+    //        //    SpeechManager.SayFromStr("右翼爆炸");
+    //        //    ModelTreeNode.TwoDofExplosion(_wingRight);
+    //        //    break;
+    //        case PlaneRelatedCommand.PlaneRelatedCommandType.explodWing:
+    //            if (_plane != null)
+    //            {
+    //                //SpeechManager.SayFromStr("侧翼爆炸");
+    //                ModelTreeNode.TwoDofExplosion(_wingLeft);
+    //                ModelTreeNode.TwoDofExplosion(_wingRight);
+    //            }
+    //            else
+    //            {
+    //                SpeechManager.SayFromStr("飞机还没出现");
+    //            }
+    //            break;
+    //        //case PlaneRelatedCommand.PlaneRelatedCommandType.debug:
+    //        //    string debugStr;
+    //        //    if (_plane.activeSelf == true)
+    //        //        debugStr = "飞机已经激活了，位置是" + _plane.transform.position.ToString();
+    //        //    else
+    //        //        debugStr = "飞机还没激活呢";
+    //        //    SpeechManager.SayFromStr(debugStr);
+    //        //    break;
+    //        default:
+    //            ReconizeFail();
+    //            break;
+    //    }
+    //}
+
+    public void TestAddPlane()
+    {
+        if (Plane == null)
+        {
+            Plane = Instantiate(_prefabOfPlane);
+            Plane.transform.position = Camera.main.transform.position;
         }
     }
 

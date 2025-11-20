@@ -42,7 +42,7 @@ public class SMPLController : BaseController
     private static Vector3 consPos;
 
     // The diastance whether virtualHuman wallking
-    private float minDistance = 0.5f;
+    private float minDistance = 0.1f;
     private float maxDistance = 15.0f;
 
     public static void SetConsPos(Vector3 pos)
@@ -191,7 +191,16 @@ public class SMPLController : BaseController
     public void HideMeshRender()
     {
         MeshRenderer sceneMeshRenderer = scene.GetComponentInChildren<MeshRenderer>();
-        sceneMeshRenderer.material = occlusionMaterial;
+        //sceneMeshRenderer.material = occlusionMaterial;
+        Material[] newMaterials = new Material[2];  // 假设你要设置两个材质
+
+        // 给每个材质槽赋值
+        newMaterials[0] = occlusionMaterial;
+        newMaterials[1] = occlusionMaterial;
+
+        // 设置到 MeshRenderer 上
+        GetComponent<Renderer>().materials = newMaterials;
+
     }
 
     public void ShowMeshRender()

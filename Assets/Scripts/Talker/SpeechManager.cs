@@ -36,7 +36,7 @@ private bool IsRecognizing;
         _audioSource = GetComponent<AudioSource>();
         if (Microphone.devices.IsEmpty())
         {
-            TextBubble.SetGlobalText("没有麦克风");
+            TextBubble.SetGlobalText("未找到麦克风");
             Debug.LogWarning("[SR] No input devices found.", gameObject);
         }
         else
