@@ -2,9 +2,9 @@
   "sceneModelPath": "Prefab-SJS",
   "sceneName": "石景山",
   "initPosition": {
-    "x": 2.79,
+    "x": -3,
     "y": -1.2,
-    "z": -2.43
+    "z": 2.1
   },
   "timestampMs": 123,
   "explanationPoints": [
@@ -12,12 +12,12 @@
       "id": "P61-黑寡妇战斗机",
       "title": "P61-黑寡妇战斗机",
       "position": {
-        "x": -0.83,
-        "y": -1.21,
-        "z": -1.71
+        "x": 1.96,
+        "y": -1.2,
+        "z": 1.22
       },
       "initialIntroduction": "",
-      "arriveIntroduction": "",
+      "arriveIntroduction": "请将平板对准桌子中央，观察火箭分解的过程",
       "thumb": "abc",
       "actions": [
         {
@@ -159,7 +159,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":5,
-            "delay":5
+            "delay":8
           },
           "stopTrigger": {
             "mode": "AfterAction",
@@ -168,6 +168,32 @@
           },
           "generateActionId":4,
           "customFunctionName":"HandleExplosion"
+        },{
+          "type": "Introduce",
+          "id": 7,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "现在你看到的过程是长征五号的助推器分离。起飞后，它们提供最强动力，把火箭推上高空。当燃料用尽，助推器自动脱离，让主级更轻、更快地继续冲向太空。这一刻，是火箭真正开始加速的关键节点。"
+        },{
+          "type": "AvatarAnim",
+          "id":8,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":7,
+            "delay":0
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":5
+          },
+          "animTrigger":"LeftHandUp"
         }
       ]
     }
