@@ -10,10 +10,10 @@ public class ArcSegmentGenerator : MonoBehaviour
     public int count = 4;
     Vector3 emission_position = new Vector3();
     float radius;
-    float angle = 60.0f;
+    float angle = 15.0f;
     float startAngle = 0f;
-    public float centerAngle = 0.0f; 
-    int segments = 60;
+    public float centerAngle = 0.0f;
+    int segments = 15;
     float timer = 0f;
     float timeRound = 2.0f;
     float angleStep;
@@ -36,7 +36,7 @@ public class ArcSegmentGenerator : MonoBehaviour
             Vector3 point = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
             point += emission_position;
             Matrix4x4 matrix = Matrix4x4.TRS(parentTransform.position, parentTransform.rotation, Vector3.one);
-            point =  matrix.MultiplyPoint3x4(point);
+            point = matrix.MultiplyPoint3x4(point);
             lr.SetPosition(i, point);
         }
     }
@@ -63,16 +63,15 @@ public class ArcSegmentGenerator : MonoBehaviour
                         {
                             Debug.Log(col.gameObject);
                             WaveReflector waveReflectorScript = col.gameObject.GetComponent<WaveReflector>();
-                            if (waveReflectorScript != null)
+                            if (waveReflectorScript != null && wave_generator != null)
                             {
                                 waveReflectorScript.wave_generator = wave_generator;
                                 waveReflectorScript.emission_position = point - col.gameObject.transform.position;
                                 Debug.Log(point);
                                 Debug.Log(col.gameObject.transform.position);
-                                waveReflectorScript.is_on = 1;
                                 waveReflectorScript.received_wave = gameObject;
+                                waveReflectorScript.is_on = 1;
                             }
-                      
                             break;
                         }
                     }

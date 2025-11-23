@@ -150,7 +150,7 @@ public class SceneVoiceRecCommand : VoiceRecCommand
             case SceneCommandType.showButton:
                 matchPattern = "显示按钮"; break;
             case SceneCommandType.screen:
-                matchPattern = "播放视频"; break;
+                matchPattern = "讲解原理"; break;
             case SceneCommandType.sonar:
                 matchPattern = "展示模型"; break;
             case SceneCommandType.separateSonar:
@@ -163,6 +163,8 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "型号"; break;
             case SceneCommandType.showFinding:
                 matchPattern = "研究成果"; break;
+            case SceneCommandType.end:
+                matchPattern = "没有"; break;
         }
         commandType = type;
     }
@@ -181,6 +183,7 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarWave));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
+        res.Add(new SceneVoiceRecCommand("", SceneCommandType.end));
         return res;
     }
 
@@ -197,7 +200,8 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         recoverSonar,
         showSonarWave,
         showSonarLabel,
-        showFinding
+        showFinding,
+        end
     }
 }
 

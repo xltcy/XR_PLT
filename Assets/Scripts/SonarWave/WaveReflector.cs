@@ -18,7 +18,7 @@ public class WaveReflector : MonoBehaviour
     int index = 0;
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -29,7 +29,7 @@ public class WaveReflector : MonoBehaviour
         {
             ArcSegmentGenerator receivedWaveScript = received_wave.GetComponent<ArcSegmentGenerator>();
             receivedWaveScript.in_object = 1;
-            Vector3 aPos = transform.position + emission_position; 
+            Vector3 aPos = transform.position + emission_position;
             Vector3 bPos = wave_generator.transform.position;
             Vector3 dirA = new Vector3(aPos.x, 0, aPos.z);
             Vector3 dirB = new Vector3(bPos.x, 0, bPos.z);

@@ -48,6 +48,11 @@ public class VideoManager : BaseController
         PlayVideo("test");
     }
 
+    void OnVideoPrepared(VideoPlayer vp)
+    {
+        vp.Play();
+    }
+
     public void PlayVideo(string name)
     {
         gameObject.SetActive(true);
@@ -61,7 +66,9 @@ public class VideoManager : BaseController
                 //videoPlayer.prepareCompleted += OnVideoPrepare;
                 videoPlayer.loopPointReached += OnVideoFinish;
                 videoPlayer.clip = clip;
-                videoPlayer.Play();
+                //videoPlayer.Play();
+                videoPlayer.prepareCompleted += OnVideoPrepared;
+                videoPlayer.Prepare();
                 break;
             }
         }

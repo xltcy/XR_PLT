@@ -79,7 +79,6 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
      */
     public void SkipSelect()
     {
-        SwitchRunState(RunState.VirtualManIntro);
         if (!initPos)
         {
             smplController.SetActive(true);
