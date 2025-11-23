@@ -3677,6 +3677,8 @@ MonoBehaviour:
   buttonSummonAtCamera: {fileID: 8754343721441319854}
   buttonHideMesh: {fileID: 1402537761}
   buttonShowMesh: {fileID: 1396962098}
+  buttonHideSonar: {fileID: 0}
+  buttonShowSonar: {fileID: 0}
   datasetLoc: {fileID: 1380538706}
   testImagePath: H:/UnityProject/z_testImages/test_hkg.jpg
   DEBUG_USING_NETWORK_JSON: 0

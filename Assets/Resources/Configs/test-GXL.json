@@ -178,7 +178,7 @@
           "id":9,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":7,
+            "afterActionId":3,
             "delay":1
           },
           "stopTrigger": {
@@ -215,6 +215,44 @@
             "delay":0
           },
           "animTrigger":"HandForward"
+        },{
+          "type": "GenerateObject",
+          "id":12,
+          "startTrigger": {
+            "mode": "Immediate",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "objectDataId":"label",
+          "position":{
+            "x": 2.220328,
+            "y": 0.1083427,
+            "z": -4.278635
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 1 
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "ObjectVisible",
+          "id":13,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":"12",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "generateActionId":12
         }
       ]
     }
@@ -235,6 +273,11 @@
     "name":"sonar",
     "url":"Prefab-Sonar",
     "isExplosible":true
+  },{
+    "id":"label",
+    "name":"label",
+    "url":"Prefab-Label3D",
+    "isExplosible":false
   }
   ]
 }

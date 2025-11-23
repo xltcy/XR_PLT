@@ -108,7 +108,7 @@ public class MeshController : BaseController
     
     public void HideMeshRender()
     {
-        ChangeMeshShaderWithTag("Scene", hideShader);
+        ChangeMeshShaderWithTag("Mesh", hideShader);
 
         buttonShowMesh.gameObject.SetActive(true);
         buttonHideMesh.gameObject.SetActive(false);
@@ -116,7 +116,7 @@ public class MeshController : BaseController
 
     public void ShowMeshRender()
     {
-        ChangeMeshShaderWithTag("Scene", defaultShader);
+        ChangeMeshShaderWithTag("Mesh", defaultShader);
 
         buttonShowMesh.gameObject.SetActive(false);
         buttonHideMesh.gameObject.SetActive(true);
@@ -420,22 +420,6 @@ public class MeshController : BaseController
         // 提取旋转
         rotation = GetRotation(pose);
     }
-
-    //public void HideMeshRender()
-    //{
-    //    ChangeMeshShaderWithTag("Mesh", hideShader);
-
-    //    buttonShowMesh.gameObject.SetActive(true);
-    //    buttonHideMesh.gameObject.SetActive(false);
-    //}
-
-    //public void ShowMeshRender()
-    //{
-    //    ChangeMeshShaderWithTag("Mesh", defaultShader);
-
-    //    buttonShowMesh.gameObject.SetActive(false);
-    //    buttonHideMesh.gameObject.SetActive(true);
-    //}
 
     public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
     {
