@@ -16,10 +16,13 @@ using Unity.Collections;
 using UnityEngine.Events;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using static UnityEngine.UI.Button;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using static UnityEngine.GraphicsBuffer;
 using static VirHumanVoiceRecCommand;
+using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
 
 public class MeshController : BaseController
 {
@@ -46,7 +49,7 @@ public class MeshController : BaseController
 
     [Header("使用网络配置")]
     public bool DEBUG_USING_NETWORK_JSON = false;
-    
+
     private Matrix4x4 camPoseT0, camPoseT1;
 
     private List<SummaryItemData> summary = new List<SummaryItemData>();
@@ -84,7 +87,7 @@ public class MeshController : BaseController
 
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
-        
+
         // 初始化NetWorkUtil: DEBUG_USING_NETWORK_JSON
         DEBUG_USING_NETWORK_JSON = NetworkUtil.DEBUG_USING_NETWORK_JSON;
     }
@@ -93,7 +96,7 @@ public class MeshController : BaseController
     {
         if (DEBUG_USING_NETWORK_JSON != NetworkUtil.DEBUG_USING_NETWORK_JSON)
         {
-            NetworkUtil.DEBUG_USING_NETWORK_JSON = DEBUG_USING_NETWORK_JSON; 
+            NetworkUtil.DEBUG_USING_NETWORK_JSON = DEBUG_USING_NETWORK_JSON;
         }
     }
 
@@ -105,7 +108,7 @@ public class MeshController : BaseController
         sceneSelectDropdown.ClearOptions();
         sceneSelectDropdown.AddOptions(options);
     }
-    
+
     public void HideMeshRender()
     {
         ChangeMeshShaderWithTag("Mesh", hideShader);
@@ -151,6 +154,57 @@ public class MeshController : BaseController
     //        }
     //    }
     //}
+    #region Test
+    private static Matrix4x4 PoseToMatrix4x4(Pose pose)
+    {
+        Matrix4x4 matrix = Matrix4x4.identity;
+
+        // 提取四元数分量
+        float x = pose.rotation.x;
+        float y = pose.rotation.y;
+        float z = pose.rotation.z;
+        float w = pose.rotation.w;
+
+        // 计算旋转矩阵元素（3x3部分）
+        matrix.m00 = 1 - 2 * (y * y + z * z);
+        matrix.m01 = 2 * (x * y - z * w);
+        matrix.m02 = 2 * (x * z + y * w);
+
+        // 第二行
+        matrix.m10 = 2 * (x * y + z * w);
+        matrix.m11 = 1 - 2 * (x * x + z * z);
+        matrix.m12 = 2 * (y * z - x * w);
+
+        // 第三行
+        matrix.m20 = 2 * (x * z - y * w);
+        matrix.m21 = 2 * (y * z + x * w);
+        matrix.m22 = 1 - 2 * (x * x + y * y);
+
+        // 设置平移部分（第4列）
+        matrix.m30 = pose.position.x;
+        matrix.m31 = pose.position.y;
+        matrix.m32 = pose.position.z;
+
+        return matrix;
+    }
+
+    private void Test_GetRelocatePositionUnderMetricScale(Pose relocatePose, Pose relocatePoseMetricScale, float modelScale)
+    {
+        Pose cameraPose = new Pose(Quaternion.Inverse(relocatedPose.rotation) * relocatedPose.position * -1,
+            Quaternion.Inverse(relocatedPose.rotation));
+        Pose cameraPoseMetricScale = new Pose(cameraPose.position * modelScale,
+            cameraPose.rotation);
+        Matrix4x4 cameraMatrix = PoseToMatrix4x4(cameraPoseMetricScale),
+            modelMatrix = PoseToMatrix4x4(relocatePoseMetricScale);
+        Debug.Log("Test 1: Relative scale cameraMatrix * modelMatrix:\n " + (PoseToMatrix4x4(cameraPose) * PoseToMatrix4x4(relocatePose)).ToString());
+        Debug.Log("Test 2: Metric scale cameraMatrix * modelMatrix:\n " + (cameraMatrix * modelMatrix).ToString());
+    }
+    #endregion
+
+    private Pose GetRelocatePoseUnderMetricScale(Pose relocatePose, float modelScale){
+        return new Pose(Quaternion.Inverse(relocatedPose.rotation) * relocatedPose.position * -modelScale,
+            relocatedPose.rotation);
+    }
 
     public void ClickToSummonAtCamera()
     {
@@ -162,8 +216,11 @@ public class MeshController : BaseController
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
 
-        modelInstance.transform.position = relocatedPose.position;
-        modelInstance.transform.rotation = relocatedPose.rotation;
+        Pose relocatedPoseMetricScale = GetRelocatePoseUnderMetricScale(relocatedPose, modelInstance.transform.localScale.x);
+        modelInstance.transform.position = relocatedPoseMetricScale.position;
+        modelInstance.transform.rotation = relocatedPoseMetricScale.rotation;
+
+        Test_GetRelocatePositionUnderMetricScale(relocatedPose, relocatedPoseMetricScale, modelInstance.transform.localScale.x);
 
         SetStartState(StartState.Normal);
     }

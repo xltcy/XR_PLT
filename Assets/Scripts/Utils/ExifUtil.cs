@@ -2,6 +2,7 @@ using ExifLib;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ExifUtil
 {
@@ -25,7 +26,15 @@ public class ExifUtil
 
     public static Texture2D FixOrientation(byte[] jpegBytes)
     {
-        var ori = ReadExifOrientation(jpegBytes);
+        var ori = ExifOrientation.NORMAL;
+        try
+        {
+            ori = ReadExifOrientation(jpegBytes);
+        }
+        catch(Exception e)
+        {
+            Debug.Log($"Fail to read exif: {e.Message}");
+        }
         var texture = new Texture2D(2, 2);
         texture.LoadImage(jpegBytes);
         return FixOrientation(texture, ori);

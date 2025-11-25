@@ -16,7 +16,7 @@ public class EditMode : BaseController
 
     private Vector3 screenScale;
 
-    public Dropdown 移动0旋转1;
+    public Dropdown 移动0旋转1缩放2;
 
     public Dropdown 操作幅度;
 
@@ -200,7 +200,7 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if(移动0旋转1.value == 0)
+            if(移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(-trans_amp * ratio, 0, 0));
             }
@@ -216,7 +216,7 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (移动0旋转1.value == 0)
+            if (移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(trans_amp * ratio, 0, 0));
             }
@@ -233,13 +233,17 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (移动0旋转1.value == 0)
+            if (移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, trans_amp * ratio, 0));
             }
-            else
+            else if (移动0旋转1缩放2.value == 1)
             {
                 meshObj.transform.Rotate(new Vector3(0, rot_amp * ratio, 0));
+            }
+            else
+            {
+                meshObj.transform.localScale *= ratio;
             }
         }
     }
@@ -249,13 +253,17 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (移动0旋转1.value == 0)
+            if (移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, -trans_amp * ratio, 0));
             }
-            else
+            else if (移动0旋转1缩放2.value == 1)
             {
                 meshObj.transform.Rotate(new Vector3(0, -rot_amp * ratio, 0));
+            }
+            else
+            {
+                meshObj.transform.localScale /= ratio;
             }
         }
     }
@@ -265,7 +273,7 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (移动0旋转1.value == 0)
+            if (移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, 0, trans_amp * ratio));
             }
@@ -281,7 +289,7 @@ public class EditMode : BaseController
         GameObject meshObj = GetMeshObj();
         if (meshObj != null)
         {
-            if (移动0旋转1.value == 0)
+            if (移动0旋转1缩放2.value == 0)
             {
                 meshObj.transform.Translate(new Vector3(0, 0, -trans_amp * ratio));
             }

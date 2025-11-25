@@ -9,6 +9,11 @@
     },{
       "sceneName": "石景山",
       "sceneKey": "test-SJS"
+    },
+    {
+      "sceneName":"学二食堂",
+      "sceneKey":"test-X2"
+
     }
   ]
 }

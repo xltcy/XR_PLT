@@ -26,9 +26,17 @@ public class NetworkUtil
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
 
+    private string GetRelocateUrlSuffix(string sceneLoc)
+    {
+        // TODO: 从json获取重定位算法 (request_NVLAD_redir / vggt_camera/locate)
+        string relocate_algo = sceneLoc=="x2"?"vggt_camera_locate":"request_NVLAD_redir";
+        return "media_app/" + relocate_algo + "/?source_location=";
+    }
+
     public IEnumerator RelocateByCaptureRequest(string sceneLoc, byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
     {
-        string url = SERVER_URL + RELOCATE_REQUEST_URL_SUFFIX_INTERFACE + sceneLoc;
+        string relocateRequestSuffixInterface = GetRelocateUrlSuffix(sceneLoc);
+        string url = SERVER_URL + relocateRequestSuffixInterface + sceneLoc;
 
         string timestamp = "---------------------" + System.DateTime.Now.Ticks.ToString("x");
         byte[] boundaryByte = System.Text.Encoding.UTF8.GetBytes(timestamp);
@@ -59,7 +67,8 @@ public class NetworkUtil
             Debug.Log("Truncated JSON: " + truncatedJson);
 
             string outerPattern = @"\[.*?\]"; // 匹配最外层的方括号内的内容
-            string innerPattern = @"-?\d+\.\d+"; // 匹配一个浮点数
+            //string innerPattern = @"-?\d+\.\d+"; // 匹配一个浮点数
+            string innerPattern = @"[-+]?\d*\.?\d+([eE][-+]?\d+)?";
 
             MatchCollection outerMatches = Regex.Matches(truncatedJson, outerPattern);
 
@@ -76,7 +85,7 @@ public class NetworkUtil
                 foreach (Match innerMatch in innerMatches)
                 {
                     string numberString = innerMatch.Value;
-
+                    
                     // 解析浮点数并设置到矩阵
                     float number = float.Parse(numberString);
                     num[rowIndex, columnIndex] = number;
