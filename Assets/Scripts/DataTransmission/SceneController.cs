@@ -527,4 +527,13 @@ public class SceneController : BaseController
         }
         desAction.startTrigger.nextActionIds.Add(desAction.id, isActionStart);
     }
+
+    /// <summary>
+    /// 获取当前场景数据
+    /// </summary>
+    /// <returns></returns>
+    public SceneData GetCurSceneData()
+    {
+        return sceneData;
+    }
 }

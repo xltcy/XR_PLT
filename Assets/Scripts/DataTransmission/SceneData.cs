@@ -12,6 +12,7 @@ public class SceneData
     public string sceneName;
     public Vector3 initPosition;
     public long timestampMs;
+    public string relocateUrlMid;
     // Use in SelectDesController
     public List<ExplanationPoint> explanationPoints;
     public List<ActionBase> globalActions;

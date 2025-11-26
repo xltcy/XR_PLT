@@ -16,6 +16,7 @@ public class NetworkUtil
  { 
     private const string SERVER_URL = "http://60.205.232.241:7171/";
     
+    //重定向请求接口示例，现已被GetRelocateUrlSuffix方法取代
     private const string RELOCATE_REQUEST_URL_SUFFIX_INTERFACE = "media_app/request_NVLAD_redir/?source_location=";
     private const string GET_SCENE_LIST_INTERFACE = "media_app/get_scence_list/";
     private const string GET_SCENE_CONFIG_INTERFACE = "media_app/get_config/";
@@ -25,17 +26,19 @@ public class NetworkUtil
 
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
-
-    private string GetRelocateUrlSuffix(string sceneLoc)
+    
+    private string GetRelocateUrlSuffix(SceneData sceneData)
     {
-        // TODO: 从json获取重定位算法 (request_NVLAD_redir / vggt_camera/locate)
-        string relocate_algo = sceneLoc=="x2"?"vggt_camera_locate":"request_NVLAD_redir";
+        // 如果没有指定算法，则使用默认的 request_NVLAD_redir
+        string relocate_algo = (sceneData == null || string.IsNullOrEmpty(sceneData.relocateUrlMid)) ? "request_NVLAD_redir" : sceneData.relocateUrlMid;
         return "media_app/" + relocate_algo + "/?source_location=";
     }
 
     public IEnumerator RelocateByCaptureRequest(string sceneLoc, byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
     {
-        string relocateRequestSuffixInterface = GetRelocateUrlSuffix(sceneLoc);
+        var curSceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
+        
+        string relocateRequestSuffixInterface = GetRelocateUrlSuffix(curSceneData);
         string url = SERVER_URL + relocateRequestSuffixInterface + sceneLoc;
 
         string timestamp = "---------------------" + System.DateTime.Now.Ticks.ToString("x");
