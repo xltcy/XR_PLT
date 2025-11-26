@@ -284,7 +284,7 @@ public class MeshController : BaseController
             }
             UIManager.SetLoadingStatus(false);
         }));
-        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(summary[selectedSceneIndex], rawData,
+        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(summary[selectedSceneIndex], datasetLoc?.text ?? "", rawData,
             onSuccess: (res) => {
                 // TODO Console res;
                 relocatedPose = TransArrayToWorldPose(res);

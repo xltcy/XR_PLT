@@ -34,10 +34,8 @@ public class NetworkUtil
         return "media_app/" + relocate_algo + "/?source_location=";
     }
 
-    public IEnumerator RelocateByCaptureRequest(SummaryItemData summaryItemData , byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
+    public IEnumerator RelocateByCaptureRequest(SummaryItemData summaryItemData, string sceneLoc, byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
     {
-        var sceneLoc = summaryItemData != null ? summaryItemData.sceneKey : string.Empty;
-        
         string relocateRequestSuffixInterface = GetRelocateUrlSuffix(summaryItemData);
         string url = SERVER_URL + relocateRequestSuffixInterface + sceneLoc;
 
