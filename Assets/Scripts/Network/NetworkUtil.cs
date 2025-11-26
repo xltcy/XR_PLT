@@ -22,8 +22,6 @@ public class NetworkUtil
     private const string GET_SCENE_CONFIG_INTERFACE = "media_app/get_config/";
     private const string UPLOAD_SCENE_CONFIG_INTERFACE = "/media_app/update_config/";
     
-    public static bool DEBUG_USING_NETWORK_JSON = false;
-
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
     
@@ -110,7 +108,7 @@ public class NetworkUtil
     public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
     {
         //如果使用测试数据
-        if (!DEBUG_USING_NETWORK_JSON)
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
             yield return new WaitForSeconds(1);
             GetSceneSummaryTestRequest(onSuccess, onFail);
@@ -191,7 +189,7 @@ public class NetworkUtil
     {
         var sceneKey = sceneItemData.sceneKey;
         //如果使用测试数据
-        if (!DEBUG_USING_NETWORK_JSON)
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
             yield return new WaitForSeconds(1); 
             GetSceneDataTestRequest(sceneItemData, onSuccess, onFail);
@@ -274,7 +272,7 @@ public class NetworkUtil
 
     public IEnumerator UploadSummaryData()
     {
-        if (!DEBUG_USING_NETWORK_JSON)
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
             yield break;
         }

@@ -47,9 +47,6 @@ public class MeshController : BaseController
     [Header("本地图片路径")]
     public string testImagePath;
 
-    [Header("使用网络配置")]
-    public bool DEBUG_USING_NETWORK_JSON = false;
-
     private Matrix4x4 camPoseT0, camPoseT1;
 
     private List<SummaryItemData> summary = new List<SummaryItemData>();
@@ -87,17 +84,6 @@ public class MeshController : BaseController
 
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
-
-        // 初始化NetWorkUtil: DEBUG_USING_NETWORK_JSON
-        DEBUG_USING_NETWORK_JSON = NetworkUtil.DEBUG_USING_NETWORK_JSON;
-    }
-
-    private void OnValidate()
-    {
-        if (DEBUG_USING_NETWORK_JSON != NetworkUtil.DEBUG_USING_NETWORK_JSON)
-        {
-            NetworkUtil.DEBUG_USING_NETWORK_JSON = DEBUG_USING_NETWORK_JSON;
-        }
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -242,8 +228,12 @@ public class MeshController : BaseController
 
     public void ClickToGetPoseByCapture()
     {
-
-        //tempGetPose();
+        //DebugUIMediator节点上添加开关
+        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
+        {
+            tempGetPose();
+            return;
+        }
 
         SetStartState(StartState.GettingPos);
         UIManager.SetLoadingStatus(true);
@@ -265,7 +255,6 @@ public class MeshController : BaseController
         }
         SendImageAndReadJson(rawData);
         Debug.Log(testImagePath.ToString());
-
     }
 
     private void SendImageAndReadJson(byte[] rawData)
