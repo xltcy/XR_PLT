@@ -242,9 +242,9 @@ public class MeshController : BaseController
 
     public void ClickToGetPoseByCapture()
     {
-#if UNITY_EDITOR
-        tempGetPose();
-#else
+
+        //tempGetPose();
+
         SetStartState(StartState.GettingPos);
         UIManager.SetLoadingStatus(true);
 
@@ -265,7 +265,7 @@ public class MeshController : BaseController
         }
         SendImageAndReadJson(rawData);
         Debug.Log(testImagePath.ToString());
-#endif
+
     }
 
     private void SendImageAndReadJson(byte[] rawData)
@@ -284,7 +284,7 @@ public class MeshController : BaseController
             }
             UIManager.SetLoadingStatus(false);
         }));
-        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(datasetLoc?.text ?? "", rawData,
+        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(summary[selectedSceneIndex], rawData,
             onSuccess: (res) => {
                 // TODO Console res;
                 relocatedPose = TransArrayToWorldPose(res);

@@ -27,18 +27,18 @@ public class NetworkUtil
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
     
-    private string GetRelocateUrlSuffix(SceneData sceneData)
+    private string GetRelocateUrlSuffix(SummaryItemData summaryItemData)
     {
         // 如果没有指定算法，则使用默认的 request_NVLAD_redir
-        string relocate_algo = (sceneData == null || string.IsNullOrEmpty(sceneData.relocateUrlMid)) ? "request_NVLAD_redir" : sceneData.relocateUrlMid;
+        string relocate_algo = (summaryItemData == null || string.IsNullOrEmpty(summaryItemData.sceneRelocateAlgo)) ? "request_NVLAD_redir" : summaryItemData.sceneRelocateAlgo;
         return "media_app/" + relocate_algo + "/?source_location=";
     }
 
-    public IEnumerator RelocateByCaptureRequest(string sceneLoc, byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
+    public IEnumerator RelocateByCaptureRequest(SummaryItemData summaryItemData , byte[] imageData, Action<float[,]> onSuccess, Action<string> onFail)
     {
-        var curSceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
+        var sceneLoc = summaryItemData != null ? summaryItemData.sceneKey : string.Empty;
         
-        string relocateRequestSuffixInterface = GetRelocateUrlSuffix(curSceneData);
+        string relocateRequestSuffixInterface = GetRelocateUrlSuffix(summaryItemData);
         string url = SERVER_URL + relocateRequestSuffixInterface + sceneLoc;
 
         string timestamp = "---------------------" + System.DateTime.Now.Ticks.ToString("x");

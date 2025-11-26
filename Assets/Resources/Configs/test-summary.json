@@ -2,18 +2,21 @@
   "items": [
     {
       "sceneName": "北航工训楼展厅",
-      "sceneKey": "test-GXL"
+      "sceneKey": "test-GXL",
+      "sceneRelocateAlgo":"request_NVLAD_redir"
     },{
       "sceneName": "北航航空博物馆",
-      "sceneKey": "test-HKG"
+      "sceneKey": "test-HKG",
+      "sceneRelocateAlgo":"request_NVLAD_redir"
     },{
       "sceneName": "石景山",
-      "sceneKey": "test-SJS"
+      "sceneKey": "test-SJS",
+      "sceneRelocateAlgo":"request_NVLAD_redir"
     },
     {
       "sceneName":"学二食堂",
-      "sceneKey":"test-X2"
-
+      "sceneKey":"test-X2",
+      "sceneRelocateAlgo":"vggt_camera_locate"
     }
   ]
 }
