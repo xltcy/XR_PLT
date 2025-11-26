@@ -162,9 +162,8 @@
             "delay":8
           },
           "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":6,
-            "delay":5
+            "mode": "VoiceKeyword",
+            "matchPattern": "重置火箭"
           },
           "generateActionId":4,
           "customFunctionName":"HandleExplosion"
