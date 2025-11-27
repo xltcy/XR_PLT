@@ -14,8 +14,8 @@
       "sceneRelocateAlgo":"request_NVLAD_redir"
     },
     {
-      "sceneName":"学二食堂",
-      "sceneKey":"test-X2",
+      "sceneName":"逸夫博物馆",
+      "sceneKey":"test-YF",
       "sceneRelocateAlgo":"vggt_camera_locate"
     }
   ]

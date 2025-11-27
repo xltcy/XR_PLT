@@ -21,8 +21,7 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using static UnityEngine.GraphicsBuffer;
 using static VirHumanVoiceRecCommand;
-using UnityEngine.UIElements;
-using Button = UnityEngine.UI.Button;
+using UniGLTF;
 
 public class MeshController : BaseController
 {
@@ -140,56 +139,12 @@ public class MeshController : BaseController
     //        }
     //    }
     //}
-    #region Test
-    private static Matrix4x4 PoseToMatrix4x4(Pose pose)
+
+    static public float GetModelScale(GameObject modelInstance)
     {
-        Matrix4x4 matrix = Matrix4x4.identity;
-
-        // 提取四元数分量
-        float x = pose.rotation.x;
-        float y = pose.rotation.y;
-        float z = pose.rotation.z;
-        float w = pose.rotation.w;
-
-        // 计算旋转矩阵元素（3x3部分）
-        matrix.m00 = 1 - 2 * (y * y + z * z);
-        matrix.m01 = 2 * (x * y - z * w);
-        matrix.m02 = 2 * (x * z + y * w);
-
-        // 第二行
-        matrix.m10 = 2 * (x * y + z * w);
-        matrix.m11 = 1 - 2 * (x * x + z * z);
-        matrix.m12 = 2 * (y * z - x * w);
-
-        // 第三行
-        matrix.m20 = 2 * (x * z - y * w);
-        matrix.m21 = 2 * (y * z + x * w);
-        matrix.m22 = 1 - 2 * (x * x + y * y);
-
-        // 设置平移部分（第4列）
-        matrix.m30 = pose.position.x;
-        matrix.m31 = pose.position.y;
-        matrix.m32 = pose.position.z;
-
-        return matrix;
-    }
-
-    private void Test_GetRelocatePositionUnderMetricScale(Pose relocatePose, Pose relocatePoseMetricScale, float modelScale)
-    {
-        Pose cameraPose = new Pose(Quaternion.Inverse(relocatedPose.rotation) * relocatedPose.position * -1,
-            Quaternion.Inverse(relocatedPose.rotation));
-        Pose cameraPoseMetricScale = new Pose(cameraPose.position * modelScale,
-            cameraPose.rotation);
-        Matrix4x4 cameraMatrix = PoseToMatrix4x4(cameraPoseMetricScale),
-            modelMatrix = PoseToMatrix4x4(relocatePoseMetricScale);
-        Debug.Log("Test 1: Relative scale cameraMatrix * modelMatrix:\n " + (PoseToMatrix4x4(cameraPose) * PoseToMatrix4x4(relocatePose)).ToString());
-        Debug.Log("Test 2: Metric scale cameraMatrix * modelMatrix:\n " + (cameraMatrix * modelMatrix).ToString());
-    }
-    #endregion
-
-    private Pose GetRelocatePoseUnderMetricScale(Pose relocatePose, float modelScale){
-        return new Pose(Quaternion.Inverse(relocatedPose.rotation) * relocatedPose.position * -modelScale,
-            relocatedPose.rotation);
+        GameObject mesh = modelInstance.transform.GetChildByName("mesh").gameObject;
+        if (mesh == null) return 1f;
+        return mesh.transform.localScale.x;
     }
 
     public void ClickToSummonAtCamera()
@@ -202,11 +157,8 @@ public class MeshController : BaseController
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
 
-        Pose relocatedPoseMetricScale = GetRelocatePoseUnderMetricScale(relocatedPose, modelInstance.transform.localScale.x);
-        modelInstance.transform.position = relocatedPoseMetricScale.position;
-        modelInstance.transform.rotation = relocatedPoseMetricScale.rotation;
-
-        Test_GetRelocatePositionUnderMetricScale(relocatedPose, relocatedPoseMetricScale, modelInstance.transform.localScale.x);
+        modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
+        modelInstance.transform.rotation = relocatedPose.rotation;
 
         SetStartState(StartState.Normal);
     }

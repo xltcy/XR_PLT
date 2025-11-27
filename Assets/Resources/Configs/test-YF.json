@@ -1,0 +1,181 @@
+{
+  "sceneModelPath": "Prefab-YF",
+  "sceneName": "逸夫博物馆",
+  "initPosition": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "timestampMs": 123,
+  "explanationPoints": [
+    {
+      "id": "P61-黑寡妇战斗机",
+      "title": "P61-黑寡妇战斗机",
+      "position": {
+        "x": -0.83,
+        "y": -1.21,
+        "z": -1.71
+      },
+      "initialIntroduction": "",
+      "arriveIntroduction": "",
+      "thumb": "abc",
+      "actions": [
+        {
+          "type": "PlayVideo",
+          "id": 1,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay": 0,
+            "imagePath": "Images/TrackedImages/brand",
+            "imageName": "brand"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "videoPath": "sjs01",
+          "position": {
+            "x": 2.5861,
+            "y": 0.6083161,
+            "z": -6.951444
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "type": "PlayVideo",
+          "id": 2,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay": 0,
+            "imagePath": "Images/TrackedImages/cow",
+            "imageName": "cow"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "videoPath": "test",
+          "position": {
+            "x": 2.5861,
+            "y": 0.6083161,
+            "z": -6.951444
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "type": "PlayVideo",
+          "id": 3,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay": 0,
+            "imagePath": "Images/TrackedImages/sjs01",
+            "imageName": "sjs01"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "videoPath": "video/sjs01",
+          "position": {
+            "x": 2.5861,
+            "y": 0.6083161,
+            "z": -6.951444
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "type": "GenerateObject",
+          "id":4,
+          "startTrigger": {
+            "mode": "Immediate",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "objectDataId":"Prefab-Rocket-CZ_5",
+          "position":{
+            "x": 2.014,
+            "y": -0.367,
+            "z": -0.357
+          },
+          "rotation":{
+            "x": 0, "y": 0, "z": 0, "w": 0
+          },
+          "scale":{
+            "x": 0.05,
+            "y": 0.05,
+            "z": 0.05
+          }
+        },
+        {
+          "type": "ObjectVisible",
+          "id":5,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":4,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "generateActionId":4
+        },
+        {
+          "type": "CustomFunction",
+          "id":6,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":5,
+            "delay":5
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":6,
+            "delay":5
+          },
+          "generateActionId":4,
+          "customFunctionName":"HandleExplosion"
+        }
+      ]
+    }
+  ],
+  "globalActions": [],
+  "objects": [{
+    "id":"Prefab-Rocket-CZ_5",
+    "name":"Prefab-Rocket-CZ_5",
+    "url":"Models/Rocket-CZ_5/Prefab-Rocket-CZ_5"
+  }]
+}
