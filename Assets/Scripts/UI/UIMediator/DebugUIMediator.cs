@@ -5,38 +5,58 @@ using UnityEngine.UI;
 
 public class DebugUIMediator : BaseUIMediator
 {
-    [BindChild("p_btn_scene_json"), ButtonCallback("OnRequestSceneJsonButtonClick")]
-    private Button requestSceneJsonButton;
+    [BindChild("p_DebugSwitch"), ButtonCallback("OnDebugSwitchButtonClick")]
+    private Button debugSwitchButton;
 
-    [BindChild("p_btn_scene_upload"), ButtonCallback("OnRequestSceneUploadButtonClick")]
-    private Button requestSceneUploadButton;
+    [BindChild("p_DebugView")]
+    private Transform debugView;
     
-    public void OnEnable()
-    {
-        
-    }
+    [BindChild("p_Mesh")]
+    private GameObject UI_调试_Mesh;
+    [BindChild("p_屏幕")]
+    private GameObject UI_调试_屏幕;
+    [BindChild("p_相机")]
+    private GameObject UI_调试_相机;
+    [BindChild("p_json")]
+    private Transform jsonComp;
 
-    public void OnDisable()
-    {
-        
-    }
-
-    private void OnRequestSceneJsonButtonClick()
-    {
-        Debug.Log("Request Scene Json Button Clicked");
-        var sceneController = ControllerRegister.Instance.GetController<SceneController>();
-        if (sceneController != null)
-        {
-            sceneController.RequireSummaryData();
-            Debug.Log("Request Summary Data");
-        }
-    }
-
-    private void OnRequestSceneUploadButtonClick()
-    {
-        Debug.Log("Request Scene Upload Button Clicked");
-        StartCoroutine(NetworkUtil.Instance.UploadSummaryData());
-        Debug.Log("Upload Scene Data");
-    }
+    [BindChild("p_Mesh控制台")]
+    private Toggle Toggle_Mesh;
+    [BindChild("p_屏幕控制台")]
+    private Toggle Toggle_屏幕;
+    [BindChild("p_相机控制台")]
+    private Toggle Toggle_相机;
+    [BindChild("p_json_toggle")]
+    private Toggle Toggle_json;
     
+    public void Start()
+    {
+        Toggle_Mesh.AddValueChangeListener(value => {
+            UI_调试_Mesh.SetVisible(value);
+        });
+        Toggle_屏幕.AddValueChangeListener(value => {
+            UI_调试_屏幕.SetVisible(value);
+        });
+        Toggle_相机.AddValueChangeListener(value => {
+            UI_调试_相机.SetVisible(value);
+        });
+        Toggle_json.AddValueChangeListener(value => {
+            jsonComp.SetVisible(value);
+        });
+    }
+
+
+    protected override void OnDestroy()
+    {
+        Toggle_Mesh?.RemoveAllValueChangeListeners();
+        Toggle_屏幕?.RemoveAllValueChangeListeners();
+        Toggle_相机?.RemoveAllValueChangeListeners();
+        Toggle_json?.RemoveAllValueChangeListeners();
+        base.OnDestroy();
+    }
+
+    private void OnDebugSwitchButtonClick()
+    {
+        UIUtils.ToggleVisible(debugView);
+    }
 }

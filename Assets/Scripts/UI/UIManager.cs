@@ -10,7 +10,6 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
     public GameObject SelectDesView;
     public GameObject VirtualManIntroView;
     public GameObject LoadingView;
-    public GameObject DebugView;
     public GameObject smplController;
 
     // Initialize VirtualMan For First Time
@@ -87,11 +86,6 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
         }
         SpeechManager.SayFromStr("欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来");
         Invoke("GotoShengNa", 3);
-    }
-
-    public void DebugSwitch()
-    {
-        DebugView.SetActive(!DebugView.activeSelf);
     }
 
     private void SwitchForStart(RunState newState)

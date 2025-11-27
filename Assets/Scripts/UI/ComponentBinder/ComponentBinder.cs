@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 public class ComponentBinder : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class ComponentBinder : MonoBehaviour
     private Dictionary<string, Transform> transformCache = new Dictionary<string, Transform>();
 
     [SerializeField, HideInInspector]
-    private List<Component> componentListCache = new List<Component>();
+    private List<UnityEngine.Object> componentListCache = new List<UnityEngine.Object>();
     public Dictionary<Button, MethodInfo> BtnActionCache = new Dictionary<Button, MethodInfo>();
     
     protected virtual void Awake()
@@ -31,7 +32,7 @@ public class ComponentBinder : MonoBehaviour
         }
     }
 
-    protected void OnDestroy()
+    protected virtual void OnDestroy()
     {
         DestroyAllButtonCallback();
         ClearCache();
@@ -61,9 +62,12 @@ public class ComponentBinder : MonoBehaviour
             BindSingleChildComponent(field, attribute);
             
             ButtonCallbackAttribute btnAttribute = field.GetCustomAttribute<ButtonCallbackAttribute>();
-            if (btnAttribute == null) continue;
+            if (btnAttribute != null)
+            {
+                BindSingleButtonCallback(field, attribute, btnAttribute);
+            }
             
-            BindSingleButtonCallback(field, attribute, btnAttribute);
+            
         }
     }
     
@@ -80,7 +84,7 @@ public class ComponentBinder : MonoBehaviour
         }
         
         // 获取组件
-        Component component = childTransform.GetComponent(componentType);
+        UnityEngine.Object component = (componentType == typeof(GameObject)) ? (UnityEngine.Object)childTransform.gameObject : childTransform.GetComponent(componentType);
         if (component == null)
         {
             HandleBindError(field, attribute.Required, 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -407,7 +408,23 @@ public class DynamicObject : MonoBehaviour
                 var method = script.GetType().GetMethod(functionName);
                 if (method != null)
                 {
-                    method.Invoke(script, new object[] { isStartAction });
+                    ParameterInfo[] parameters = method.GetParameters();
+    
+                    if (parameters.Length == 0)
+                    {
+                        method.Invoke(script, null);
+                    }
+                    else if (parameters.Length == 1)
+                    {
+                        // 直接传递参数，依赖类型兼容性
+                        method.Invoke(script, new object[] { isStartAction });
+                    }
+                    else if (parameters.Length == 2)
+                    {
+                        // 直接传递两个参数
+                        method.Invoke(script, new object[] { isStartAction, action.customFunctionParam });
+                    }
+
                     return true;
                 }
             }

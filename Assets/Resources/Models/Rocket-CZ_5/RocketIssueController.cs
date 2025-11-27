@@ -21,8 +21,19 @@ public class RocketIssueController : MonoBehaviour
         }
     }
 
-    public void HandleExplosion(bool isStartAction)
+    //仅做参数解析示例，无实际用处
+    class HandleExplosionParam
     {
+        public int testParam1;
+        public string testParam2;
+    }
+    
+    //在test-SJS中调用这个方法
+    public void HandleExplosion(bool isStartAction, string paramJson)
+    {
+        //仅做参数解析示例，无实际用处
+        var param = JsonUtility.FromJson<HandleExplosionParam>(paramJson);
+        
         if (initiateDirty)
         {
             InitiateTreeNode();

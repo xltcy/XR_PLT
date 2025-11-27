@@ -1,26 +1,33 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class UIUtils
 {
-    public static void SetVisible(Component component, bool visible)
+    public static void SetVisible(object obj, bool visible)
     {
-        SetVisible(component?.gameObject, visible);
+        if (obj == null) return;
+        if (obj is GameObject go)
+        {
+            go.SetVisible(visible);
+        }
+        else if (obj is Component comp)
+        {
+            comp.SetVisible(visible);
+        }
     }
     
-    public static void SetVisible(GameObject go, bool visible)
+    public static void ToggleVisible(object obj)
     {
-        go?.SetVisible(visible);
-    }
-    
-    public static void ToggleVisible(Component component)
-    {
-        ToggleVisible(component?.gameObject);
-    }
-
-    public static void ToggleVisible(GameObject go)
-    {
-        go?.ToggleVisible();
+        if (obj == null) return;
+        if (obj is GameObject go)
+        {
+            go.ToggleVisible();
+        }
+        else if (obj is Component comp)
+        {
+            comp.ToggleVisible();
+        }
     }
 
     private static readonly Dictionary<string, string> TypeNameDic = new Dictionary<string, string>()

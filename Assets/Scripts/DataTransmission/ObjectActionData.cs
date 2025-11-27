@@ -117,8 +117,12 @@ public class WaveGenerateAction : ObjectActionBase
     // TODO
 }
 
+//调用的函数是在生成物体上的，所以需要先生成物体再调用
 public class CustomFunctionAction : ObjectActionBase
 {
+    // 需要调用的自定义函数名称
     public string customFunctionName;
+    // 需要传递的参数，以字符串（json）形式传递，需要自己在函数内进行解析
+    public string customFunctionParam;
 }
 

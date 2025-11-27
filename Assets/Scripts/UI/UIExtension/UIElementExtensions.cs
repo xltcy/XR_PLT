@@ -138,6 +138,25 @@ public static class UIElementExtensions
     }
     
     #endregion GameObject Extensions
+    
+    #region Component Extensions
+    /// <summary>
+    /// 设置GameObject的显示/隐藏状态
+    /// </summary>
+    public static void SetVisible(this Component go, bool visible)
+    {
+        go?.gameObject.SetActive(visible);
+    }
+    
+    /// <summary>
+    /// 切换显示状态
+    /// </summary>
+    /// <param name="component"></param>
+    public static void ToggleVisible(this Component component)
+    {
+        component?.gameObject.ToggleVisible();
+    }
+    #endregion Component Extensions
 
     #region Canvas Extensions
     
@@ -155,4 +174,72 @@ public static class UIElementExtensions
     }
     
     #endregion Canvas Extensions
+    
+    #region 回调绑定
+    // Slider 扩展
+    public static void AddValueChangeListener(this UnityEngine.UI.Slider slider, UnityEngine.Events.UnityAction<float> action)
+    {
+        slider.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this UnityEngine.UI.Slider slider)
+    {
+        slider.onValueChanged?.RemoveAllListeners();
+    }
+    
+    // Dropdown 扩展
+    public static void AddValueChangeListener(this UnityEngine.UI.Dropdown dropdown, UnityEngine.Events.UnityAction<int> action)
+    {
+        dropdown.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this UnityEngine.UI.Dropdown dropdown)
+    {
+        dropdown.onValueChanged?.RemoveAllListeners();
+    }
+    
+    // InputField 扩展
+    public static void AddValueChangeListener(this UnityEngine.UI.InputField inputField, UnityEngine.Events.UnityAction<string> action)
+    {
+        inputField.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this UnityEngine.UI.InputField inputField)
+    {
+        inputField.onValueChanged?.RemoveAllListeners();
+    }
+    
+    // Toggle 扩展
+    public static void AddValueChangeListener(this UnityEngine.UI.Toggle toggle, UnityEngine.Events.UnityAction<bool> action)
+    {
+        toggle.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this UnityEngine.UI.Toggle toggle)
+    {
+        toggle.onValueChanged?.RemoveAllListeners();
+    }
+    
+    // TMP_InputField 扩展
+    public static void AddValueChangeListener(this TMPro.TMP_InputField inputField, UnityEngine.Events.UnityAction<string> action)
+    {
+        inputField.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this TMPro.TMP_InputField inputField)
+    {
+        inputField.onValueChanged?.RemoveAllListeners();
+    }
+    
+    // TMP_Dropdown 扩展
+    public static void AddValueChangeListener(this TMPro.TMP_Dropdown dropdown, UnityEngine.Events.UnityAction<int> action)
+    {
+        dropdown.onValueChanged.AddListener(action);
+    }
+    
+    public static void RemoveAllValueChangeListeners(this TMPro.TMP_Dropdown dropdown)
+    {
+        dropdown.onValueChanged?.RemoveAllListeners();
+    }
+    #endregion 回调绑定
 }

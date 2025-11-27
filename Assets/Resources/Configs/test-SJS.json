@@ -166,7 +166,8 @@
             "matchPattern": "重置火箭"
           },
           "generateActionId":4,
-          "customFunctionName":"HandleExplosion"
+          "customFunctionName":"HandleExplosion",
+          "customFunctionParam":"{\"testParam1\":123,\"testParam2\":\"abc\"}"
         },{
           "type": "Introduce",
           "id": 7,
