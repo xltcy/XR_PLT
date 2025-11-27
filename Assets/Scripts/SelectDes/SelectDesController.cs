@@ -60,7 +60,7 @@ public class SelectDesController : BaseController
     {
         string input = testVoiceInputField.textComponent.text;
         Debug.Log($"test voice rec {input}");
-        ControllerRegister.Instance.GetController<VoiceController>().语音识别结果(input);
+        ControllerRegister.Instance.GetController<VoiceController>().ProcessVoiceRecognizeResult(input);
     }
 
     public List<SelectDesModel> GetSelectDesList()

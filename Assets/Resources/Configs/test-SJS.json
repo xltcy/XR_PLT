@@ -203,5 +203,6 @@
     "id":"Prefab-Rocket-CZ_5",
     "name":"Prefab-Rocket-CZ_5",
     "url":"Models/Rocket-CZ_5/Prefab-Rocket-CZ_5"
-  }]
+  }],
+  "llmPrompt":"现在你们正位于石景山首钢，用户提问的问题是{0}，请以一个精通历史的专家身份回答，每次回答尽量不要超过五十字。"
 }

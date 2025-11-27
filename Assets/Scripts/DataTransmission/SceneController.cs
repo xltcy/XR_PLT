@@ -86,6 +86,7 @@ public class SceneController : BaseController
         
     }
 
+    #region 获取数据
     /**
      * Send API to get summary data.
      */
@@ -142,7 +143,7 @@ public class SceneController : BaseController
                 onComplete?.Invoke(true);
             }));
     }
-
+    
     /**
      * Preprocess SceneData.
      * Instantiate SceneModel.
@@ -189,7 +190,26 @@ public class SceneController : BaseController
         InitAllTriggers();
         return scene;
     }
-
+    
+    /// <summary>
+    /// 获取当前SummaryData
+    /// </summary>
+    /// <returns></returns>
+    public SummaryData GetCurSummaryData()
+    {
+        return summaryData;
+    }
+    
+    /// <summary>
+    /// 获取当前SceneData
+    /// </summary>
+    /// <returns></returns>
+    public SceneData GetCurSceneData()
+    {
+        return sceneData;
+    }
+    #endregion 获取数据
+    
     /**
     * init globalTriggerCommands and pointTriggerCommands.
     * When initing SceneData.

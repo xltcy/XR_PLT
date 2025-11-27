@@ -24,7 +24,8 @@ public class NetworkUtil
     
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
-    
+
+    #region 重定位
     private string GetRelocateUrlSuffix(SummaryItemData summaryItemData)
     {
         // 如果没有指定算法，则使用默认的 request_NVLAD_redir
@@ -103,7 +104,8 @@ public class NetworkUtil
             onFail?.Invoke(req.error);
         }
     }
-
+    #endregion 重定位
+    
     #region 获取场景列表
     public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
     {
@@ -279,7 +281,7 @@ public class NetworkUtil
         //get summary data
         var url = SERVER_URL + UPLOAD_SCENE_CONFIG_INTERFACE;
         
-        var sceneItemData = ControllerRegister.Instance.GetController<MeshController>().GetCurrentSceneData();
+        var sceneItemData = ControllerRegister.Instance.GetController<MeshController>().GetCurrentSummaryItemData();
         string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
         // 将数据对象转换为JSON字符串
         string json = "";

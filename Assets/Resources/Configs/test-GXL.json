@@ -2,10 +2,10 @@
   "sceneModelPath": "Prefab-GXL",
   "sceneName": "工训楼",
   "initPosition": {
-  "x": -1.179,
-  "y": -0.709,
-  "z": -15.45
-},
+    "x": -1.179,
+    "y": -0.709,
+    "z": -15.45
+  },
   "timestampMs": 123,
   "explanationPoints": [
     {
@@ -258,26 +258,28 @@
     }
   ],
   "globalActions":[],
-  "objects":[{
-    "id":"wall",
-    "name":"wall",
-    "url":"Prefab-Wall",
-    "isExplosible":false
-  },{
-    "id":"curtain",
-    "name":"curtain",
-    "url":"Prefab-Curtain",
-    "isExplosible":false
-  },{
-    "id":"sonar",
-    "name":"sonar",
-    "url":"Prefab-Sonar",
-    "isExplosible":true
-  },{
-    "id":"label",
-    "name":"label",
-    "url":"Prefab-Label3D",
-    "isExplosible":false
-  }
-  ]
+  "objects":[
+    {
+      "id":"wall",
+      "name":"wall",
+      "url":"Prefab-Wall",
+      "isExplosible":false
+    },{
+      "id":"curtain",
+      "name":"curtain",
+      "url":"Prefab-Curtain",
+      "isExplosible":false
+    },{
+      "id":"sonar",
+      "name":"sonar",
+      "url":"Prefab-Sonar",
+      "isExplosible":true
+    },{
+      "id":"label",
+      "name":"label",
+      "url":"Prefab-Label3D",
+      "isExplosible":false
+    }
+  ],
+  "llmPrompt":"现在你们正位于工训楼，用户提问的问题是{0}，请以一个精通声呐知识的专家身份回答，每次回答尽量不要超过五十字。"
 }

@@ -128,12 +128,12 @@ public class ControllerRegister : MonoBehaviour
                 
                 if (logInitialization)
                 {
-                    Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 自动注册Controller: {controllerType.Name}");
+                    Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 自动注册Controller: {controllerType.Name}");
                 }
             }
             else
             {
-                Util.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在，跳过重复注册");
+                Utils.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在，跳过重复注册");
             }
         }
     }
@@ -163,7 +163,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (controllers.TryGetValue(controllerType, out var value))
         {
-            Util.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在");
+            Utils.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在");
             return (T)value;
         }
         
@@ -179,7 +179,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (logInitialization)
         {
-            Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 创建Controller: {controllerType.Name}");
+            Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 创建Controller: {controllerType.Name}");
         }
         
         // 如果已经初始化完成，立即初始化新创建的Controller
@@ -201,7 +201,7 @@ public class ControllerRegister : MonoBehaviour
     {
         if (isInitializing)
         {
-            Util.LogMessage(LogType.Warning, warnInitialization, "[ControllerRegister] Controller初始化正在进行中");
+            Utils.LogMessage(LogType.Warning, warnInitialization, "[ControllerRegister] Controller初始化正在进行中");
             return;
         }
         
@@ -216,7 +216,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (logInitialization)
         {
-            Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 开始初始化 {initializationQueue.Count} 个Controller");
+            Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 开始初始化 {initializationQueue.Count} 个Controller");
         }
         
         // 初始化所有Controller
@@ -230,13 +230,13 @@ public class ControllerRegister : MonoBehaviour
                     
                     if (logInitialization)
                     {
-                        Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 初始化完成: {controller.GetType().Name}");
+                        Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 初始化完成: {controller.GetType().Name}");
                     }
                 }
             }
             catch (Exception e)
             {
-                Util.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 初始化Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 初始化Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
             }
         }
         
@@ -245,7 +245,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (logInitialization)
         {
-            Util.LogMessage(LogType.Log, logInitialization, "[ControllerRegister] 所有Controller初始化完成");
+            Utils.LogMessage(LogType.Log, logInitialization, "[ControllerRegister] 所有Controller初始化完成");
         }
     }
     
@@ -265,13 +265,13 @@ public class ControllerRegister : MonoBehaviour
             }
             catch (Exception e)
             {
-                Util.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 清理Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 清理Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
             }
         }
         
         if (logInitialization)
         {
-            Util.LogMessage(LogType.Log, logInitialization, "[ControllerRegister] 所有Controller清理完成");
+            Utils.LogMessage(LogType.Log, logInitialization, "[ControllerRegister] 所有Controller清理完成");
         }
     }
     
@@ -308,7 +308,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (controllers.ContainsKey(controllerType))
         {
-            Util.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在，将被替换");
+            Utils.LogMessage(LogType.Warning, warnInitialization, $"[ControllerRegister] Controller类型 {controllerType.Name} 已存在，将被替换");
         }
         
         controllers[controllerType] = controller;
@@ -316,7 +316,7 @@ public class ControllerRegister : MonoBehaviour
         
         if (logInitialization)
         {
-            Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 手动注册Controller: {controllerType.Name}");
+            Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 手动注册Controller: {controllerType.Name}");
         }
     }
     
@@ -338,7 +338,7 @@ public class ControllerRegister : MonoBehaviour
             
             if (logInitialization)
             {
-                Util.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 注销Controller: {controllerType.Name}");
+                Utils.LogMessage(LogType.Log, logInitialization, $"[ControllerRegister] 注销Controller: {controllerType.Name}");
             }
         }
     }

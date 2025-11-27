@@ -182,7 +182,8 @@ namespace UniGLTF
                 }
             }
 
-            throw new KeyNotFoundException();
+            Debug.LogError("KeyNotFoundException");
+            return null;
         }
 
         public static Transform GetFromPath(this Transform self, string path)

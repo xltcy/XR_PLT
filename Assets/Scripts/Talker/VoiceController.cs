@@ -21,10 +21,10 @@ public class VoiceController : BaseController
     void Start()
     {
         voiceActiveButton.ResetBtn();
-        voiceActiveButton.onPointerDown.AddListener(开始语音识别);
-        voiceActiveButton.onPointerUp.AddListener(停止语音识别);
+        voiceActiveButton.onPointerDown.AddListener(StartVoiceRecognize);
+        voiceActiveButton.onPointerUp.AddListener(StopVoiceRecognize);
         xunfei = XunFeiYuYin.Init("5c81de59", "ea4d5e9b06f8cfb0deae4d5360e7f8a7", "94348d7a6d5f3807176cb1f4923efa5c", "c6ea43c9e7b14d163bdeb4e51d2e564d");
-        xunfei.语音识别完成事件 += 语音识别结果;
+        xunfei.语音识别完成事件 += ProcessVoiceRecognizeResult;
 
         llmGenerator = LLMGenerator.Init();
 
@@ -59,12 +59,12 @@ public class VoiceController : BaseController
         voiceRecCommands.Clear();
     }
 
-    public void 开始语音识别()
+    public void StartVoiceRecognize()
     {
         xunfei.开始语音识别();
         SpeechManager.ForceStop();
     }
-    public void 停止语音识别()
+    public void StopVoiceRecognize()
     {
         StartCoroutine(xunfei.停止语音识别());
     }
@@ -75,14 +75,18 @@ public class VoiceController : BaseController
         debugText.text = "";
     }
 
-    public void 语音识别结果(string result)
+    public void ProcessVoiceRecognizeResult(string result)
     {
-        if (result == null || result == "")
+        if (result.IsNullOrEmpty())
         {
             CommandFail();
             return;
         }
-        debugText.text += "\n语音识别结束，结果:" + result;
+
+        if (debugText)
+        {
+            debugText.text += "\n语音识别结束，结果:" + result;
+        }
         VoiceRecCommand resCommand = new VoiceRecCommand("");
         foreach (var command in voiceRecCommands)
         {
@@ -110,8 +114,7 @@ public class VoiceController : BaseController
                     break;
                 default:
                     matchFail = true;
-                    //todo 移动到场景相关的配置文件
-                    RemoteChat($"现在你们正位于石景山首钢，用户提问的问题是{result},请以一个精通历史的专家身份回答，每次回答尽量不要超过五十字。");
+                    RemoteChat(GetCurSceneLLMPrompt(result));
                     break;
             }
         }
@@ -130,7 +133,7 @@ public class VoiceController : BaseController
     public void FakeGetVoiceResult(string result)
     {
         result = fakeVoiceText.text.ToString();
-        语音识别结果(result);
+        ProcessVoiceRecognizeResult(result);
     }
 
     public void VirHumanAction(VirHumanVoiceRecCommand command)
@@ -306,5 +309,25 @@ public class VoiceController : BaseController
                 ReconizeFail();
             }
         );
+    }
+
+    public string GetCurSceneLLMPrompt(string voiceInput)
+    {
+        var sceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
+        if (sceneData != null)
+        {
+            string prompt = sceneData.llmPrompt;
+            if (prompt.Contains("{0}"))
+            {
+                prompt = prompt.Replace("{0}", voiceInput);
+            }
+            else
+            {
+                prompt += $"；用户的问题是:{voiceInput}";
+            }
+            return prompt;
+        }
+        
+        return string.Empty;
     }
 }

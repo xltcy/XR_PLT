@@ -11,20 +11,16 @@ public class DebugJsonComponent : BaseStateComponent
     private Button requestSceneUploadButton;
 
     private void OnRequestSceneJsonButtonClick()
-    {
-        Debug.Log("Request Scene Json Button Clicked");
+    { 
         var sceneController = ControllerRegister.Instance.GetController<SceneController>();
         if (sceneController != null)
         {
             sceneController.RequireSummaryData();
-            Debug.Log("Request Summary Data");
         }
     }
 
     private void OnRequestSceneUploadButtonClick()
     {
-        Debug.Log("Request Scene Upload Button Clicked");
         StartCoroutine(NetworkUtil.Instance.UploadSummaryData());
-        Debug.Log("Upload Scene Data");
     }
 }

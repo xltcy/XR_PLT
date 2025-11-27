@@ -142,9 +142,9 @@ public class MeshController : BaseController
 
     static public float GetModelScale(GameObject modelInstance)
     {
-        GameObject mesh = modelInstance.transform.GetChildByName("mesh").gameObject;
+        Transform mesh = modelInstance.transform.GetChildByName("mesh");
         if (mesh == null) return 1f;
-        return mesh.transform.localScale.x;
+        return mesh.localScale.x;
     }
 
     public void ClickToSummonAtCamera()
@@ -484,8 +484,11 @@ public class MeshController : BaseController
     
     
         
-    //todo delete temp function
-    public SummaryItemData GetCurrentSceneData()
+    /// <summary>
+    /// 获取当前选择的场景摘要数据
+    /// </summary>
+    /// <returns></returns>
+    public SummaryItemData GetCurrentSummaryItemData()
     {
         return summary[selectedSceneIndex];
     }

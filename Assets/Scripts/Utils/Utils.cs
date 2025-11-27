@@ -3,7 +3,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public static class Util
+public static class Utils
 {
     public static IEnumerator SetTimeOut(float time, Action callback)
     {
@@ -85,5 +85,17 @@ public static class Util
                 break;
         }
     }
+
+    #region String相关
+    public static float StrToFloat(object floatString)
+    {
+        if (floatString != null && float.TryParse(floatString.ToString(), out var result))
+        {
+            return result;
+        }
+
+        return 0;
+    }
+    #endregion String相关
 }
 

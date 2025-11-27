@@ -63,21 +63,21 @@ public class DebugCameraComponent : BaseStateComponent
     
     void cxChange(string value)
     {
-        cx = StrToFloat(value);
+        cx = Utils.StrToFloat(value);
         cy = cx / cx_cy;
         arCamera.GetComponent<Camera>().sensorSize = new Vector2(cx, cy);
     }
 
     void cyChange(string value)
     {
-        cy = StrToFloat(value);
+        cy = Utils.StrToFloat(value);
         cx = cy * cx_cy;
         arCamera.GetComponent<Camera>().sensorSize = new Vector2(cx, cy);
     }
 
     void focalChange(string value)
     {
-        focal = StrToFloat(value);
+        focal = Utils.StrToFloat(value);
         arCamera.GetComponent<Camera>().focalLength = focal;
     }
 
@@ -87,21 +87,5 @@ public class DebugCameraComponent : BaseStateComponent
         cx = cy * cx_cy;
         arCamera.GetComponent<Camera>().sensorSize = new Vector2(cx, cy);
     }
-    
-    private float StrToFloat(object floatString)
-    {
-        if (floatString != null)
-        {
-            if (float.TryParse(floatString.ToString(), out var result))
-                return result;
-            else
-            {
-                return (float)0.00;
-            }
-        }
-        else
-        {
-            return (float)0.00;
-        }
-    }
+
 }

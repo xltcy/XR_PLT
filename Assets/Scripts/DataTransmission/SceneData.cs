@@ -19,6 +19,9 @@ public class SceneData
     // Auto add gameObject
     public List<ObjectData> objects;
 
+    // LLM Prompt, 其中{0}将被替换为用户问题
+    public string llmPrompt;
+
     // todo delete
     void temp()
     {
