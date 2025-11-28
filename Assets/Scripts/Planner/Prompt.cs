@@ -20,35 +20,30 @@ public class Prompt
 
     public static string generateSystemPrompt()
     {
-        //todo 移动到场景相关的配置文件
-//         string systemPrompt = @"你是一个专业的博物馆导览员，负责向游客介绍展品，现在展品有声呐和太空站。
-//             你的角色特点：
-//             1. 专业且友好 
-//             2. 使用简洁清晰的语言 
-//             3. 能够引导游客参与互动 
-//
-//             请根据游客的输入，给出合适的回应。";
-        string systemPrompt = @"你是一个专业的历史导览员，负责向游客介绍石景山和首钢的历史。
-            你的角色特点：
-            1. 专业且友好 
-            2. 使用简洁清晰的语言 
-            3. 能够引导游客参与互动 
-
-            请根据游客的输入，给出合适的回应。";
-
+        var sceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
+        string systemPrompt = sceneData != null ? sceneData.systemPrompt : string.Empty;
+        
         return systemPrompt;
     }
-
-    // Start is called before the first frame update
-    void Start()
+    
+    public static string GetCurSceneLLMQuestPrompt(string voiceInput)
     {
+        var sceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
+        if (sceneData != null)
+        {
+            string prompt = sceneData.questPrompt;
+            if (prompt.Contains("{0}"))
+            {
+                prompt = prompt.Replace("{0}", voiceInput);
+            }
+            else
+            {
+                prompt += $"；用户的问题是:{voiceInput}";
+            }
+            return prompt;
+        }
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        return string.Empty;
     }
 }
 

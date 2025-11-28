@@ -114,7 +114,7 @@ public class VoiceController : BaseController
                     break;
                 default:
                     matchFail = true;
-                    RemoteChat(GetCurSceneLLMPrompt(result));
+                    RemoteChat(Prompt.GetCurSceneLLMQuestPrompt(result));
                     break;
             }
         }
@@ -309,25 +309,5 @@ public class VoiceController : BaseController
                 ReconizeFail();
             }
         );
-    }
-
-    public string GetCurSceneLLMPrompt(string voiceInput)
-    {
-        var sceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
-        if (sceneData != null)
-        {
-            string prompt = sceneData.llmPrompt;
-            if (prompt.Contains("{0}"))
-            {
-                prompt = prompt.Replace("{0}", voiceInput);
-            }
-            else
-            {
-                prompt += $"；用户的问题是:{voiceInput}";
-            }
-            return prompt;
-        }
-        
-        return string.Empty;
     }
 }

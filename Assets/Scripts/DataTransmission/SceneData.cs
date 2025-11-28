@@ -19,8 +19,10 @@ public class SceneData
     // Auto add gameObject
     public List<ObjectData> objects;
 
-    // LLM Prompt, 其中{0}将被替换为用户问题
-    public string llmPrompt;
+    // LLM System Prompt, 用于初始化对话，仅在对话开始时发送一次
+    public string systemPrompt;
+    // LLM Quest Prompt, 其中{0}将被替换为用户问题，在每一句对话都会发送该字符串
+    public string questPrompt;
 
     // todo delete
     void temp()
