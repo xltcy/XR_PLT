@@ -29,8 +29,8 @@ public class DebugMeshComponent : BaseStateComponent
     [BindChild("p_Back"), ButtonCallback("OnBtnBackClick")]
     private Button btnBack;
 
-    private float trans_amp = 0.01f;
-    private float rot_amp = 0.1f;
+    private float trans_amp = 0.1f;
+    private float rot_amp = 1f;
     private float ratio = 1;
 
     private EditModeManager editModeManager;
@@ -75,7 +75,7 @@ public class DebugMeshComponent : BaseStateComponent
         switch (operationType)
         {
             case EditModeManager.OperationType.Move:
-                stepLen = trans_amp * ratio;
+                stepLen = trans_amp * ratio * MeshController.GetModelScale(editModeManager?.GetMeshObj(EditModeManager.OperationTarget.Mesh));
                 break;
             case EditModeManager.OperationType.Rotate:
                 stepLen = rot_amp * ratio;
