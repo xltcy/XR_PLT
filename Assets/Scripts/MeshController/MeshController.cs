@@ -74,7 +74,6 @@ public class MeshController : BaseController
 
 
         sceneSelectDropdown.ClearOptions();
-        sceneSelectDropdown.onValueChanged.AddListener((value) => selectedSceneIndex = value);
 
         SetStartState(StartState.Normal);
 
@@ -83,6 +82,16 @@ public class MeshController : BaseController
 
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
+    }
+    
+    void OnEnable()
+    {
+        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+    }
+    
+    void OnDisable()
+    {
+        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -140,7 +149,7 @@ public class MeshController : BaseController
     //    }
     //}
 
-    static public float GetModelScale(GameObject modelInstance)
+    public static float GetModelScale(GameObject modelInstance)
     {
         Transform mesh = modelInstance.transform.GetChildByName("mesh");
         if (mesh == null) return 1f;
@@ -243,6 +252,7 @@ public class MeshController : BaseController
             {
                 hasError = isError;
                 countdownEvent.Signal();
+                ControllerRegister.Instance.GetController<VoiceController>().InitLLMMessageList();
             });
     }
 
@@ -366,9 +376,10 @@ public class MeshController : BaseController
             {
                 hasError = isError;
                 countdownEvent.Signal();
+                ControllerRegister.Instance.GetController<VoiceController>().InitLLMMessageList();
             });
     }
-
+    
     public void tempClickSummon()
     {
         SetStartState(StartState.Summoning);
@@ -492,4 +503,13 @@ public class MeshController : BaseController
     {
         return summary[selectedSceneIndex];
     }
+    
+    
+    #region callback
+    private void OnSceneSelectChanged(int index)
+    {
+        selectedSceneIndex = index;
+    }
+    
+    #endregion callback
 }

@@ -18,7 +18,7 @@ public class Prompt
         return p;
     }
 
-    public static string generateSystemPrompt()
+    public static string GenerateSystemPrompt()
     {
         var sceneData = ControllerRegister.Instance.GetController<SceneController>().GetCurSceneData();
         string systemPrompt = sceneData != null ? sceneData.systemPrompt : string.Empty;

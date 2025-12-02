@@ -16,7 +16,7 @@ public class VoiceController : BaseController
     public Text fakeVoiceText;
 
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
-    private LLMGenerator llmGenerator;
+    public LLMGenerator llmGenerator;
 
     void Start()
     {
@@ -309,5 +309,11 @@ public class VoiceController : BaseController
                 ReconizeFail();
             }
         );
+    }
+
+    //todo 优化调用
+    public void InitLLMMessageList()
+    {
+        llmGenerator?.InitMessagesList();
     }
 }

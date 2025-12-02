@@ -33,7 +33,21 @@ public class DebugMeshComponent : BaseStateComponent
     private float rot_amp = 1f;
     private float ratio = 1;
 
+    //todo 优化获取EditModeManager的方式
     private EditModeManager editModeManager;
+    private EditModeManager EditModeManager
+    {
+        get
+        {
+            if (editModeManager == null)
+            {
+                editModeManager = ControllerRegister.Instance.GetController<EditModeManager>();
+            }
+
+            return editModeManager;
+        }
+    }
+    
     private EditModeManager.OperationTarget targetType;
     EditModeManager.OperationType operationType;
     GameObject meshObj;
@@ -44,11 +58,6 @@ public class DebugMeshComponent : BaseStateComponent
         dropdownOpAmp?.AddValueChangeListener(OnOperationAmpChange);
         dropdownOpTargetType?.AddValueChangeListener(OnOperationTargetChange);
         dropDownOpType?.AddValueChangeListener(OnOperationTypeChange);
-
-        if (editModeManager == null)
-        {
-            editModeManager = ControllerRegister.Instance.GetController<EditModeManager>();
-        }
         
         // 初始化操作对象的类型，以获取物体
         if (dropdownOpTargetType)
@@ -75,7 +84,7 @@ public class DebugMeshComponent : BaseStateComponent
         switch (operationType)
         {
             case EditModeManager.OperationType.Move:
-                stepLen = trans_amp * ratio * MeshController.GetModelScale(editModeManager?.GetMeshObj(EditModeManager.OperationTarget.Mesh));
+                stepLen = trans_amp * ratio * MeshController.GetModelScale(EditModeManager?.GetMeshObj(EditModeManager.OperationTarget.Mesh));
                 break;
             case EditModeManager.OperationType.Rotate:
                 stepLen = rot_amp * ratio;
@@ -85,7 +94,7 @@ public class DebugMeshComponent : BaseStateComponent
                 break;
             
         }
-        editModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
+        EditModeManager?.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
     }
     
     public void OnBtnLeftClick()
@@ -168,7 +177,7 @@ public class DebugMeshComponent : BaseStateComponent
         if (meshObj == null || targetType != newType)
         {
             targetType = newType;
-            meshObj = editModeManager?.GetMeshObj(targetType);
+            meshObj = EditModeManager?.GetMeshObj(targetType);
         }
     }
 

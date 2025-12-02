@@ -182,7 +182,7 @@ namespace UniGLTF
                 }
             }
 
-            Debug.LogError("KeyNotFoundException");
+            Debug.LogWarning("KeyNotFoundException");
             return null;
         }
 
