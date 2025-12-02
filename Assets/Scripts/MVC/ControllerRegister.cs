@@ -40,27 +40,8 @@ public abstract class BaseController : MonoBehaviour
 /// <summary>
 /// Controller注册表，用于管理所有Controller和Manager
 /// </summary>
-public class ControllerRegister : MonoBehaviour
+public class ControllerRegister : Singleton<ControllerRegister>
 {
-    private static ControllerRegister instance;
-    public static ControllerRegister Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<ControllerRegister>();
-                if (instance == null)
-                {
-                    GameObject go = new GameObject("ControllerRegister");
-                    instance = go.AddComponent<ControllerRegister>();
-                    DontDestroyOnLoad(go);
-                }
-            }
-            return instance;
-        }
-    }
-    
     [Header("Controller配置")]
     private bool autoInitializeOnStart = true;
     [SerializeField] private bool logInitialization = true;
@@ -76,41 +57,37 @@ public class ControllerRegister : MonoBehaviour
     
     // 是否正在初始化
     private bool isInitializing = false;
-    
-    private void Awake()
+
+    protected override void Awake()
     {
-        if (instance == null)
+        // 添加 PersistentSingleton 组件
+        if (gameObject.GetComponent<PersistentSingleton>() == null)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+            gameObject.AddComponent<PersistentSingleton>();
         }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        
+        base.Awake();
         
         // 自动查找并注册场景中已存在的Controller
         AutoRegisterExistingControllers();
     }
     
-    private void Start()
+    protected void Start()
     {
         if (autoInitializeOnStart)
         {
             InitializeAllControllers();
         }
     }
-    
-    private void OnDestroy()
+
+    protected override void OnDestroy()
     {
-        if (instance == this)
-        {
-            CleanupAllControllers();
-            instance = null;
-        }
+        CleanupAllControllers();
+        
+        base.OnDestroy();
     }
-    
+
+
     /// <summary>
     /// 自动注册场景中已存在的Controller
     /// </summary>

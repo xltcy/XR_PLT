@@ -32,21 +32,6 @@ public class DebugMeshComponent : BaseStateComponent
     private float trans_amp = 0.1f;
     private float rot_amp = 1f;
     private float ratio = 1;
-
-    //todo 优化获取EditModeManager的方式
-    private EditModeManager editModeManager;
-    private EditModeManager EditModeManager
-    {
-        get
-        {
-            if (editModeManager == null)
-            {
-                editModeManager = ControllerRegister.Instance.GetController<EditModeManager>();
-            }
-
-            return editModeManager;
-        }
-    }
     
     private EditModeManager.OperationTarget targetType;
     EditModeManager.OperationType operationType;
@@ -84,7 +69,7 @@ public class DebugMeshComponent : BaseStateComponent
         switch (operationType)
         {
             case EditModeManager.OperationType.Move:
-                stepLen = trans_amp * ratio * MeshController.GetModelScale(EditModeManager?.GetMeshObj(EditModeManager.OperationTarget.Mesh));
+                stepLen = trans_amp * ratio * MeshController.GetModelScale(ControllerRefer.EditModeManager.GetMeshObj(EditModeManager.OperationTarget.Mesh));
                 break;
             case EditModeManager.OperationType.Rotate:
                 stepLen = rot_amp * ratio;
@@ -94,7 +79,7 @@ public class DebugMeshComponent : BaseStateComponent
                 break;
             
         }
-        EditModeManager?.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
+        ControllerRefer.EditModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
     }
     
     public void OnBtnLeftClick()
@@ -177,7 +162,7 @@ public class DebugMeshComponent : BaseStateComponent
         if (meshObj == null || targetType != newType)
         {
             targetType = newType;
-            meshObj = EditModeManager?.GetMeshObj(targetType);
+            meshObj = ControllerRefer.EditModeManager.GetMeshObj(targetType);
         }
     }
 

@@ -281,7 +281,7 @@ public class NetworkUtil
         //get summary data
         var url = SERVER_URL + UPLOAD_SCENE_CONFIG_INTERFACE;
         
-        var sceneItemData = ControllerRegister.Instance.GetController<MeshController>().GetCurrentSummaryItemData();
+        var sceneItemData = ControllerRefer.MeshController.GetCurrentSummaryItemData();
         string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
         // 将数据对象转换为JSON字符串
         string json = "";

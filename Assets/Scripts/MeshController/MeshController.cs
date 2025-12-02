@@ -161,7 +161,7 @@ public class MeshController : BaseController
         SetStartState(StartState.Summoning);
 
         // init modelInstance
-        modelInstance = ControllerRegister.Instance.GetController<SceneController>().AnalysisSceneData();
+        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
@@ -247,12 +247,12 @@ public class MeshController : BaseController
                 countdownEvent.Signal();
             }));
 
-        ControllerRegister.Instance.GetController<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex],
+        ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
             onComplete: isError =>
             {
                 hasError = isError;
                 countdownEvent.Signal();
-                ControllerRegister.Instance.GetController<VoiceController>().InitLLMMessageList();
+                ControllerRefer.VoiceController.InitLLMMessageList();
             });
     }
 
@@ -371,12 +371,12 @@ public class MeshController : BaseController
             }
             UIManager.SetLoadingStatus(false);
         }));
-        ControllerRegister.Instance.GetController<SceneController>().RequestSceneDataByKey(summary[selectedSceneIndex],
+        ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
             onComplete: isError =>
             {
                 hasError = isError;
                 countdownEvent.Signal();
-                ControllerRegister.Instance.GetController<VoiceController>().InitLLMMessageList();
+                ControllerRefer.VoiceController.InitLLMMessageList();
             });
     }
     
@@ -384,7 +384,7 @@ public class MeshController : BaseController
     {
         SetStartState(StartState.Summoning);
         // init modelInstance
-        modelInstance = ControllerRegister.Instance.GetController<SceneController>().AnalysisSceneData();
+        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
         relocatedPose = testPose();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;

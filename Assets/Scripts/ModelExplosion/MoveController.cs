@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class MoveController : MonoBehaviour
+public class MoveController : BaseController
 {
     private float speed=1.0f;
     private Vector3 target;

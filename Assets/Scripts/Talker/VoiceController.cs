@@ -110,7 +110,7 @@ public class VoiceController : BaseController
                     SceneAction(sceneCommand);
                     break;
                 case ActionTriggerCommand triggerCommand:
-                    ControllerRegister.Instance.GetController<SceneController>().ConsoleVoiceTrigger(triggerCommand);
+                    ControllerRefer.SceneController.ConsoleVoiceTrigger(triggerCommand);
                     break;
                 default:
                     matchFail = true;

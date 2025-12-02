@@ -12,11 +12,7 @@ public class DebugJsonComponent : BaseStateComponent
 
     private void OnRequestSceneJsonButtonClick()
     { 
-        var sceneController = ControllerRegister.Instance.GetController<SceneController>();
-        if (sceneController != null)
-        {
-            sceneController.RequireSummaryData();
-        }
+        ControllerRefer.SceneController.RequireSummaryData();
     }
 
     private void OnRequestSceneUploadButtonClick()

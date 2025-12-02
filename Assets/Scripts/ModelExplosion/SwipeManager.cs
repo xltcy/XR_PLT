@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-public class SwipeManager : MonoBehaviour
+public class SwipeManager : BaseController
 {
     #region PublicVariable
     public UnityEvent _onSwipeUp;

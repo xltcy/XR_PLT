@@ -51,6 +51,6 @@ public class ModelComponent : MonoBehaviour
         // TBD.
         clickableObject.objIntroduction = "测试点击" + this.name;
 
-        ControllerRegister.Instance.GetController<Click3DObjectManager>().AddClickableObjs(clickableObject);*/
+        ControllerRefer.Click3DObjectManager.AddClickableObjs(clickableObject);*/
     }
 }
