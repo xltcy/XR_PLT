@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UniGLTF;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -61,10 +62,8 @@ public class ControllerRegister : Singleton<ControllerRegister>
     protected override void Awake()
     {
         // 添加 PersistentSingleton 组件
-        if (gameObject.GetComponent<PersistentSingleton>() == null)
-        {
-            gameObject.AddComponent<PersistentSingleton>();
-        }
+        gameObject.GetOrAddComponent<PersistentSingleton>();
+
         
         base.Awake();
         

@@ -78,6 +78,20 @@ public class SceneController : BaseController
         RequireSummaryData();
     }
 
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -85,30 +99,61 @@ public class SceneController : BaseController
     }
 
     #region 获取数据
-    /**
-     * Send API to get summary data.
-     */
+    /// <summary>
+    /// 获取场景列表
+    /// </summary>
     public void RequireSummaryData()
     {
-        UIManager.SetLoadingStatus(true);
-        StartCoroutine(NetworkUtil.Instance.GetSceneSummaryRequest(
-            onSuccess: (res) => {
-                summaryData = res;
-                ControllerRefer.MeshController.InitSceneSummary(res.items);
-                UIManager.SetLoadingStatus(false);
-            },
-            onFail: (errorText) => {
-                //TODO
-                UIManager.SetLoadingStatus(false);
-            }));
+        //如果使用测试数据
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
+        {
+            NetworkUtil.Instance.GetSceneSummaryTestRequest(
+                onSuccess: (res) => {
+                    summaryData = res;
+                    ControllerRefer.MeshController.InitSceneSummary(res.items);
+                    UIManager.SetLoadingStatus(false);
+                },
+                onFail: (errorText) => {
+                    //TODO
+                    UIManager.SetLoadingStatus(false);
+                }
+            );
+        }
+        else
+        {
+            var requestParam = new GetSummaryJsonRequestParams();
+            requestParam.Send();
+        }
     }
 
-    /**
-     * Send API Get Scene json data.
-     * OnComplete only use to notify complete event.Param means hasError in http request.
-     * All dispositions should be dispose in onSuccess/onError.
-     */
-    public void RequestSceneDataByKey(SummaryItemData sceneItemData , Action<bool> onComplete = null)
+    /// <summary>
+    /// 获取场景列表回调
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="response"></param>
+    private void RequireSummaryDataCallback(bool result, NetworkResponse response)
+    {
+        if (result)
+        {
+            // 解析 JSON
+            Debug.Log("下载成功: " + response.rawResponse);
+            summaryData = JsonConvert.DeserializeObject<SummaryData>(response.rawResponse);
+            
+            // 保存到本地文件
+            string localPath = Path.Combine(Application.persistentDataPath, "downloaded-summary.json");
+            File.WriteAllText(localPath, response.rawResponse);
+            Debug.Log("文件保存到: " + localPath);
+            
+            ControllerRefer.MeshController.InitSceneSummary(summaryData.items);
+        }
+    }
+
+    /// <summary>
+    /// 获取场景数据
+    /// </summary>
+    /// <param name="sceneItemData"></param>
+    /// <param name="onComplete"></param>
+    public void RequestSceneDataByKey(SummaryItemData sceneItemData , NetworkServiceSystem.ResponseEvent onComplete = null)
     {
         if (sceneItemData == null)
         {
@@ -121,25 +166,62 @@ public class SceneController : BaseController
         {
             jsonLocationHint.text = "json应该放在：" + localJsonPath;
         }
-        // TODO API get Response. Get From Local.
-        // GetFakeResources();
-        // get json
-        StartCoroutine(NetworkUtil.Instance.GetSceneDataRequest(sceneItemData,
-            onSuccess: (res) => {
-                if (sceneData == null || sceneData.timestampMs < res.timestampMs)
-                {
-                    // TODO save to local
-                    sceneData = res;
-                } else
-                {
-                    // use sceneData directly.
+
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
+        {
+            NetworkUtil.Instance.GetSceneDataTestRequest(sceneItemData, 
+                onSuccess: (res) => {
+                    if (sceneData == null || sceneData.timestampMs < res.timestampMs)
+                    {
+                        // TODO save to local
+                        sceneData = res;
+                    } else
+                    {
+                        // use sceneData directly.
+                    }
+                    onComplete?.Invoke(true, null);
+                },
+                onFail: (errorText) => {
+                    //TODO
+                    onComplete?.Invoke(false, null);
                 }
-                onComplete?.Invoke(false);
-            },
-            onFail: (errorText) => {
-                //TODO
-                onComplete?.Invoke(true);
-            }));
+            );
+        }
+        else
+        {
+            var requestParam = new GetSceneDataRequestParams(sceneItemData);
+            requestParam.Send(null, onComplete);
+        }
+    }
+
+    
+    /// <summary>
+    /// 获取场景数据回调
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="response"></param>
+    private void RequestSceneDataByKeyCallback(bool result, NetworkResponse response)
+    {
+        if (!result)
+        {
+            return;
+        }
+
+        string jsonText = response.rawResponse;
+        var sceneItemData = response.localData as SummaryItemData;
+        
+        // 解析 JSON
+        SceneData data = JsonConvert.DeserializeObject<SceneData>(jsonText);
+        
+        // 保存到本地文件
+        string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
+        File.WriteAllText(localPath, jsonText);
+        Debug.Log("文件保存到: " + localPath);
+        
+        if (sceneData == null || sceneData.timestampMs < data.timestampMs)
+        {
+            sceneData = data;
+        }
     }
     
     /**

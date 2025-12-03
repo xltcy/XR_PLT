@@ -246,11 +246,11 @@ public class MeshController : BaseController
                 hasError = true;
                 countdownEvent.Signal();
             }));
-
+        
         ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
-            onComplete: isError =>
+            onComplete: (result, response) =>
             {
-                hasError = isError;
+                hasError |= !result;
                 countdownEvent.Signal();
                 ControllerRefer.VoiceController.InitLLMMessageList();
             });
@@ -372,9 +372,9 @@ public class MeshController : BaseController
             UIManager.SetLoadingStatus(false);
         }));
         ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
-            onComplete: isError =>
+            onComplete: (result, response) =>
             {
-                hasError = isError;
+                hasError |= !result;
                 countdownEvent.Signal();
                 ControllerRefer.VoiceController.InitLLMMessageList();
             });

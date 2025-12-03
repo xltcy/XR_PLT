@@ -13,14 +13,14 @@ using UnityEngine.Networking;
  * Use to send http request.
  */
 public class NetworkUtil
- { 
-    private const string SERVER_URL = "http://60.205.232.241:7171/";
+ {
+     public const string SERVER_URL = "http://60.205.232.241:7171/";
     
     //重定向请求接口示例，现已被GetRelocateUrlSuffix方法取代
-    private const string RELOCATE_REQUEST_URL_SUFFIX_INTERFACE = "media_app/request_NVLAD_redir/?source_location=";
-    private const string GET_SCENE_LIST_INTERFACE = "media_app/get_scence_list/";
-    private const string GET_SCENE_CONFIG_INTERFACE = "media_app/get_config/";
-    private const string UPLOAD_SCENE_CONFIG_INTERFACE = "/media_app/update_config/";
+    public const string RELOCATE_REQUEST_URL_SUFFIX_INTERFACE = "media_app/request_NVLAD_redir/?source_location=";
+    public const string GET_SCENE_LIST_INTERFACE = "media_app/get_scence_list/";
+    public const string GET_SCENE_CONFIG_INTERFACE = "media_app/get_config/";
+    public const string UPLOAD_SCENE_CONFIG_INTERFACE = "/media_app/update_config/";
     
     private static NetworkUtil _instance;
     public static NetworkUtil Instance => _instance ??= new NetworkUtil();
@@ -106,48 +106,13 @@ public class NetworkUtil
     }
     #endregion 重定位
     
-    #region 获取场景列表
-    public IEnumerator GetSceneSummaryRequest(Action<SummaryData> onSuccess, Action<string> onFail)
-    {
-        //如果使用测试数据
-        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
-        {
-            yield return new WaitForSeconds(1);
-            GetSceneSummaryTestRequest(onSuccess, onFail);
-        }
-        else
-        {
-            string url = SERVER_URL + GET_SCENE_LIST_INTERFACE;
-        
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-            
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    string jsonText = request.downloadHandler.text;
-                    Debug.Log("下载成功: " + jsonText);
-                
-                    // 解析 JSON
-                    SummaryData data = JsonUtility.FromJson<SummaryData>(jsonText);
-                
-                    // 保存到本地文件
-                    string localPath = Path.Combine(Application.persistentDataPath, "downloaded-summary.json");
-                    File.WriteAllText(localPath, jsonText);
-                    Debug.Log("文件保存到: " + localPath);
-                    onSuccess.Invoke(data);
-                }
-                else
-                {
-                    string errorMsg = $"请求失败 - 状态: {request.result}, 错误: {request.error}, 状态码: {request.responseCode}";
-                    Debug.Log(errorMsg);
-                    onFail.Invoke(errorMsg);
-                }
-            }   
-        }
-    }
-    
-    private void GetSceneSummaryTestRequest(Action<SummaryData> onSuccess, Action<string> onFail)
+    #region 场景列表
+    /// <summary>
+    /// 获取本地测试场景列表
+    /// </summary>
+    /// <param name="onSuccess"></param>
+    /// <param name="onFail"></param>
+    public void GetSceneSummaryTestRequest(Action<SummaryData> onSuccess, Action<string> onFail)
     {
         // 创建模拟数据
         string localJsonPath = "test-summary.json";
@@ -184,52 +149,15 @@ public class NetworkUtil
             onSuccess.Invoke(data);
         }
     }
-    #endregion 获取场景列表
+    #endregion 场景列表
     
-    #region 获取某一场景数据
-    public IEnumerator GetSceneDataRequest(SummaryItemData sceneItemData, Action<SceneData> onSuccess, Action<string> onFail)
-    {
-        var sceneKey = sceneItemData.sceneKey;
-        //如果使用测试数据
-        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
-        {
-            yield return new WaitForSeconds(1); 
-            GetSceneDataTestRequest(sceneItemData, onSuccess, onFail);
-        }
-        else
-        {
-            string url = SERVER_URL + GET_SCENE_CONFIG_INTERFACE;
-        
-            url = $"{url}?sceneKey={UnityWebRequest.EscapeURL(sceneKey)}";
-        
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-
-                if (request.result ==UnityWebRequest.Result.Success)
-                {
-                    string jsonText = request.downloadHandler.text;
-                    Debug.Log("下载成功: " + jsonText);
-
-                    // 解析 JSON
-                    SceneData data = JsonUtility.FromJson<SceneData>(jsonText);
-
-                    // 保存到本地文件
-                    string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
-                    File.WriteAllText(localPath, jsonText);
-                    Debug.Log("文件保存到: " + localPath);
-                    onSuccess?.Invoke(data);
-                }
-                else
-                {
-                    string errorMsg = $"请求失败 - 状态: {request.result}, 错误: {request.error}, 状态码: {request.responseCode}";
-                    Debug.Log(errorMsg);
-                    onFail?.Invoke(errorMsg);
-                }
-            }   
-        }
-    }
-
+    #region 某一场景数据
+    /// <summary>
+    /// 获取本地测试场景数据
+    /// </summary>
+    /// <param name="sceneItemData"></param>
+    /// <param name="onSuccess"></param>
+    /// <param name="onFail"></param>
     public void GetSceneDataTestRequest(SummaryItemData sceneItemData, Action<SceneData> onSuccess, Action<string> onFail)
     {
         string localJsonPath = sceneItemData.sceneKey;
@@ -246,76 +174,47 @@ public class NetworkUtil
         {
             onFail?.Invoke("jsonFail");
         }
-        return;
-        // temp logic end
-
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            localJsonPath = Application.persistentDataPath + localJsonPath;
-        }
-        else
-        {
-            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
-        }
-
-        if (!File.Exists(localJsonPath))
-        {
-            string error = "找不到 scene.json！Path:" + localJsonPath;
-            Debug.LogError(error);
-            onFail.Invoke(error);
-        } else
-        {
-            string json = File.ReadAllText(localJsonPath);
-            SceneData data = JsonConvert.DeserializeObject<SceneData>(json);
-            Debug.Log("Get Response json: Data:" + data);
-            onSuccess.Invoke(data);
-        }
     }
 
-    public IEnumerator UploadSummaryData()
+    /// <summary>
+    /// 上传场景数据
+    /// </summary>
+    /// <returns></returns>
+    public void UploadSummaryData()
     {
         if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
-            yield break;
-        }
-        //get summary data
-        var url = SERVER_URL + UPLOAD_SCENE_CONFIG_INTERFACE;
-        
-        var sceneItemData = ControllerRefer.MeshController.GetCurrentSummaryItemData();
-        string localPath = Path.Combine(Application.persistentDataPath, $"{sceneItemData.sceneName}_{sceneItemData.sceneKey}.json");
-        // 将数据对象转换为JSON字符串
-        string json = "";
-        if (File.Exists(localPath))
-        {
-            json = File.ReadAllText(localPath);
+            return;
         }
         
-        
-        json = Resources.Load<TextAsset>("Configs/" + "test-HKG").text;
-        
-        
-        // 使用WWWForm构建multipart/form-data
-        WWWForm form = new WWWForm();
-        // 添加config字段，值是JSON字符串
-        form.AddField("config", json);
-        
-        
-        // 创建UnityWebRequest，设置URL和方法
-        using (UnityWebRequest request = UnityWebRequest.Post(url + "?key=5", form))
+        var curSceneItemData = ControllerRefer.MeshController.GetCurrentSummaryItemData();
+        if (curSceneItemData == null)
         {
-            
-            // 发送请求并等待响应
-            yield return request.SendWebRequest();
-            
-            if (request.result == UnityWebRequest.Result.Success)
+            Debug.LogWarning("当前场景数据为空，无法上传");
+            return;
+        }
+
+        var jsonText = Resources.Load<TextAsset>("Configs/" + localSceneDataJsonDict[curSceneItemData.sceneKey]).text;
+        var reqParams = new UploadSceneDataRequestParams(curSceneItemData.sceneKey, jsonText);
+        reqParams.Send(null, (result, response) =>
+        {
+            if (result)
             {
-                Debug.Log("上传成功: " + request.downloadHandler.text);
+                Debug.Log("上传成功: " + response.rawResponse);
             }
             else
             {
-                Debug.LogError("上传失败: " + request.error);
+                Debug.LogError("上传失败: " + response.error);
             }
-        }
+        });
     }
-    #endregion 获取某一场景数据
+    
+    private Dictionary<string, string> localSceneDataJsonDict = new Dictionary<string, string>()
+    {
+        {"4", "test-HKG"},
+        {"3", "test-SJS"},
+        {"6", "test-GXL"},
+    };
+
+    #endregion 某一场景数据
 }
