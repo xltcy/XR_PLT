@@ -1,13 +1,16 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2025-12-02 18:42:01
-// 包含 18 个用户 Controller
+// 生成时间: 2025-12-03 20:38:43
+// 包含 17 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
 
+// 请确保以下命名空间存在，或添加相应的 using 语句
+// using YourNamespace; // 根据实际情况修改
+
 /// <summary>
-/// Controller 快速引用器 - 仅用户脚本
+/// Controller 快速引用器 - 仅继承 BaseController 的类
 /// 自动生成，请勿手动修改
 /// </summary>
 public static class ControllerRefer
@@ -111,15 +114,6 @@ public static class ControllerRefer
         }
     }
 
-    private static Speech2BlendshapeController _speech2BlendshapeController;
-    public static Speech2BlendshapeController Speech2BlendshapeController
-    {
-        get
-        {
-            return _speech2BlendshapeController ??= ControllerRegister.Instance?.GetController<Speech2BlendshapeController>();
-        }
-    }
-
     private static SpeechManager _speechManager;
     public static SpeechManager SpeechManager
     {
@@ -183,6 +177,62 @@ public static class ControllerRefer
     }
 
     /// <summary>
+    /// 根据类型名称字符串获取 Controller
+    /// </summary>
+    /// <param name="controllerName">Controller 类型名称</param>
+    /// <returns>BaseController 实例，如果未找到则返回 null</returns>
+    public static BaseController GetByName(string controllerName)
+    {
+        if (string.IsNullOrEmpty(controllerName))
+        {
+            Debug.LogWarning("Controller 名称不能为空");
+            return null;
+        }
+
+        // 使用 switch 语句根据名称返回对应的 Controller
+        switch (controllerName)
+        {
+            case "Click3DObjectManager":
+                return Click3DObjectManager;
+            case "EditModeManager":
+                return EditModeManager;
+            case "ExternalModelController":
+                return ExternalModelController;
+            case "LoadingViewController":
+                return LoadingViewController;
+            case "MeshController":
+                return MeshController;
+            case "MoveController":
+                return MoveController;
+            case "RotateController":
+                return RotateController;
+            case "SceneController":
+                return SceneController;
+            case "SelectDesController":
+                return SelectDesController;
+            case "SMPLController":
+                return SMPLController;
+            case "SonarWaveManager":
+                return SonarWaveManager;
+            case "SpeechManager":
+                return SpeechManager;
+            case "SwipeManager":
+                return SwipeManager;
+            case "TrackingImageManager":
+                return TrackingImageManager;
+            case "UIManager":
+                return UIManager;
+            case "VideoManager":
+                return VideoManager;
+            case "VoiceController":
+                return VoiceController;
+            default:
+                Debug.LogWarning($"未找到名为 {controllerName} 的 Controller");
+                return null;
+        }
+    }
+
+    /// <summary>
     /// 重置所有 Controller 引用（场景切换时调用）
     /// </summary>
     public static void ResetAll()
@@ -198,7 +248,6 @@ public static class ControllerRefer
         _selectDesController = null;
         _sMPLController = null;
         _sonarWaveManager = null;
-        _speech2BlendshapeController = null;
         _speechManager = null;
         _swipeManager = null;
         _trackingImageManager = null;

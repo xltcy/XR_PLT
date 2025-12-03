@@ -4,15 +4,19 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 public class ControllerReferUserGenerator : EditorWindow
 {
     private string outputPath = "Assets/Scripts/MVC/ControllerRefer.cs";
     
+    // 父类名称
+    private string baseControllerName = "BaseController";
+    
     // 有效的后缀
     private List<string> controllerSuffixes = new List<string> 
     { 
-        "Controller", "Manager"
+        "Controller"
     };
     
     // 要包含的目录（用户脚本）
@@ -21,11 +25,12 @@ public class ControllerReferUserGenerator : EditorWindow
         "Assets/Scripts",
     };
     
-    // 要排除的文件名关键词（第三方库）
+    // 要排除的文件名关键词（如第三方库）
     private List<string> excludeKeywords = new List<string>
     {
         "Google",
         "Facebook",
+        "ControllerRegister",
     };
     
     private Vector2 scrollPosition;
@@ -58,7 +63,7 @@ public class ControllerReferUserGenerator : EditorWindow
     [MenuItem("Tools/Generate/ControllerRefer生成")]
     public static void ShowWindow()
     {
-        GetWindow<ControllerReferUserGenerator>("Controller Refer Generator - 用户脚本");
+        GetWindow<ControllerReferUserGenerator>("Controller Refer Generator - 继承BaseController");
     }
     
     private void OnEnable()
@@ -69,14 +74,14 @@ public class ControllerReferUserGenerator : EditorWindow
     
     void OnGUI()
     {
-        GUILayout.Label("Controller Refer 代码生成器 - 仅用户脚本", EditorStyles.boldLabel);
+        GUILayout.Label("Controller Refer 代码生成器 - 继承BaseController", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
         
         // 配置选项
         outputPath = EditorGUILayout.TextField("输出路径:", outputPath);
         
         EditorGUILayout.Space(10);
-        GUILayout.Label($"检测到的用户 Controller 类: {detectedControllers.Count}", EditorStyles.boldLabel);
+        GUILayout.Label($"检测到的继承 BaseController 的类: {detectedControllers.Count}", EditorStyles.boldLabel);
         
         // 操作按钮
         EditorGUILayout.BeginHorizontal();
@@ -168,8 +173,8 @@ public class ControllerReferUserGenerator : EditorWindow
             
             string fileName = Path.GetFileNameWithoutExtension(scriptPath);
             
-            // 检查是否是 Controller 类
-            if (IsControllerClass(fileName, scriptPath))
+            // 检查是否继承了 BaseController
+            if (IsInheritsBaseController(fileName, scriptPath))
             {
                 detectedControllers.Add(new ControllerClassInfo(fileName, scriptPath));
             }
@@ -180,7 +185,7 @@ public class ControllerReferUserGenerator : EditorWindow
             .OrderBy(c => c.TypeName)
             .ToList();
         
-        Debug.Log($"检测到 {detectedControllers.Count} 个用户 Controller 类");
+        Debug.Log($"检测到 {detectedControllers.Count} 个继承 BaseController 的类");
     }
     
     private bool ShouldExcludeScript(string scriptPath)
@@ -227,6 +232,12 @@ public class ControllerReferUserGenerator : EditorWindow
         string relativePath = scriptPath.Substring(Application.dataPath.Length + 1);
         string[] pathParts = relativePath.Split(Path.DirectorySeparatorChar);
         
+        // 6. 排除BaseController本身
+        if (fileName == baseControllerName)
+        {
+            return true;
+        }
+        
         // 如果脚本在 Assets 根目录下的特殊文件夹中，可能不是用户脚本
         if (pathParts.Length > 0)
         {
@@ -240,52 +251,73 @@ public class ControllerReferUserGenerator : EditorWindow
         return false;
     }
     
-    private bool IsControllerClass(string fileName, string scriptPath)
+    private bool IsInheritsBaseController(string fileName, string scriptPath)
     {
-        // 检查文件名后缀
-        foreach (string suffix in controllerSuffixes)
+        try
         {
-            if (fileName.EndsWith(suffix) && fileName.Length > suffix.Length)
+            string[] lines = File.ReadAllLines(scriptPath, Encoding.UTF8);
+            
+            bool hasClassDefinition = false;
+            bool inheritsBaseController = false;
+            string currentClassName = "";
+            
+            // 正则表达式匹配类定义
+            Regex classRegex = new Regex(@"^\s*(public\s+)?class\s+(\w+)");
+            Regex inheritanceRegex = new Regex(@"^\s*(public\s+)?class\s+\w+\s*:\s*(.*)");
+            
+            foreach (string line in lines)
             {
-                // 进一步检查文件内容，确认是 MonoBehaviour
-                try
+                // 检查类定义
+                Match classMatch = classRegex.Match(line);
+                if (classMatch.Success)
                 {
-                    string[] lines = File.ReadAllLines(scriptPath, Encoding.UTF8);
-                    
-                    // 检查文件内容
-                    bool hasClassDefinition = false;
-                    
-                    foreach (string line in lines)
+                    string className = classMatch.Groups[2].Value;
+                    if (className == fileName)
                     {
-                        string trimmedLine = line.Trim();
+                        hasClassDefinition = true;
+                        currentClassName = className;
                         
-                        // 检查类定义
-                        if (trimmedLine.StartsWith("public class") || trimmedLine.StartsWith("class"))
+                        // 检查继承关系
+                        Match inheritanceMatch = inheritanceRegex.Match(line);
+                        if (inheritanceMatch.Success)
                         {
-                            if (trimmedLine.Contains(fileName))
+                            string inheritanceChain = inheritanceMatch.Groups[2].Value;
+                            // 检查是否直接或间接继承 BaseController
+                            if (inheritanceChain.Contains(baseControllerName))
                             {
-                                hasClassDefinition = true;
+                                inheritsBaseController = true;
+                                break;
                             }
                         }
-                        
-                        // 如果已经找到所需信息，提前退出
-                        if (hasClassDefinition)
+                    }
+                }
+                
+                // 如果已经找到类定义，检查后续行中的继承关系
+                if (hasClassDefinition && currentClassName == fileName)
+                {
+                    // 检查是否在后续行中继承 BaseController（处理跨行继承）
+                    if (line.Contains(":"))
+                    {
+                        string[] parts = line.Split(':');
+                        if (parts.Length > 1)
                         {
-                            break;
+                            if (parts[1].Contains(baseControllerName))
+                            {
+                                inheritsBaseController = true;
+                                break;
+                            }
                         }
                     }
-                    
-                    return hasClassDefinition;
-                }
-                catch
-                {
-                    // 读取文件失败，跳过
-                    return false;
                 }
             }
+            
+            return hasClassDefinition && inheritsBaseController;
         }
-        
-        return false;
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"读取脚本 {scriptPath} 时出错: {e.Message}");
+            return false;
+        }
     }
     
     private void GenerateCode()
@@ -304,15 +336,33 @@ public class ControllerReferUserGenerator : EditorWindow
         sb.AppendLine("// =====================================================");
         sb.AppendLine("// 自动生成的 Controller 引用类");
         sb.AppendLine("// 生成时间: " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-        sb.AppendLine("// 包含 " + selectedControllers.Count + " 个用户 Controller");
+        sb.AppendLine("// 包含 " + selectedControllers.Count + " 个继承 BaseController 的类");
         sb.AppendLine("// =====================================================");
         sb.AppendLine();
         sb.AppendLine("using UnityEngine;");
         sb.AppendLine();
         
+        // 添加 BaseController 的 using（如果需要）
+        bool needsBaseControllerUsing = false;
+        foreach (var controller in selectedControllers)
+        {
+            if (controller.TypeName != "BaseController")
+            {
+                needsBaseControllerUsing = true;
+                break;
+            }
+        }
+        
+        if (needsBaseControllerUsing)
+        {
+            sb.AppendLine("// 请确保以下命名空间存在，或添加相应的 using 语句");
+            sb.AppendLine("// using YourNamespace; // 根据实际情况修改");
+            sb.AppendLine();
+        }
+        
         // 类注释
         sb.AppendLine("/// <summary>");
-        sb.AppendLine("/// Controller 快速引用器 - 仅用户脚本");
+        sb.AppendLine("/// Controller 快速引用器 - 仅继承 BaseController 的类");
         sb.AppendLine("/// 自动生成，请勿手动修改");
         sb.AppendLine("/// </summary>");
         sb.AppendLine("public static class ControllerRefer");
@@ -346,6 +396,39 @@ public class ControllerReferUserGenerator : EditorWindow
         sb.AppendLine("    }");
         sb.AppendLine();
         
+            
+        // 根据字符串名称获取 Controller
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 根据类型名称字符串获取 Controller");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine("    /// <param name=\"controllerName\">Controller 类型名称</param>");
+        sb.AppendLine("    /// <returns>BaseController 实例，如果未找到则返回 null</returns>");
+        sb.AppendLine("    public static BaseController GetByName(string controllerName)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        if (string.IsNullOrEmpty(controllerName))");
+        sb.AppendLine("        {");
+        sb.AppendLine("            Debug.LogWarning(\"Controller 名称不能为空\");");
+        sb.AppendLine("            return null;");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+        sb.AppendLine("        // 使用 switch 语句根据名称返回对应的 Controller");
+        sb.AppendLine("        switch (controllerName)");
+        sb.AppendLine("        {");
+    
+        // 为每个选中的 Controller 生成 case 语句
+        foreach (var controller in selectedControllers)
+        {
+            sb.AppendLine($"            case \"{controller.TypeName}\":");
+            sb.AppendLine($"                return {controller.VariableName};");
+        }
+    
+        sb.AppendLine("            default:");
+        sb.AppendLine("                Debug.LogWarning($\"未找到名为 {controllerName} 的 Controller\");");
+        sb.AppendLine("                return null;");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+        
         // 添加重置方法
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 重置所有 Controller 引用（场景切换时调用）");
@@ -371,22 +454,15 @@ public class ControllerReferUserGenerator : EditorWindow
             Directory.CreateDirectory(directory);
         }
         
-        // 备份旧文件（如果存在）
-        // if (File.Exists(outputPath))
-        // {
-        //     string backupPath = outputPath + ".backup_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        //     File.Copy(outputPath, backupPath, true);
-        // }
-        
         // 写入文件
         File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
         
         Debug.Log($"✅ ControllerRefer.cs 已生成到: {outputPath}");
-        Debug.Log($"✅ 包含 {selectedControllers.Count} 个用户 Controller");
+        Debug.Log($"✅ 包含 {selectedControllers.Count} 个继承 BaseController 的类");
         
         string result = $"已生成 ControllerRefer.cs\n" +
                        $"路径: {outputPath}\n" +
-                       $"包含 {selectedControllers.Count} 个用户 Controller:\n" +
+                       $"包含 {selectedControllers.Count} 个继承 BaseController 的类:\n" +
                        string.Join(", ", selectedControllers.Select(c => c.TypeName));
         
         EditorUtility.DisplayDialog("生成成功", result, "确定");
@@ -406,7 +482,7 @@ public class ControllerReferUserGenerator : EditorWindow
             return;
         
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("用户 Controller 列表");
+        sb.AppendLine("继承 BaseController 的类列表");
         sb.AppendLine("生成时间: " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
         sb.AppendLine("总数: " + selected.Count);
         sb.AppendLine();

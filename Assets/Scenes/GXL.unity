@@ -2569,7 +2569,6 @@ Transform:
   - {fileID: 1914045659}
   - {fileID: 698180111}
   - {fileID: 1280279422}
-  - {fileID: 1183033216}
   - {fileID: 1454047320}
   - {fileID: 1866011432}
   - {fileID: 1956539234}
@@ -6089,12 +6088,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1183033215}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 507.20377, y: 300.2577, z: 2.8988953}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 353603105}
-  m_RootOrder: 5
+  m_Father: {fileID: 6607029714911409465}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1183033217
 MonoBehaviour:
@@ -7044,7 +7043,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 353603105}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1310555226
 MonoBehaviour:
@@ -8345,7 +8344,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 353603105}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1454047321
 MonoBehaviour:
@@ -10560,7 +10559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab30f9ea7388ab4d999bf714f24bbea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speech2BlendshapeController: {fileID: 0}
+  speech2BlendshapeController: {fileID: 1183033217}
 --- !u!4 &1823502598
 Transform:
   m_ObjectHideFlags: 0
@@ -10665,7 +10664,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 353603105}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1866011433
 MonoBehaviour:
@@ -11351,7 +11350,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 353603105}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1956539235
 MonoBehaviour:
@@ -15435,6 +15434,7 @@ Transform:
   - {fileID: 1250297084873412146}
   - {fileID: 8770183701960832091}
   - {fileID: 5578160170649732982}
+  - {fileID: 1183033216}
   m_Father: {fileID: 1314408787}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
