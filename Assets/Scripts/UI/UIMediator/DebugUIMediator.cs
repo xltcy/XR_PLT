@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class DebugUIMediator : BaseUIMediator
 {
-    [BindChild("p_DebugSwitch"), ButtonCallback("OnDebugSwitchButtonClick")]
+    [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
 
     [BindChild("p_DebugView")]

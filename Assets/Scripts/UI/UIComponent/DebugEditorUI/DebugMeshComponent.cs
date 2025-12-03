@@ -16,17 +16,17 @@ public class DebugMeshComponent : BaseStateComponent
     [BindChild("p_模型大小调节")]
     private Slider sliderModelScale;
 
-    [BindChild("p_Left"), ButtonCallback("OnBtnLeftClick")]
+    [BindChild("p_Left"), ButtonCallback(nameof(OnBtnLeftClick))]
     private Button btnLeft;
-    [BindChild("p_Right"), ButtonCallback("OnBtnRightClick")]
+    [BindChild("p_Right"), ButtonCallback(nameof(OnBtnRightClick))]
     private Button btnRight;
-    [BindChild("p_Up"), ButtonCallback("OnBtnUpClick")]
+    [BindChild("p_Up"), ButtonCallback(nameof(OnBtnUpClick))]
     private Button btnUp;
-    [BindChild("p_Down"), ButtonCallback("OnBtnDownClick")]
+    [BindChild("p_Down"), ButtonCallback(nameof(OnBtnDownClick))]
     private Button btnDown;
-    [BindChild("p_Forward"), ButtonCallback("OnBtnForwardClick")]
+    [BindChild("p_Forward"), ButtonCallback(nameof(OnBtnForwardClick))]
     private Button btnForward;
-    [BindChild("p_Back"), ButtonCallback("OnBtnBackClick")]
+    [BindChild("p_Back"), ButtonCallback(nameof(OnBtnBackClick))]
     private Button btnBack;
 
     private float trans_amp = 0.1f;
