@@ -5,7 +5,7 @@ using UnityEngine;
 /**
  * Use to Manager Generate Component for an external object.
  */
-public class ExternalModelController : MonoBehaviour
+public class ExternalModelController : BaseController
 {
     public ActionBase action;
     // Start is called before the first frame update

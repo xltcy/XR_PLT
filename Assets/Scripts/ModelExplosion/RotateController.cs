@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class RotateController : MonoBehaviour
+public class RotateController : BaseController
 {
     private float speed = 120.0f;
     private float targetAngle;

@@ -16,24 +16,23 @@ public class DebugMeshComponent : BaseStateComponent
     [BindChild("p_模型大小调节")]
     private Slider sliderModelScale;
 
-    [BindChild("p_Left"), ButtonCallback("OnBtnLeftClick")]
+    [BindChild("p_Left"), ButtonCallback(nameof(OnBtnLeftClick))]
     private Button btnLeft;
-    [BindChild("p_Right"), ButtonCallback("OnBtnRightClick")]
+    [BindChild("p_Right"), ButtonCallback(nameof(OnBtnRightClick))]
     private Button btnRight;
-    [BindChild("p_Up"), ButtonCallback("OnBtnUpClick")]
+    [BindChild("p_Up"), ButtonCallback(nameof(OnBtnUpClick))]
     private Button btnUp;
-    [BindChild("p_Down"), ButtonCallback("OnBtnDownClick")]
+    [BindChild("p_Down"), ButtonCallback(nameof(OnBtnDownClick))]
     private Button btnDown;
-    [BindChild("p_Forward"), ButtonCallback("OnBtnForwardClick")]
+    [BindChild("p_Forward"), ButtonCallback(nameof(OnBtnForwardClick))]
     private Button btnForward;
-    [BindChild("p_Back"), ButtonCallback("OnBtnBackClick")]
+    [BindChild("p_Back"), ButtonCallback(nameof(OnBtnBackClick))]
     private Button btnBack;
 
     private float trans_amp = 0.1f;
     private float rot_amp = 1f;
     private float ratio = 1;
-
-    private EditModeManager editModeManager;
+    
     private EditModeManager.OperationTarget targetType;
     EditModeManager.OperationType operationType;
     GameObject meshObj;
@@ -44,11 +43,6 @@ public class DebugMeshComponent : BaseStateComponent
         dropdownOpAmp?.AddValueChangeListener(OnOperationAmpChange);
         dropdownOpTargetType?.AddValueChangeListener(OnOperationTargetChange);
         dropDownOpType?.AddValueChangeListener(OnOperationTypeChange);
-
-        if (editModeManager == null)
-        {
-            editModeManager = ControllerRegister.Instance.GetController<EditModeManager>();
-        }
         
         // 初始化操作对象的类型，以获取物体
         if (dropdownOpTargetType)
@@ -75,7 +69,7 @@ public class DebugMeshComponent : BaseStateComponent
         switch (operationType)
         {
             case EditModeManager.OperationType.Move:
-                stepLen = trans_amp * ratio * MeshController.GetModelScale(editModeManager?.GetMeshObj(EditModeManager.OperationTarget.Mesh));
+                stepLen = trans_amp * ratio * MeshController.GetModelScale(ControllerRefer.EditModeManager.GetMeshObj(EditModeManager.OperationTarget.Mesh));
                 break;
             case EditModeManager.OperationType.Rotate:
                 stepLen = rot_amp * ratio;
@@ -85,7 +79,7 @@ public class DebugMeshComponent : BaseStateComponent
                 break;
             
         }
-        editModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
+        ControllerRefer.EditModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
     }
     
     public void OnBtnLeftClick()
@@ -168,7 +162,7 @@ public class DebugMeshComponent : BaseStateComponent
         if (meshObj == null || targetType != newType)
         {
             targetType = newType;
-            meshObj = editModeManager?.GetMeshObj(targetType);
+            meshObj = ControllerRefer.EditModeManager.GetMeshObj(targetType);
         }
     }
 

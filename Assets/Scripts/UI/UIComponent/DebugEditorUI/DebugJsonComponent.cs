@@ -4,23 +4,19 @@ using UnityEngine.UI;
 
 public class DebugJsonComponent : BaseStateComponent
 {
-    [BindChild("p_btn_scene_json"), ButtonCallback("OnRequestSceneJsonButtonClick")]
+    [BindChild("p_btn_scene_json"), ButtonCallback(nameof(OnRequestSceneJsonButtonClick))]
     private Button requestSceneJsonButton;
 
-    [BindChild("p_btn_scene_upload"), ButtonCallback("OnRequestSceneUploadButtonClick")]
+    [BindChild("p_btn_scene_upload"), ButtonCallback(nameof(OnRequestSceneUploadButtonClick))]
     private Button requestSceneUploadButton;
 
     private void OnRequestSceneJsonButtonClick()
     { 
-        var sceneController = ControllerRegister.Instance.GetController<SceneController>();
-        if (sceneController != null)
-        {
-            sceneController.RequireSummaryData();
-        }
+        ControllerRefer.SceneController.RequireSummaryData();
     }
 
     private void OnRequestSceneUploadButtonClick()
     {
-        StartCoroutine(NetworkUtil.Instance.UploadSummaryData());
+        NetworkUtil.Instance.UploadSummaryData();
     }
 }

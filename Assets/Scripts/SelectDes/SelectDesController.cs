@@ -60,7 +60,7 @@ public class SelectDesController : BaseController
     {
         string input = testVoiceInputField.textComponent.text;
         Debug.Log($"test voice rec {input}");
-        ControllerRegister.Instance.GetController<VoiceController>().ProcessVoiceRecognizeResult(input);
+        ControllerRefer.VoiceController.ProcessVoiceRecognizeResult(input);
     }
 
     public List<SelectDesModel> GetSelectDesList()
@@ -159,7 +159,7 @@ public class SelectDesController : BaseController
 
     public void GenerateDesList()
     {
-        var sceneData = ControllerRegister.Instance.GetController<SceneController>().sceneData;
+        var sceneData = ControllerRefer.SceneController.GetCurSceneData();
         // generate hint string
         hintString = "欢迎来到" + sceneData.sceneName +"，请选择想要参观的区域\n点击屏幕上的选项";
 

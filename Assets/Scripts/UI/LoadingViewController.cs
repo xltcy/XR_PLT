@@ -1,7 +1,7 @@
 using Unity.VectorGraphics;
 using UnityEngine;
 
-public class LoadingViewController : MonoBehaviour
+public class LoadingViewController : BaseController
 {
     public float loadingRotationSpeed = 200f; // 加载旋转速度
 

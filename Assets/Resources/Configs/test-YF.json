@@ -154,7 +154,7 @@
           "generateActionId":4
         },
         {
-          "type": "CustomFunction",
+          "type": "CustomObjectFunction",
           "id":6,
           "startTrigger": {
             "mode": "AfterAction",
@@ -167,7 +167,7 @@
             "delay":5
           },
           "generateActionId":4,
-          "customFunctionName":"HandleExplosion"
+          "customObjectFunctionName":"HandleExplosion"
         }
       ]
     }

@@ -18,7 +18,8 @@ public enum ActionType
     Explosion,
     WaveGenerate,
     AvatarAnim,
-    CustomFunction,
+    CustomObjectFunction,
+    ControllerFunction,
 }
 
 [JsonConverter(typeof(ActionConverter))] // 关键
@@ -96,6 +97,16 @@ public class AvatarAnimAction: ActionBase
     public string animTrigger;
 }
 
+//调用函数
+public class ControllerFunctionAction : ActionBase
+{
+    public string controllerName;
+    // 需要调用的自定义函数名称
+    public string controllerFunctionName;
+    // 需要传递的参数，以字符串（json）形式传递，需要自己在函数内进行解析
+    public string controllerFunctionParam;
+}
+
 /**
  * Use to Converte Abstract class ActionBase.
  */
@@ -148,8 +159,11 @@ public class ActionConverter : JsonConverter
             case ActionType.AvatarAnim:
                 action = new AvatarAnimAction();
                 break;
-            case ActionType.CustomFunction:
-                action = new CustomFunctionAction();
+            case ActionType.CustomObjectFunction:
+                action = new CustomObjectFunctionAction();
+                break;
+            case ActionType.ControllerFunction:
+                action = new ControllerFunctionAction();
                 break;
             default:
                 throw new Exception($"Unknown action type: {type}");

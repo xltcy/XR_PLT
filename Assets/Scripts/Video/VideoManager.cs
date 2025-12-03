@@ -39,7 +39,7 @@ public class VideoManager : BaseController
 
     public void PlayShengnaVideo()
     {
-        //ControllerRegister.Instance.GetController<MeshController>().SummonScreen();
+        //ControllerRefer.MeshController.SummonScreen();
         PlayVideo("test");
     }
 

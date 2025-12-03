@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SonarWaveManager : MonoBehaviour
+public class SonarWaveManager : BaseController
 {
     public GameObject sonar_subobj;
     public Transform wall;

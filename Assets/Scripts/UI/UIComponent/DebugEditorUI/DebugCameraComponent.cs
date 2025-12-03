@@ -29,12 +29,10 @@ public class DebugCameraComponent : BaseStateComponent
     private float cx_cy = 1.6f;
 
     private Camera arCamera;
-    private EditModeManager editModeManager;
 
     private void Start()
     {
-        editModeManager = ControllerRegister.Instance.GetController<EditModeManager>();
-        arCamera = editModeManager.GetARCamera();
+        arCamera = ControllerRefer.EditModeManager.GetARCamera();
     }
 
     private void OnEnable()

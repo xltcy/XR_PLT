@@ -20,7 +20,9 @@ public class LLMGenerator : MonoBehaviour
     private List<Dictionary<string, string>> messages = new List<Dictionary<string, string>>();
 
     private static LLMGenerator llmGenerator;
-    private string systemPrompt = Prompt.generateSystemPrompt();
+    private string systemPrompt;
+    
+    private SceneData cachedSceneData;
 
     // UI
     public InputField userInput;
@@ -30,9 +32,9 @@ public class LLMGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", systemPrompt } });
+        
     }
-
+    
     public static LLMGenerator Init()
     {
         string name = nameof(LLMGenerator);
@@ -58,6 +60,15 @@ public class LLMGenerator : MonoBehaviour
         return llmGenerator;
     }
 
+    /// <summary>
+    /// 在选定场景之后才能初始化消息列表，需要修改为依赖响应调用
+    /// </summary>
+    public void InitMessagesList()
+    {
+        messages.Clear();
+        messages.Add(new Dictionary<string, string> { { "role", "system" }, { "content", Prompt.GenerateSystemPrompt() } });
+    }
+    
     private IEnumerator getLLMResponse()
     {
         // 准备请求数据
@@ -146,7 +157,6 @@ public class LLMGenerator : MonoBehaviour
     // 修改后的 CallForLLM 方法
     public void CallForLLM(string prompt, Action<string> onSuccess = null, Action<string> onError = null)
     {
-        string processedPrompt = Prompt.generateShengnaPompt(prompt);
         messages.Add(new Dictionary<string, string> { { "role", "user" }, { "content", prompt } });
 
         // 修改 getLLMResponse 协程以支持回调
