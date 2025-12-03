@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -465,7 +466,7 @@ public class SceneController : BaseController
             case ActionType.HighlightObject:
             case ActionType.Explosion:
             case ActionType.WaveGenerate:
-            case ActionType.CustomFunction:
+            case ActionType.CustomObjectFunction:
                 var objectAction = actionData as ObjectActionBase;
                 var addedModel = addedObjects[objectAction.generateActionId];
                 addedModel.GetComponent<DynamicObject>().ConsoleActions(objectAction, isStartAction, onComplete: () => { });
@@ -490,6 +491,9 @@ public class SceneController : BaseController
                     smplCtrl.AvatarAnim(avatarAnimAction.animTrigger);
                 }
                 break;
+            case ActionType.ControllerFunction:
+                ConsoleControllerFunction(actionData as ControllerFunctionAction, isStartAction);
+                break;
             default:
                 throw new Exception($"Unknown action type: {actionData.type}");
         }
@@ -498,6 +502,66 @@ public class SceneController : BaseController
         {
             var nextAction = allActions.FindLast(i => i.id == item.Key);
             StartCoroutine(ConsoleAction(nextAction, item.Value));
+        }
+    }
+
+    /// <summary>
+    /// 自定义函数调用，直接调用
+    /// </summary>
+    /// <param name="actionData"></param>
+    /// <param name="isStartAction"></param>
+    public void ConsoleControllerFunction(ControllerFunctionAction actionData, bool isStartAction)
+    {
+        if (actionData.controllerName.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        var script = ControllerRefer.GetByName(actionData.controllerName);
+        if (!script)
+        {
+            return;
+        }
+        
+        var functionName = actionData.controllerFunctionName;
+        if (string.IsNullOrEmpty(functionName))
+        {
+            Debug.LogWarning($"action id:{actionData.id}-{functionName}为空");
+            return;
+        }
+
+        try
+        {
+            var method = script.GetType().GetMethod(functionName, System.Reflection.BindingFlags.Public |
+                                                                  System.Reflection.BindingFlags.Instance |
+                                                                  System.Reflection.BindingFlags.NonPublic);
+            if (method != null)
+            {
+                ParameterInfo[] parameters = method.GetParameters();
+
+                if (parameters.Length == 0)
+                {
+                    method.Invoke(script, null);
+                }
+                else if (parameters.Length == 1)
+                {
+                    // 直接传递参数，依赖类型兼容性
+                    method.Invoke(script, new object[] { isStartAction });
+                }
+                else if (parameters.Length == 2)
+                {
+                    // 直接传递两个参数
+                    method.Invoke(script, new object[] { isStartAction, actionData.controllerFunctionParam });
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"调用失败: action id:{actionData.id}-{functionName}() - 未找到对应函数");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"调用失败: action id{actionData.id}-{functionName}() - {e.Message}");
         }
     }
 
@@ -624,5 +688,15 @@ public class SceneController : BaseController
             desAction.stopTrigger.delay = 0;
         }
         desAction.startTrigger.nextActionIds.Add(desAction.id, isActionStart);
+    }
+
+    /// <summary>
+    /// 仅为ControllerFunctionAction测试用 todo 删除测试函数
+    /// </summary>
+    /// <param name="isStartAction"></param>
+    /// <param name="data"></param>
+    public void TestForFunctionCall(bool isStartAction, object data)
+    {
+        Debug.LogWarning("SceneController.TestForFunctionCall |" + isStartAction);
     }
 }

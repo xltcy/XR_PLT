@@ -75,9 +75,9 @@ public class DynamicObject : MonoBehaviour
             case ActionType.Explosion:
                 SetExplosion(isStartAction);
                 break;
-            case ActionType.CustomFunction:
-                var customObjectAction = action as CustomFunctionAction;
-                ExecuteCustomAction(customObjectAction, isStartAction);
+            case ActionType.CustomObjectFunction:
+                var customObjectAction = action as CustomObjectFunctionAction;
+                ExecuteCustomObjectAction(customObjectAction, isStartAction);
                 break;
             default:
                 // nothing
@@ -384,9 +384,9 @@ public class DynamicObject : MonoBehaviour
     /// </summary>
     /// <param name="action"></param>
     /// <param name="isStartAction">是开始还是结束</param>
-    private bool ExecuteCustomAction(CustomFunctionAction action, bool isStartAction)
+    private bool ExecuteCustomObjectAction(CustomObjectFunctionAction action, bool isStartAction)
     {
-        var functionName = action.customFunctionName;
+        var functionName = action.customObjectFunctionName;
         if (string.IsNullOrEmpty(functionName))
         {
             Debug.LogWarning($"action id:{action.id}-{functionName}为空");
@@ -422,7 +422,7 @@ public class DynamicObject : MonoBehaviour
                     else if (parameters.Length == 2)
                     {
                         // 直接传递两个参数
-                        method.Invoke(script, new object[] { isStartAction, action.customFunctionParam });
+                        method.Invoke(script, new object[] { isStartAction, action.customObjectFunctionParam });
                     }
 
                     return true;
