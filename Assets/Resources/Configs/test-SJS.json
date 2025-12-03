@@ -2,117 +2,24 @@
   "sceneModelPath": "Prefab-SJS",
   "sceneName": "石景山",
   "initPosition": {
-    "x": -3,
-    "y": -1.2,
-    "z": 2.1
+    "x": -3.7,
+    "y": -1.6,
+    "z": 2.38
   },
   "timestampMs": 123,
   "explanationPoints": [
     {
-      "id": "P61-黑寡妇战斗机",
-      "title": "P61-黑寡妇战斗机",
+      "id": "长征五号火箭发射",
+      "title": "长征五号火箭发射",
       "position": {
         "x": 1.96,
         "y": -1.2,
         "z": 1.22
       },
-      "initialIntroduction": "",
+      "initialIntroduction": "欢迎光临石景山，现在我将带领你观看长征五号助推器分解的过程",
       "arriveIntroduction": "请将平板对准桌子中央，观察火箭分解的过程",
       "thumb": "abc",
       "actions": [
-        {
-          "type": "PlayVideo",
-          "id": 1,
-          "startTrigger": {
-            "mode": "ImageRecognition",
-            "delay": 0,
-            "imagePath": "Images/TrackedImages/brand",
-            "imageName": "brand"
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay": 0
-          },
-          "videoPath": "sjs01",
-          "position": {
-            "x": 2.5861,
-            "y": 0.6083161,
-            "z": -6.951444
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "w": 1
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          }
-        },
-        {
-          "type": "PlayVideo",
-          "id": 2,
-          "startTrigger": {
-            "mode": "ImageRecognition",
-            "delay": 0,
-            "imagePath": "Images/TrackedImages/cow",
-            "imageName": "cow"
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay": 0
-          },
-          "videoPath": "test",
-          "position": {
-            "x": 2.5861,
-            "y": 0.6083161,
-            "z": -6.951444
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "w": 1
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          }
-        },
-        {
-          "type": "PlayVideo",
-          "id": 3,
-          "startTrigger": {
-            "mode": "ImageRecognition",
-            "delay": 0,
-            "imagePath": "Images/TrackedImages/sjs01",
-            "imageName": "sjs01"
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay": 0
-          },
-          "videoPath": "video/sjs01",
-          "position": {
-            "x": 2.5861,
-            "y": 0.6083161,
-            "z": -6.951444
-          },
-          "rotation": {
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "w": 1
-          },
-          "scale": {
-            "x": 1,
-            "y": 1,
-            "z": 1
-          }
-        },
         {
           "type": "GenerateObject",
           "id":4,
@@ -194,6 +101,81 @@
             "delay":5
           },
           "animTrigger":"LeftHandUp"
+        }
+      ]
+    },{
+      "id": "石景山遗址介绍",
+      "title": "石景山遗址介绍",
+      "position": {
+        "x": -2.468,
+        "y": -1.2,
+        "z": 2.472
+      },
+      "initialIntroduction": "欢迎光临石景山，现在我将带领你观看长征五号助推器分解的过程",
+      "arriveIntroduction": "请将平板对准桌子中央，观察火箭分解的过程",
+      "thumb": "abc",
+      "actions": [
+        {
+          "type": "PlayVideo",
+          "id": 2,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay": 0,
+            "imagePath": "Images/TrackedImages/cow",
+            "imageName": "cow"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "videoPath": "test",
+          "position": {
+            "x": 2.5861,
+            "y": 0.6083161,
+            "z": -6.951444
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        {
+          "type": "PlayVideo",
+          "id": 3,
+          "startTrigger": {
+            "mode": "ImageRecognition",
+            "delay": 0,
+            "imagePath": "Images/TrackedImages/sjs01",
+            "imageName": "sjs01"
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "videoPath": "video/sjs01",
+          "position": {
+            "x": 2.5861,
+            "y": 0.6083161,
+            "z": -6.951444
+          },
+          "rotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
         }
       ]
     }
