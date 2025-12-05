@@ -7,6 +7,8 @@ public class DebugUIMediator : BaseUIMediator
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
+    [BindChild("RelocateSonar"), ButtonCallback(nameof(Test))]
+    private Button RelocateSonar;
 
     [BindChild("p_DebugView")]
     private Transform debugView;
@@ -58,5 +60,9 @@ public class DebugUIMediator : BaseUIMediator
     private void OnDebugSwitchButtonClick()
     {
         UIUtils.ToggleVisible(debugView);
+    }
+    private void Test()
+    {
+        ControllerRefer.MeshController.ClickToGetPoseByCapture(MeshController.RelocateType.Sonar);
     }
 }

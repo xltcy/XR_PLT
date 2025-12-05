@@ -63,3 +63,19 @@ public class UploadSceneDataRequestParams : RequestParams
         headers.Add("Content-Type", "application/x-www-form-urlencoded");
     }
 }
+
+public class GetSonarPoseParams : RequestParams
+{
+    public GetSonarPoseParams(string name, byte[] imageData)
+    {
+        url = NetworkServiceSystem.Instance.BuildUrl($"/media_app/obj_pose_estimate/?obj_name={name}");
+        method = "POST";
+        requestData = new Dictionary<string, byte[]>()
+        {
+            { "image", imageData }
+        };
+        networkConstant = NetworkConstant.GET_SONAR_POSE;
+        headers.Add("Content-Type", "application/x-www-form-urlencoded");
+    }
+
+}

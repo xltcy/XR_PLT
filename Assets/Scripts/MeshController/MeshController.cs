@@ -87,11 +87,14 @@ public class MeshController : BaseController
     void OnEnable()
     {
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
     }
     
     void OnDisable()
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -186,9 +189,16 @@ public class MeshController : BaseController
     {
         modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.up, 90f);
     }
-
-    public void ClickToGetPoseByCapture()
+    public enum RelocateType
     {
+        Scene = 0,
+        Sonar = 1
+    }
+
+    public void ClickToGetPoseByCapture(RelocateType relocateType)
+    {
+        //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
+
         //DebugUIMediator节点上添加开关
         if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
         {
@@ -211,10 +221,19 @@ public class MeshController : BaseController
         }
         else
         {
+            testImagePath = "C:\\Users\\hi\\Desktop\\tst.jpg";
             // load from file
             rawData = ReadImageBytes(testImagePath);
         }
-        SendImageAndReadJson(rawData);
+        switch (relocateType)
+        {
+            case RelocateType.Scene:
+                SendImageAndReadJson(rawData);
+                break;
+            case RelocateType.Sonar:
+                SendImage(rawData);
+                break;
+        }
         Debug.Log(testImagePath.ToString());
     }
 
@@ -255,6 +274,57 @@ public class MeshController : BaseController
                 ControllerRefer.VoiceController.InitLLMMessageList();
             });
     }
+
+    private void SendImage(byte[] rawData)
+    {
+        bool hasError = false;
+        SetStartState(StartState.GettingPos);
+        UIManager.SetLoadingStatus(true);
+
+        var req = new GetSonarPoseParams("sonar", rawData);
+        req.Send();
+    }
+    class GetSonarPoseResponseData
+    {
+        string message;
+        List<List<double>> pose;
+        public Matrix4x4 pose2matrix()
+        {
+            Matrix4x4 m = new Matrix4x4();
+
+            if (pose == null || pose.Count != 3 || pose[0].Count != 4)
+            {
+                Debug.LogError("Pose data format incorrect! Expected 3x4.");
+                return Matrix4x4.identity;
+            }
+
+            // Unity 的 Matrix4x4 是按列存储，但使用 m[row, col] 时可以按行填
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 4; col++)
+                {
+                    m[row, col] = (float)pose[row][col];
+                }
+            }
+
+            // 最后一行补齐 0 0 0 1
+            m[3, 0] = 0;
+            m[3, 1] = 0;
+            m[3, 2] = 0;
+            m[3, 3] = 1;
+
+            return m;
+        }
+    }
+    private void GetPoseCallBack(bool result, NetworkResponse response)
+    {
+        if (result)
+        {
+            var data = JsonUtility.FromJson<GetSonarPoseResponseData>(response.rawResponse);
+            int a = 10;
+        }
+    }
+
 
     private byte[] GetImageByARFoundation()
     {
