@@ -431,10 +431,15 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
         {
             case "POST":
             case "PUT":
-                if (requestParams.requestData is Dictionary<string, string> formData)
+                if (requestParams.requestData is Dictionary<string, string> formStringData)
                 {
                     // Form-data请求
-                    return CreateFormDataRequest(url, requestParams.method, formData);
+                    return CreateFormDataRequest(url, requestParams.method, formStringData);
+                }
+                else if (requestParams.requestData is Dictionary<string, byte[]> formByteData)
+                {
+                    // Form-data请求
+                    return CreateFormDataRequest(url, requestParams.method, formByteData);
                 }
                 else
                 {
@@ -469,6 +474,23 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
         foreach (var field in formData)
         {
             form.AddField(field.Key, field.Value);
+            
+        }
+    
+        UnityWebRequest request = UnityWebRequest.Post(url, form);
+        request.method = method.ToUpper(); // 支持PUT等其他方法
+    
+        return request;
+    }
+    
+    private UnityWebRequest CreateFormDataRequest(string url, string method, Dictionary<string, byte[]> formData)
+    {
+        // 使用WWWForm构建form-data
+        WWWForm form = new WWWForm();
+    
+        foreach (var field in formData)
+        {
+            form.AddBinaryData(field.Key, field.Value);
         }
     
         UnityWebRequest request = UnityWebRequest.Post(url, form);
