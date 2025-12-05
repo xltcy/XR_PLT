@@ -123,7 +123,6 @@ public class NetworkServiceExample : MonoBehaviour
                     Debug.Log($"登录成功: {loginResponse.data.username}");
                     
                     // 保存token
-                    NetworkServiceSystem.Instance.SetAuthToken(loginResponse.token);
                 }
             }
             else

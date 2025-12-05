@@ -14,15 +14,18 @@ public class RequestParams
     public string url;
     public string method = "GET";
     public object requestData;
-    public Dictionary<string, string> headers = new Dictionary<string, string>();
+    public Dictionary<string, string> headers = new Dictionary<string, string>();   //一般来讲不需要手动设置
     public Dictionary<string, string> queryParams = new Dictionary<string, string>();
     public int timeout = 30;
     public bool showLoading = true;
-    public bool retryOnFailure = true;
+    public bool retryOnFailure = false;
     public object localData; // 仅本地使用的数据，会传递到response，不参与网络传输
 
     // 用户定义，一般为NetworkConstant中的常量
     public string networkConstant;
+    
+    // 新的 FormData 属性，支持多种类型
+    public List<FormField> FormDataFields { get; set; }
 
     public void Send(Transform lockable = null, NetworkServiceSystem.ResponseEvent callback = null)
     {
@@ -55,12 +58,11 @@ public class UploadSceneDataRequestParams : RequestParams
     {
         url = NetworkServiceSystem.Instance.BuildUrl($"{NetworkUtil.UPLOAD_SCENE_CONFIG_INTERFACE}?key={UnityWebRequest.EscapeURL(sceneKey)}");
         method = "POST";
-        requestData = new Dictionary<string, string>()
-        {
-            { "config", json }
-        };
+
         networkConstant = NetworkConstant.UPLOAD_SCENE_DATA;
-        headers.Add("Content-Type", "application/x-www-form-urlencoded");
+        
+        FormDataFields = new List<FormField> { FormField.CreateText("config", json) };
+
     }
 }
 
@@ -70,12 +72,10 @@ public class GetSonarPoseParams : RequestParams
     {
         url = NetworkServiceSystem.Instance.BuildUrl($"/media_app/obj_pose_estimate/?obj_name={name}");
         method = "POST";
-        requestData = new Dictionary<string, byte[]>()
-        {
-            { "image", imageData }
-        };
         networkConstant = NetworkConstant.GET_SONAR_POSE;
-        headers.Add("Content-Type", "application/x-www-form-urlencoded");
+        
+        // 添加图片文件
+        FormDataFields = new List<FormField> { FormField.CreateFile("image", imageData, "getPoseImage.png") };
     }
 
 }

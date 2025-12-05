@@ -221,7 +221,6 @@ public class MeshController : BaseController
         }
         else
         {
-            testImagePath = "C:\\Users\\hi\\Desktop\\tst.jpg";
             // load from file
             rawData = ReadImageBytes(testImagePath);
         }
