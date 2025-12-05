@@ -168,8 +168,36 @@ public class MeshController : BaseController
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
-
+        
         modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
+        modelInstance.transform.rotation = relocatedPose.rotation;
+
+        SetStartState(StartState.Normal);
+    }
+
+    public void ClickToSummonSonarAtCamera()
+    {
+        string prefabPathInResources = "Prefab/3ds_sonar";
+
+        SetStartState(StartState.Summoning);
+
+        GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
+        if (prefab == null)
+        {
+            Debug.LogError("找不到 prefab：" + prefabPathInResources);
+            return;
+        }
+
+        modelInstance = Instantiate(prefab);
+
+        float scale = GetModelScale(modelInstance);
+        //绕z轴旋转180
+        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedPose.rotation * Vector3.forward);
+
+        // 更新 Pose 的旋转
+        relocatedPose.rotation = rot180 * relocatedPose.rotation;
+
+        modelInstance.transform.position = relocatedPose.position * scale;
         modelInstance.transform.rotation = relocatedPose.rotation;
 
         SetStartState(StartState.Normal);
@@ -283,36 +311,64 @@ public class MeshController : BaseController
         var req = new GetSonarPoseParams("sonar", rawData);
         req.Send();
     }
-    class GetSonarPoseResponseData
+    [Serializable]
+    public class GetSonarPoseResponseData
     {
-        string message;
-        List<List<double>> pose;
-        public Matrix4x4 pose2matrix()
+        public string message;
+        public float[,] poseMatrix; // 存 3x4 矩阵
+
+        /// <summary>
+        /// 手动解析 pose JSON 字符串，填充 poseMatrix
+        /// </summary>
+        public void ParsePoseFromJson(string json)
         {
-            Matrix4x4 m = new Matrix4x4();
+            // 用正则匹配所有数字
+            string pattern = @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?";
+            var matches = Regex.Matches(json, pattern);
 
-            if (pose == null || pose.Count != 3 || pose[0].Count != 4)
+            if (matches.Count != 12)
             {
-                Debug.LogError("Pose data format incorrect! Expected 3x4.");
-                return Matrix4x4.identity;
+                Debug.LogError("Pose json format incorrect! Need 12 numbers (3x4).");
+                poseMatrix = new float[3, 4];
+                return;
             }
 
-            // Unity 的 Matrix4x4 是按列存储，但使用 m[row, col] 时可以按行填
-            for (int row = 0; row < 3; row++)
-            {
-                for (int col = 0; col < 4; col++)
-                {
-                    m[row, col] = (float)pose[row][col];
-                }
-            }
+            poseMatrix = new float[3, 4];
 
-            // 最后一行补齐 0 0 0 1
-            m[3, 0] = 0;
-            m[3, 1] = 0;
-            m[3, 2] = 0;
-            m[3, 3] = 1;
+            for (int i = 0; i < 12; i++)
+            {
+                poseMatrix[i / 4, i % 4] = float.Parse(matches[i].Value);
+            }
+        }
+
+        /// <summary>
+        /// 转成 Unity Matrix4x4
+        /// </summary>
+        public Matrix4x4 ToMatrix()
+        {
+            if (poseMatrix == null) return Matrix4x4.identity;
+
+            Matrix4x4 m = Matrix4x4.identity;
+
+            for (int r = 0; r < 3; r++)
+                for (int c = 0; c < 4; c++)
+                    m[r, c] = poseMatrix[r, c];
+
+            // 补最后一行
+            m[3, 0] = 0; m[3, 1] = 0; m[3, 2] = 0; m[3, 3] = 1;
 
             return m;
+        }
+
+        /// <summary>
+        /// 转成 Unity Pose
+        /// </summary>
+        public Pose ToPose()
+        {
+            Matrix4x4 m = ToMatrix();
+            Vector3 position = m.GetColumn(3);
+            Quaternion rotation = Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
+            return new Pose(position, rotation);
         }
     }
     private void GetPoseCallBack(bool result, NetworkResponse response)
@@ -320,7 +376,19 @@ public class MeshController : BaseController
         if (result)
         {
             var data = JsonUtility.FromJson<GetSonarPoseResponseData>(response.rawResponse);
-            int a = 10;
+            Debug.Log(data.message);
+
+            // 2️⃣ 手动解析 pose 字段
+            data.ParsePoseFromJson(response.rawResponse);
+
+            // 3️⃣ 转 Matrix4x4
+            //Matrix4x4 matrix = data.ToMatrix();
+
+            // 4️⃣ 转 Pose
+            relocatedPose = TransArrayToWorldPose(data.poseMatrix);
+
+            // 5️⃣ 输出测试
+            Debug.Log($"Position: {relocatedPose.position}, Rotation: {relocatedPose.rotation}");
         }
     }
 
