@@ -399,4 +399,19 @@ public class SMPLController : BaseController
             graph.RelocateNodes(graph.CalculateTransform());
         });
     }
+
+    class PositionParam
+    {
+        public float x;
+        public float y;
+        public float z;
+        public Vector3 pos => new Vector3(x, y, z);
+    }
+
+    public void JsonSetDestination(bool isStartAction, string paramJson)
+    {
+        var param = JsonUtility.FromJson<PositionParam>(paramJson);
+
+        SetDestination(param.pos);
+    }
 }
