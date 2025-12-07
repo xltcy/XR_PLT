@@ -87,11 +87,14 @@ public class MeshController : BaseController
     void OnEnable()
     {
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
     }
     
     void OnDisable()
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+
     }
 
     public void InitSceneSummary(List<SummaryItemData> items)
@@ -165,8 +168,36 @@ public class MeshController : BaseController
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
-
+        
         modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
+        modelInstance.transform.rotation = relocatedPose.rotation;
+
+        SetStartState(StartState.Normal);
+    }
+
+    public void ClickToSummonSonarAtCamera()
+    {
+        string prefabPathInResources = "Prefab/3ds_sonar";
+
+        SetStartState(StartState.Summoning);
+
+        GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
+        if (prefab == null)
+        {
+            Debug.LogError("找不到 prefab：" + prefabPathInResources);
+            return;
+        }
+
+        modelInstance = Instantiate(prefab);
+
+        float scale = GetModelScale(modelInstance);
+        //绕z轴旋转180
+        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedPose.rotation * Vector3.forward);
+
+        // 更新 Pose 的旋转
+        relocatedPose.rotation = rot180 * relocatedPose.rotation;
+
+        modelInstance.transform.position = relocatedPose.position * scale;
         modelInstance.transform.rotation = relocatedPose.rotation;
 
         SetStartState(StartState.Normal);
@@ -186,9 +217,16 @@ public class MeshController : BaseController
     {
         modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.up, 90f);
     }
-
-    public void ClickToGetPoseByCapture()
+    public enum RelocateType
     {
+        Scene = 0,
+        Sonar = 1
+    }
+
+    public void ClickToGetPoseByCapture(RelocateType relocateType)
+    {
+        //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
+
         //DebugUIMediator节点上添加开关
         if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
         {
@@ -214,7 +252,15 @@ public class MeshController : BaseController
             // load from file
             rawData = ReadImageBytes(testImagePath);
         }
-        SendImageAndReadJson(rawData);
+        switch (relocateType)
+        {
+            case RelocateType.Scene:
+                SendImageAndReadJson(rawData);
+                break;
+            case RelocateType.Sonar:
+                SendImage(rawData);
+                break;
+        }
         Debug.Log(testImagePath.ToString());
     }
 
@@ -255,6 +301,97 @@ public class MeshController : BaseController
                 ControllerRefer.VoiceController.InitLLMMessageList();
             });
     }
+
+    private void SendImage(byte[] rawData)
+    {
+        bool hasError = false;
+        SetStartState(StartState.GettingPos);
+        UIManager.SetLoadingStatus(true);
+
+        var req = new GetSonarPoseParams("sonar", rawData);
+        req.Send();
+    }
+    [Serializable]
+    public class GetSonarPoseResponseData
+    {
+        public string message;
+        public float[,] poseMatrix; // 存 3x4 矩阵
+
+        /// <summary>
+        /// 手动解析 pose JSON 字符串，填充 poseMatrix
+        /// </summary>
+        public void ParsePoseFromJson(string json)
+        {
+            // 用正则匹配所有数字
+            string pattern = @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?";
+            var matches = Regex.Matches(json, pattern);
+
+            if (matches.Count != 12)
+            {
+                Debug.LogError("Pose json format incorrect! Need 12 numbers (3x4).");
+                poseMatrix = new float[3, 4];
+                return;
+            }
+
+            poseMatrix = new float[3, 4];
+
+            for (int i = 0; i < 12; i++)
+            {
+                poseMatrix[i / 4, i % 4] = float.Parse(matches[i].Value);
+            }
+        }
+
+        /// <summary>
+        /// 转成 Unity Matrix4x4
+        /// </summary>
+        public Matrix4x4 ToMatrix()
+        {
+            if (poseMatrix == null) return Matrix4x4.identity;
+
+            Matrix4x4 m = Matrix4x4.identity;
+
+            for (int r = 0; r < 3; r++)
+                for (int c = 0; c < 4; c++)
+                    m[r, c] = poseMatrix[r, c];
+
+            // 补最后一行
+            m[3, 0] = 0; m[3, 1] = 0; m[3, 2] = 0; m[3, 3] = 1;
+
+            return m;
+        }
+
+        /// <summary>
+        /// 转成 Unity Pose
+        /// </summary>
+        public Pose ToPose()
+        {
+            Matrix4x4 m = ToMatrix();
+            Vector3 position = m.GetColumn(3);
+            Quaternion rotation = Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
+            return new Pose(position, rotation);
+        }
+    }
+    private void GetPoseCallBack(bool result, NetworkResponse response)
+    {
+        if (result)
+        {
+            var data = JsonUtility.FromJson<GetSonarPoseResponseData>(response.rawResponse);
+            Debug.Log(data.message);
+
+            // 2️⃣ 手动解析 pose 字段
+            data.ParsePoseFromJson(response.rawResponse);
+
+            // 3️⃣ 转 Matrix4x4
+            //Matrix4x4 matrix = data.ToMatrix();
+
+            // 4️⃣ 转 Pose
+            relocatedPose = TransArrayToWorldPose(data.poseMatrix);
+
+            // 5️⃣ 输出测试
+            Debug.Log($"Position: {relocatedPose.position}, Rotation: {relocatedPose.rotation}");
+        }
+    }
+
 
     private byte[] GetImageByARFoundation()
     {

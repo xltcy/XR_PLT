@@ -12,9 +12,8 @@ using UnityEngine.Networking;
 public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
 {
     [Header("配置")]
-    [SerializeField] private NetworkConfig config = NetworkConfig.Instance;
+    private NetworkConfig config = NetworkConfig.Instance;
 
-    private Dictionary<string, string> _headers = new Dictionary<string, string>();
     private Queue<Action> _mainThreadActions = new Queue<Action>();
     private readonly object _queueLock = new object();
     private int _activeRequests = 0;
@@ -42,12 +41,6 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
         base.Awake();
         
         DontDestroyOnLoad(gameObject);
-
-        // 初始化默认header
-        foreach (var header in config.defaultHeaders)
-        {
-            _headers[header.Key] = header.Value;
-        }
 
         Debug.Log($"[NetworkService] 初始化完成，基础URL: {config.baseUrl}");
     }
@@ -105,7 +98,7 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// <summary>
     /// 发送POST请求
     /// </summary>
-    public string Post(string endpoint, object requestData, Transform lockable, ResponseEvent callback = null)
+    public string Post(string endpoint, object requestData, Transform lockable = null, ResponseEvent callback = null)
     {
         var requestParams = new RequestParams
         {
@@ -118,28 +111,75 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     }
 
     /// <summary>
-    /// 发送FormData请求（multipart/form-data）
+    /// 发送 FormData 请求（支持多种数据类型）
     /// </summary>
-    public string PostFormData(string url, Dictionary<string, string> formFields, Transform lockable, ResponseEvent callback = null)
+    public string SendFormData(string url, List<FormField> formFields, 
+                              string method = "POST", Transform lockable = null,
+                              ResponseEvent callback = null)
     {
         var requestParams = new RequestParams
         {
             url = url,
-            method = "POST",
-            requestData = formFields,  // 使用Dictionary作为body
-            headers = new Dictionary<string, string>
-            {
-                { "Content-Type", "application/x-www-form-urlencoded" }
-            },
+            method = method,
+            FormDataFields = formFields
         };
-    
+        
         return SendRequest(requestParams, lockable, callback);
+    }
+    
+    /// <summary>
+    /// 发送文件上传请求
+    /// </summary>
+    public string UploadFile(string url, string fieldName, byte[] fileData, 
+                            string fileName, Dictionary<string, string> additionalFields = null,
+                            Transform lockable = null, ResponseEvent callback = null)
+    {
+        var formFields = new List<FormField>();
+        
+        // 添加文件
+        formFields.Add(FormField.CreateFile(fieldName, fileData, fileName));
+        
+        // 添加额外字段
+        if (additionalFields != null)
+        {
+            foreach (var kvp in additionalFields)
+            {
+                formFields.Add(FormField.CreateText(kvp.Key, kvp.Value));
+            }
+        }
+        
+        return SendFormData(url, formFields, "POST", lockable, callback);
+    }
+    
+    /// <summary>
+    /// 发送图片上传请求
+    /// </summary>
+    public string UploadImage(string url, string fieldName, byte[] imageData,
+                             string fileName = "image.jpg", 
+                             Dictionary<string, string> additionalFields = null,
+                             Transform lockable = null, ResponseEvent callback = null)
+    {
+        var formFields = new List<FormField>();
+        
+        // 添加图片文件
+        formFields.Add(FormField.CreateFile(fieldName, imageData, fileName, "image/jpeg"));
+        
+        // 添加额外字段
+        if (additionalFields != null)
+        {
+            foreach (var kvp in additionalFields)
+            {
+                formFields.Add(FormField.CreateText(kvp.Key, kvp.Value));
+            }
+        }
+        
+        return SendFormData(url, formFields, "POST", lockable, callback);
     }
     
     /// <summary>
     /// 发送PUT请求
     /// </summary>
-    public string Put(string endpoint, object requestData, Transform lockable, ResponseEvent callback = null)
+    public string Put(string endpoint, object requestData, Transform lockable = null, ResponseEvent callback = null)
     {
         var requestParams = new RequestParams
         {
@@ -154,7 +194,7 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// <summary>
     /// 发送DELETE请求
     /// </summary>
-    public string Delete(string endpoint, Transform lockable, ResponseEvent callback = null)
+    public string Delete(string endpoint, Transform lockable = null, ResponseEvent callback = null)
     {
         var requestParams = new RequestParams
         {
@@ -164,42 +204,7 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
 
         return SendRequest(requestParams, lockable, callback);
     }
-
-    /// <summary>
-    /// 设置认证token
-    /// </summary>
-    public void SetAuthToken(string token)
-    {
-        _authToken = token;
-        if (!string.IsNullOrEmpty(token))
-        {
-            SetHeader("Authorization", $"Bearer {token}");
-        }
-        else
-        {
-            RemoveHeader("Authorization");
-        }
-    }
-
-    /// <summary>
-    /// 设置全局header
-    /// </summary>
-    public void SetHeader(string key, string value)
-    {
-        _headers[key] = value;
-    }
-
-    /// <summary>
-    /// 移除全局header
-    /// </summary>
-    public void RemoveHeader(string key)
-    {
-        if (_headers.ContainsKey(key))
-        {
-            _headers.Remove(key);
-        }
-    }
-
+    
     /// <summary>
     /// 清除所有请求
     /// </summary>
@@ -431,10 +436,10 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
         {
             case "POST":
             case "PUT":
-                if (requestParams.requestData is Dictionary<string, string> formData)
+                if (requestParams.FormDataFields != null && requestParams.FormDataFields.Count > 0)
                 {
-                    // Form-data请求
-                    return CreateFormDataRequest(url, requestParams.method, formData);
+                    // 新的 FormData 请求（支持多种数据类型）
+                    return CreateFormDataRequest(url, requestParams.method, requestParams.FormDataFields);
                 }
                 else
                 {
@@ -442,11 +447,11 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
                     var request = new UnityWebRequest(url, requestParams.method);
                     if (requestParams.requestData != null)
                     {
-                        //string json = JsonUtility.ToJson(requestParams.body);
                         string json = JsonConvert.SerializeObject(requestParams.requestData);
                         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
                         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                         request.downloadHandler = new DownloadHandlerBuffer();
+                        request.SetRequestHeader("Content-Type", "application/json");
                     }
                     return request;
                 }
@@ -461,30 +466,62 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// <summary>
     /// 创建FormData请求
     /// </summary>
-    private UnityWebRequest CreateFormDataRequest(string url, string method, Dictionary<string, string> formData)
+    private UnityWebRequest CreateFormDataRequest(string url, string method, List<FormField> formFields)
     {
-        // 使用WWWForm构建form-data
+        // 创建 WWWForm
         WWWForm form = new WWWForm();
     
-        foreach (var field in formData)
+        foreach (var field in formFields)
         {
-            form.AddField(field.Key, field.Value);
+            switch (field.Type)
+            {
+                case FormFieldType.Text:
+                    // 添加文本字段
+                    form.AddField(field.FieldName, field.StringValue);
+                    break;
+                
+                case FormFieldType.Binary:
+                    // 添加二进制数据（作为文件）
+                    if (field.BinaryValue != null)
+                    {
+                        form.AddBinaryData(
+                            field.FieldName,
+                            field.BinaryValue,
+                            field.FileName ?? "data.bin",
+                            field.MimeType ?? "application/octet-stream"
+                        );
+                    }
+                    break;
+                
+                case FormFieldType.File:
+                    // 添加文件数据
+                    if (field.BinaryValue != null)
+                    {
+                        form.AddBinaryData(
+                            field.FieldName,
+                            field.BinaryValue,
+                            field.FileName,
+                            field.MimeType ?? FormField.GetMimeType(field.FileName)
+                        );
+                    }
+                    break;
+            }
         }
     
+        // 创建 UnityWebRequest
         UnityWebRequest request = UnityWebRequest.Post(url, form);
-        request.method = method.ToUpper(); // 支持PUT等其他方法
+    
+        // 如果不是 POST，修改方法（PUT 等也支持 FormData）
+        if (method.ToUpper() != "POST")
+        {
+            request.method = method.ToUpper();
+        }
     
         return request;
     }
     
     private void AddHeadersToRequest(UnityWebRequest request, Dictionary<string, string> customHeaders)
     {
-        // 添加全局headers
-        foreach (var header in _headers)
-        {
-            request.SetRequestHeader(header.Key, header.Value);
-        }
-
         // 添加请求特定headers
         if (customHeaders != null)
         {
