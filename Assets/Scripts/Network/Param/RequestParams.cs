@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+#if UNITY_EDITOR
 using UnityEditorInternal;
+#endif
+
 using UnityEngine;
 using UnityEngine.Networking;
 
