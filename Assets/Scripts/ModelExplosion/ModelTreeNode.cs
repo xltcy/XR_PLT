@@ -20,10 +20,10 @@ public class ModelTreeNode : MonoBehaviour
     [Header("Child")]
     public List<GameObject> _children;
     [Header("Property")]
-    public float _mass;
+    public float _mass=1.0f;
     public Vector3 _standardAxis;
-    public float _standardIntensity;    // 每个子节点爆炸时移动的距离
-    public float _factor;       // 当前节点爆炸时移动距离的权重
+    public float _standardIntensity=1.0f;    // 每个子节点爆炸时移动的距离
+    public float _factor=1.0f;       // 当前节点爆炸时移动距离的权重
     #endregion
 
     #region PrivateVar
@@ -179,7 +179,7 @@ public class ModelTreeNode : MonoBehaviour
         _direction = direction;
         _deltaIntensity = intensity * _factor * _deltaTime;
         _time += 1.0f;
-        CenterMovement(direction, intensity);
+        CenterMovement(direction, _factor * intensity);
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class ModelTreeNode : MonoBehaviour
     /// <param name="intensity">移动距离</param>
     private void CenterMovement(Vector3 direction, float intensity)
     {
-        _center += direction * _factor * intensity;
+        _center += direction * intensity;
         if (_isLeafNode == true)
         {
             return;
