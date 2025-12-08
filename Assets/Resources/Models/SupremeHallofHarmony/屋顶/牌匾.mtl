@@ -1,0 +1,23 @@
+# Blender 4.3.2 MTL File: 'SupermeHallofHarmony.blend'
+# www.blender.org
+
+newmtl 3d66_Standardmaterial_17342430_094
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.499967 0.499967 0.499967
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/THD_Mix.tga
+map_Bump ../textures/3d66Model-17342430-files-076.jpg
+
+newmtl wire_224143087
+Ns 32.000008
+Ka 1.000000 1.000000 1.000000
+Kd 0.878400 0.560800 0.341200
+Ks 0.350000 0.350000 0.350000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
