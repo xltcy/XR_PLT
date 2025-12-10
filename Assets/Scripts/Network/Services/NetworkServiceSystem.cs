@@ -2,9 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-#if UNITY_EDITOR
-using UnityEditorInternal;
-#endif
 using UnityEngine;
 using UnityEngine.Networking;
 
