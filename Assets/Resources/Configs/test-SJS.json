@@ -16,13 +16,13 @@
         "y": -1.2,
         "z": 1.22
       },
-      "initialIntroduction": "欢迎光临石景山，现在我将带领你观看长征五号助推器分解的过程",
-      "arriveIntroduction": "请将平板对准桌子中央，观察火箭分解的过程",
+      "initialIntroduction": "欢迎来到石景山，我会带你走过这里的工业遗址，也会带你了解火箭发射背后的秘密。准备好了吗？跟我来，我们首先了解火箭发射的秘密。",
+      "arriveIntroduction": "请把屏幕对准桌面。我将在这里为你展示长征五号发射过程的一部分",
       "thumb": "abc",
       "actions": [
         {
           "type": "PlayVideo",
-          "id": 2,
+          "id": 1,
           "startTrigger": {
             "mode": "ImageRecognition",
             "delay": 0,
@@ -53,7 +53,7 @@
         },
         {
           "type": "PlayVideo",
-          "id": 3,
+          "id": 2,
           "startTrigger": {
             "mode": "ImageRecognition",
             "delay": 0,
@@ -84,10 +84,10 @@
         },
         {
           "type": "GenerateObject",
-          "id":4,
+          "id":3,
           "startTrigger": {
             "mode": "Immediate",
-            "delay":0
+            "delay":2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -110,37 +110,51 @@
         },
         {
           "type": "ObjectVisible",
-          "id":5,
+          "id":4,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":4,
+            "afterActionId":3,
             "delay":0
           },
           "stopTrigger": {
             "mode": "Never",
             "delay":0
           },
-          "generateActionId":4
+          "generateActionId":3
         },
         {
           "type": "CustomObjectFunction",
-          "id":6,
+          "id":5,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":5,
-            "delay":8
+            "afterActionId":4,
+            "delay":3
           },
           "stopTrigger": {
             "mode": "VoiceKeyword",
             "matchPattern": "重置火箭"
           },
-          "generateActionId":4,
+          "generateActionId":3,
           "customObjectFunctionName":"HandleExplosion",
           "customObjectFunctionParam":"{\"testParam1\":123,\"testParam2\":\"abc\"}"
         },
         {
           "type": "Introduce",
-          "id": 7,
+          "id": 6,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":5,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "看这里，下面四个部分是火箭在上升阶段使用的助推器。当它们提供完成最强推力后，就会进行——助推器分离！"
+        },
+        {
+          "type": "AvatarAnim",
+          "id":7,
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":6,
@@ -148,27 +162,55 @@
           },
           "stopTrigger": {
             "mode": "Never",
-            "delay":0
-          },
-          "introduction": "现在你看到的过程是长征五号的助推器分离。起飞后，它们提供最强动力，把火箭推上高空。当燃料用尽，助推器自动脱离，让主级更轻、更快地继续冲向太空。这一刻，是火箭真正开始加速的关键节点。"
-        },
-        {
-          "type": "AvatarAnim",
-          "id":8,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":7,
-            "delay":0
-          },
-          "stopTrigger": {
-             "mode": "Never",
             "delay":5
           },
           "animTrigger":"LeftHandUp"
         },
         {
+          "type": "Introduce",
+          "id": 8,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"步骤",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "在助推器分离后，火箭会由芯级继续点火以维持上升速度，并在空气逐渐稀薄时抛弃整流罩，让有效载荷暴露于太空环境，随后点燃二级火箭将其推送至预定轨道，最终完成有效载荷的分离与顺利入轨。"
+        },
+        {
+          "type": "Introduce",
+          "id": 9,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 8,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "introduction": "你还有其他问题吗？"
+        },
+        {
+          "type": "Introduce",
+          "id": 10,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"窗外",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction": "那就是首钢的高炉。它曾经是中国钢铁工业的心脏。请跟我来，我来为你展示一下它的前世今生"
+        },
+        {
           "type": "ControllerFunction",
-          "id":9,
+          "id":11,
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":7,
@@ -180,7 +222,35 @@
           },
           "controllerName":"SMPLController",
           "controllerFunctionName":"JsonSetDestination",
-          "controllerFunctionParam":"{ \"x\": -2.5, \"y\": -1.6, \"z\": 2.6 }"
+          "controllerFunctionParam":"{ \"x\": -2.5, \"y\": -1.6, \"z\": 2.6, \"initialIntro\": \"\", \"arriveIntro\": \"\" }"
+        },
+        {
+          "type": "Introduce",
+          "id": 12,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 11,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay": 0
+          },
+          "introduction": "视频内容"
+        },
+        {
+          "type": "AvatarAnim",
+          "id":13,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":12,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":5
+          },
+          "animTrigger":"LeftHandUp"
         }
       ]
     }

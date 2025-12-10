@@ -405,6 +405,8 @@ public class SMPLController : BaseController
         public float x;
         public float y;
         public float z;
+        public string initialIntro;
+        public string arriveIntro;
         public Vector3 pos => new Vector3(x, y, z);
     }
 
@@ -412,6 +414,6 @@ public class SMPLController : BaseController
     {
         var param = JsonUtility.FromJson<PositionParam>(paramJson);
 
-        SetDestination(param.pos);
+        SetDestination(param.pos, param.initialIntro, param.arriveIntro);
     }
 }

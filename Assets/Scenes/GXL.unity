@@ -3288,7 +3288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4012ed6f10127c49b03033683f45104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DEBUG_FAKE_RELOCATE: 0
+  DEBUG_FAKE_RELOCATE: 1
   DEBUG_USING_NETWORK_JSON: 0
 --- !u!222 &506754613
 CanvasRenderer:
