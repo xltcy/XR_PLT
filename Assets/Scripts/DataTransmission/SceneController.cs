@@ -480,6 +480,7 @@ public class SceneController : BaseController
                     // only use in start action;stop action do nothing.
                     smplController.IntroduceString(introduroduceAction.introduction, onComplete: () =>
                     {
+                        Debug.LogWarning("[Console Action Debug]Coroutine in Coroutine IntroduceAction");
                         StartCoroutine(ConsoleAction(introduroduceAction, false));
                     });
                 }
@@ -502,6 +503,7 @@ public class SceneController : BaseController
         foreach (var item in trigger.nextActionIds)
         {
             var nextAction = allActions.FindLast(i => i.id == item.Key);
+            Debug.LogWarning("[Console Action Debug]Coroutine in Coroutine nextActionIds");
             StartCoroutine(ConsoleAction(nextAction, item.Value));
         }
     }
