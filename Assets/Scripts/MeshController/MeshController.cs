@@ -66,14 +66,14 @@ public class MeshController : BaseController
     {
         base.OnRegister();
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
     }
 
     public override void OnUnregister()
     {
         base.OnUnregister();
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
     }
 
     void Start()
@@ -619,12 +619,7 @@ public class MeshController : BaseController
             return false;
         }
     }
-
-    void Update()
-    {
-    }
-
-
+    
     byte[] ReadImageBytes(string path)
     {
         try

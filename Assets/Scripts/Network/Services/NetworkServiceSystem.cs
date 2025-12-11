@@ -217,23 +217,25 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// <summary>
     /// 添加请求事件监听
     /// </summary>
-    public void AddResponseListener(string networkConstant, ResponseEvent listener)
+    public static void AddResponseListener(string networkConstant, ResponseEvent listener)
     {
-        if (!_responseEvents.ContainsKey(networkConstant))
+        if (Instance == null) return;
+        if (!Instance._responseEvents.ContainsKey(networkConstant))
         {
-            _responseEvents[networkConstant] = null;
+            Instance._responseEvents[networkConstant] = null;
         }
-        _responseEvents[networkConstant] += listener;
+        Instance._responseEvents[networkConstant] += listener;
     }
 
     /// <summary>
     /// 移除请求事件监听
     /// </summary>
-    public void RemoveResponseListener(string requestId, ResponseEvent listener)
+    public static void RemoveResponseListener(string requestId, ResponseEvent listener)
     {
-        if (_responseEvents.ContainsKey(requestId))
+        if (Instance == null) return;
+        if (Instance._responseEvents.ContainsKey(requestId))
         {
-            _responseEvents[requestId] -= listener;
+            Instance._responseEvents[requestId] -= listener;
         }
     }
     

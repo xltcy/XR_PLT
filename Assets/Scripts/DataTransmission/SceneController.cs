@@ -82,15 +82,15 @@ public class SceneController : BaseController
     public override void OnRegister()
     {
         base.OnRegister();
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
     }
 
     public override void OnUnregister()
     {
         base.OnUnregister();
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
     }
 
     // Update is called once per frame
