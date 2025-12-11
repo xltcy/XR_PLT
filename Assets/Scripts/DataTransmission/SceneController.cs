@@ -456,8 +456,9 @@ public class SceneController : BaseController
                     videoScreen.transform.localScale = videoAction.scale;
                 }
                 videoScreen.SetActive(true);
-                ControllerRefer.VideoManager.PlayVideo(videoAction.videoPath);
-                ControllerRefer.VideoManager.trackedImage = arTrackedImage;
+                var videoManager = videoScreen.GetComponent<VideoManager>();
+                videoManager.PlayVideo(videoAction.videoPath);
+                videoManager.trackedImage = arTrackedImage;
                 break;
 
             case ActionType.ObjectVisible:

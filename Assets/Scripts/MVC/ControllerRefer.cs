@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2025-12-03 20:38:43
-// 包含 17 个继承 BaseController 的类
+// 生成时间: 2025-12-11 15:41:46
+// 包含 16 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -150,15 +150,6 @@ public static class ControllerRefer
         }
     }
 
-    private static VideoManager _videoManager;
-    public static VideoManager VideoManager
-    {
-        get
-        {
-            return _videoManager ??= ControllerRegister.Instance?.GetController<VideoManager>();
-        }
-    }
-
     private static VoiceController _voiceController;
     public static VoiceController VoiceController
     {
@@ -222,8 +213,6 @@ public static class ControllerRefer
                 return TrackingImageManager;
             case "UIManager":
                 return UIManager;
-            case "VideoManager":
-                return VideoManager;
             case "VoiceController":
                 return VoiceController;
             default:
@@ -252,7 +241,6 @@ public static class ControllerRefer
         _swipeManager = null;
         _trackingImageManager = null;
         _uIManager = null;
-        _videoManager = null;
         _voiceController = null;
     }
 }
