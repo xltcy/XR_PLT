@@ -164,7 +164,7 @@ public class SpeechManager : BaseController
     public static void SayFromStr(string str, Action onSpeakComplete = null)
     {
         Debug.Log($"Msg in SayFromStr: {str}");
-        if (Instance != null && Application.platform == RuntimePlatform.Android)
+        if (Instance != null)
         {
             var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
             Instance.RunTask(speakTask);
@@ -260,5 +260,6 @@ public class SpeechManager : BaseController
     private void OnDestroy()
     {
         synthesizer?.StopSpeakingAsync();
+        Instance.StopAllCoroutines();
     }
 }

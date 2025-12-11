@@ -575,7 +575,8 @@ public class SceneController : BaseController
                     smplController.IntroduceString(introduroduceAction.introduction, onComplete: () =>
                     {
                         Debug.LogWarning("[Console Action Debug]Coroutine in Coroutine IntroduceAction");
-                        StartCoroutine(ConsoleAction(introduroduceAction, false));
+                        //todo 修正逻辑 临时去除Coroutine内调用Coroutine的逻辑
+                        //StartCoroutine(ConsoleAction(introduroduceAction, false));
                     });
                 }
                 break;

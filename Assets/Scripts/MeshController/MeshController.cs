@@ -176,7 +176,8 @@ public class MeshController : BaseController
         for (int i = 0; i < modelInstance.transform.childCount; i++)
         {
             var childTrans = modelInstance.transform.GetChild(i);
-            if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
+            // 只取可见节点
+            if (!childTrans.gameObject.activeSelf || childTrans.name.ToLower().Contains("FindPath".ToLower()))
             {
                 continue;
             }
