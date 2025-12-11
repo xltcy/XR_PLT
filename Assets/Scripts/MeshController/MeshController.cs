@@ -62,6 +62,20 @@ public class MeshController : BaseController
         Summoning
     }
 
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+    }
+
     void Start()
     {
         //modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
@@ -86,14 +100,11 @@ public class MeshController : BaseController
     
     void OnEnable()
     {
-        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+
     }
     
     void OnDisable()
     {
-        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
 
     }
 
@@ -155,8 +166,22 @@ public class MeshController : BaseController
     public static float GetModelScale(GameObject modelInstance)
     {
         Transform mesh = modelInstance.transform.GetChildByName("mesh");
-        if (mesh == null) return 1f;
-        return mesh.localScale.x;
+        if (mesh != null)
+        {
+            return mesh.localScale.x;
+        }
+
+        for (int i = 0; i < modelInstance.transform.childCount; i++)
+        {
+            var childTrans = modelInstance.transform.GetChild(i);
+            if (childTrans.name.ToLower().Contains("FindPath"))
+            {
+                continue;
+            }
+            return childTrans.localScale.x;
+        }
+        
+        return modelInstance.transform.localScale.x;
     }
 
     public void ClickToSummonAtCamera()

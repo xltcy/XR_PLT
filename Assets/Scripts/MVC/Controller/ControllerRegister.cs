@@ -5,39 +5,6 @@ using System.Reflection;
 using UniGLTF;
 using UnityEngine;
 using UnityEngine.Rendering;
-
-/// <summary>
-/// Controller和Manager的基类
-/// </summary>
-public abstract class BaseController : MonoBehaviour
-{
-    /// <summary>
-    /// Controller的初始化优先级，数值越小优先级越高
-    /// </summary>
-    public virtual int InitPriority => 999;
-    
-    /// <summary>
-    /// Controller是否已经初始化完成
-    /// </summary>
-    public bool IsInitialized { get; protected set; }
-    
-    /// <summary>
-    /// 初始化Controller
-    /// </summary>
-    public virtual void OnRegister()
-    {
-        IsInitialized = true;
-    }
-    
-    /// <summary>
-    /// 清理Controller
-    /// </summary>
-    public virtual void OnUnregister()
-    {
-        IsInitialized = false;
-    }
-}
-
 /// <summary>
 /// Controller注册表，用于管理所有Controller和Manager
 /// </summary>
