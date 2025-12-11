@@ -24,7 +24,8 @@
           "type": "GenerateObject",
           "id":1,
           "startTrigger": {
-            "mode": "Immediate",
+            "mode": "AfterAction",
+            "afterActionId":9,
             "delay":0
           },
           "stopTrigger": {
@@ -112,7 +113,8 @@
           "type": "ObjectVisible",
           "id":5,
           "startTrigger": {
-            "mode": "Immediate",
+            "mode": "AfterAction",
+            "afterActionId":1,
             "delay":0
           },
           "stopTrigger": {
@@ -263,7 +265,7 @@
           "stopTrigger": {
             "mode": "AfterAction",
             "afterActionId":14,
-            "delay":15
+            "delay":20
           },
           "generateActionId":3
         },{

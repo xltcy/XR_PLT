@@ -144,4 +144,4 @@ MonoBehaviour:
   distance: 0.3
   timeRound: 1.5
   ori_radius: 0.3
-  count: 5
+  count: 15
