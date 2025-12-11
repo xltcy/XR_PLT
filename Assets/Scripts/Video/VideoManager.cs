@@ -74,12 +74,18 @@ public class VideoManager : MonoBehaviour
             }
         }
 
+        var needLoad = videoPlayer.clip == null;
+        if (!needLoad)
+        {
+            var list = name.Split('/');
+            needLoad = list[list.Length - 1] != videoPlayer.clip.name;
+        }
         
-        if (videoPlayer.clip == null)
+        if (needLoad)
         {
             //其次寻找本地视频文件
             videoPlayer.source = VideoSource.VideoClip;
-            videoPlayer.clip = Resources.Load<VideoClip>("video/sjs01");
+            videoPlayer.clip = Resources.Load<VideoClip>(name);
         }
 
 
