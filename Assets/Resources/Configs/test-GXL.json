@@ -319,7 +319,7 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"video/fidings",
+          "videoPath":"video/findings",
           "position":{
               "x": 9.512,
               "y": 0.81,
