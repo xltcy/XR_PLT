@@ -20,6 +20,20 @@ public class VideoManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (videoPlayer)
+        {
+            videoPlayer.loopPointReached += OnVideoFinish;
+            videoPlayer.prepareCompleted += OnVideoPrepared;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (videoPlayer)
+        {
+            videoPlayer.loopPointReached -= OnVideoFinish;
+            videoPlayer.prepareCompleted -= OnVideoPrepared;
+        }
     }
 
     // Update is called once per frame
@@ -91,20 +105,12 @@ public class VideoManager : MonoBehaviour
 
         if (videoPlayer.clip != null)
         {
-            //videoPlayer.prepareCompleted += OnVideoPrepare;
             videoPlayer.loopPointReached += OnVideoFinish;
-            //videoPlayer.Play();
             videoPlayer.prepareCompleted += OnVideoPrepared;
             videoPlayer.Prepare();
         }
-
         
-        // video_url = Application.persistentDataPath + "/Videos/video_file.mp4";
-        // video_url = "T:/Desktop/video.mp4";
         Debug.Log("videoUrl: " + video_url);
-        // videoPlayer.url = video_url;
-        // videoPlayer.Play();
-        // videoPlayer.Prepare();
     }
 
     void OnVideoPrepare(VideoPlayer vp)
