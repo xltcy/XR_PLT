@@ -14,7 +14,7 @@ public class SMPLController : BaseController
     private GameObject scene;
     private Animator walkAnim;
     private Animator talkAnim;
-    private GameObject initPos;
+    private Vector3 initPos;
 
     public GameObject destination;
     public GameObject walkingModel;
@@ -64,8 +64,8 @@ public class SMPLController : BaseController
 
     public void InitilizeObjectWithTag()
     {
-        scene = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.Mesh.ToString());
-        initPos = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.initPos.ToString());
+        scene = GameObject.FindGameObjectWithTag(nameof(SceneController.GameObjectTag.Mesh));
+        initPos = ControllerRefer.SceneController.SceneData.initPosition;
     }
 
     public void SetDestination(string desName)
@@ -76,8 +76,6 @@ public class SMPLController : BaseController
     // Start is called before the first frame update
     void Init()
     {
-        // InitilizeObjectWithTag();
-
         walkAnim = walkingModel.GetComponent<Animator>();
         talkAnim = talkingModel.GetComponent<Animator>();
 
@@ -100,7 +98,7 @@ public class SMPLController : BaseController
             animState = talkAnim.GetCurrentAnimatorStateInfo(0);
         }
 
-        if (initPos != null && destination != null)
+        if (destination != null)
         {
             WalkCheck();
         }
@@ -125,7 +123,7 @@ public class SMPLController : BaseController
             }
         }
 
-        if (initPos.transform.position != destination.transform.position)
+        if (initPos != destination.transform.position)
         {
             isInitPos = false;
         }
@@ -224,9 +222,9 @@ public class SMPLController : BaseController
     {
         InitilizeObjectWithTag();
 
-        walkingModel.transform.position = initPos.transform.position;
-        talkingModel.transform.position = initPos.transform.position;
-        destination.transform.position = initPos.transform.position;
+        walkingModel.transform.position = initPos;
+        talkingModel.transform.position = initPos;
+        destination.transform.position = initPos;
 
         SwitchToTalkMode();
         LookAtMe();

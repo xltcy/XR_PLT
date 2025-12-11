@@ -17,7 +17,6 @@ public class SceneController : BaseController
     public enum GameObjectTag
     {
         Mesh,
-        initPos,
     }
     public SummaryData SummaryData { get; private set; }
     public SceneData SceneData { get; private set; }
@@ -364,14 +363,8 @@ public class SceneController : BaseController
         {
             GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + SceneData.sceneModelPath);
             scene = Instantiate(scenePrefab);
-            scene.tag = GameObjectTag.Mesh.ToString();
+            scene.tag = nameof(GameObjectTag.Mesh);
         }
-
-        // initPos
-        GameObject initPos = new GameObject("initPos");
-        initPos.transform.SetParent(scene.transform, false);
-        initPos.transform.localPosition = SceneData.initPosition;
-        initPos.tag = GameObjectTag.initPos.ToString();
 
         // Generate ObjectDatas
         prefabs.Clear();
