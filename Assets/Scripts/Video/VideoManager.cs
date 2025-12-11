@@ -105,8 +105,6 @@ public class VideoManager : MonoBehaviour
 
         if (videoPlayer.clip != null)
         {
-            videoPlayer.loopPointReached += OnVideoFinish;
-            videoPlayer.prepareCompleted += OnVideoPrepared;
             videoPlayer.Prepare();
         }
         
