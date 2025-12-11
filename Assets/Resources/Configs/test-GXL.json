@@ -12,12 +12,12 @@
       "id":"智慧海洋系统1",
       "title":"智慧海洋系统1",
       "position":{
-          "x": 1.655281,
+          "x": 11.491,
           "y": -1.048873,
-          "z": -8.6174285
+          "z": 3.024
       }, 
       "initialIntroduction":"欢迎来到VR科教平台，接下来我将带你参观介绍声呐，请跟我来",
-      "arriveIntroduction":"我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问",
+      "arriveIntroduction":"我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍。",
       "thumb":"abc",
       "actions":[
         {
@@ -58,12 +58,12 @@
           },
           "objectDataId":"curtain",
           "position":{
-            "x": 2.706551,
-            "y": 1.253959,
-            "z": -6.9591
+            "x": 9.48,
+            "y": 1.41,
+            "z": 2.923
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0.021, "y": 0.83, "z": -0.014, "w": -0.555
           },
           "scale":{
             "x": 0.5,
@@ -83,12 +83,12 @@
           },
           "objectDataId":"sonar",
           "position":{
-            "x": 2.32,
-            "y": -0.071, 
-            "z": -7.391
+            "x": 9.69,
+            "y": 0.03, 
+            "z": 2.65
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": 0.978, "z": 0, "w": 0.21
           },
           "scale":{
             "x": 1,
@@ -100,7 +100,7 @@
           "id":4,
           "startTrigger": {
             "mode": "VoiceKeyword",
-            "matchPattern":"播放视频",
+            "matchPattern":"讲解原理",
             "delay":0
           },
           "stopTrigger": {
@@ -133,14 +133,14 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"test",
+          "videoPath":"video/shengna",
           "position":{
-              "x": 2.5861,
-              "y": 0.6083161,
-              "z": -6.951444
+              "x": 9.512,
+              "y": 0.81,
+              "z": 2.911
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": 0.551, "z": 0, "w": 0.834
           },
           "scale":{
             "x": 1,
@@ -214,7 +214,7 @@
              "mode": "Never",
             "delay":0
           },
-          "animTrigger":"HandForward"
+          "animTrigger":"RightHandUp"
         },{
           "type": "GenerateObject",
           "id":12,
@@ -253,6 +253,20 @@
             "delay":0
           },
           "generateActionId":12
+        },{
+          "type":"WaveGenerate",
+          "id":14,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"发射",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":6
+          },
+          "generateActionId":3
         }
       ]
     }

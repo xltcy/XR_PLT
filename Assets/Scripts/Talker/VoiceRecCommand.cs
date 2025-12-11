@@ -149,16 +149,12 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "隐藏按钮"; break;
             case SceneCommandType.showButton:
                 matchPattern = "显示按钮"; break;
-            case SceneCommandType.screen:
-                matchPattern = "讲解原理"; break;
             case SceneCommandType.sonar:
                 matchPattern = "展示模型"; break;
             case SceneCommandType.separateSonar:
                 matchPattern = "模型分解"; break;
             case SceneCommandType.recoverSonar:
                 matchPattern = "模型恢复"; break;
-            case SceneCommandType.showSonarWave:
-                matchPattern = "声波"; break;
             case SceneCommandType.showSonarLabel:
                 matchPattern = "型号"; break;
             case SceneCommandType.showFinding:
@@ -180,7 +176,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarWave));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.end));
@@ -194,11 +189,9 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         showScene,
         hideButton,
         showButton,
-        screen,
         sonar,
         separateSonar,
         recoverSonar,
-        showSonarWave,
         showSonarLabel,
         showFinding,
         end
