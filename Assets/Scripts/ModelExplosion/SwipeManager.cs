@@ -53,8 +53,20 @@ public class SwipeManager : BaseController
 
 
     #region Behaviour
+
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+    }
+
     // Start is called before the first frame update
-    void Start()
+    void Init()
     {
         HandlerListInit();
     }

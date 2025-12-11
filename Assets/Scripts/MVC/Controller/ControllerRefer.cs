@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2025-12-11 15:41:46
-// 包含 16 个继承 BaseController 的类
+// 生成时间: 2025-12-11 19:41:41
+// 包含 15 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -105,15 +105,6 @@ public static class ControllerRefer
         }
     }
 
-    private static SonarWaveManager _sonarWaveManager;
-    public static SonarWaveManager SonarWaveManager
-    {
-        get
-        {
-            return _sonarWaveManager ??= ControllerRegister.Instance?.GetController<SonarWaveManager>();
-        }
-    }
-
     private static SpeechManager _speechManager;
     public static SpeechManager SpeechManager
     {
@@ -203,8 +194,6 @@ public static class ControllerRefer
                 return SelectDesController;
             case "SMPLController":
                 return SMPLController;
-            case "SonarWaveManager":
-                return SonarWaveManager;
             case "SpeechManager":
                 return SpeechManager;
             case "SwipeManager":
@@ -236,7 +225,6 @@ public static class ControllerRefer
         _sceneController = null;
         _selectDesController = null;
         _sMPLController = null;
-        _sonarWaveManager = null;
         _speechManager = null;
         _swipeManager = null;
         _trackingImageManager = null;

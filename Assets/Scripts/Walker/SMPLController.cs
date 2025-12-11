@@ -45,6 +45,17 @@ public class SMPLController : BaseController
     private float minDistance = 0.1f;
     private float maxDistance = 15.0f;
 
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+    }
+
     public static void SetConsPos(Vector3 pos)
     {
         consPos = pos;
@@ -63,7 +74,7 @@ public class SMPLController : BaseController
     }
 
     // Start is called before the first frame update
-    void Start()
+    void Init()
     {
         // InitilizeObjectWithTag();
 

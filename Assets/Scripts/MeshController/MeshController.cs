@@ -67,6 +67,8 @@ public class MeshController : BaseController
         base.OnRegister();
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
         NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+
+        Init();
     }
 
     public override void OnUnregister()
@@ -76,7 +78,7 @@ public class MeshController : BaseController
         NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
     }
 
-    void Start()
+    void Init()
     {
         //modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
         //SetDropDownAddListener(模型切换);
@@ -174,7 +176,7 @@ public class MeshController : BaseController
         for (int i = 0; i < modelInstance.transform.childCount; i++)
         {
             var childTrans = modelInstance.transform.GetChild(i);
-            if (childTrans.name.ToLower().Contains("FindPath"))
+            if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
             {
                 continue;
             }

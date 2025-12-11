@@ -18,6 +18,7 @@ public enum EventPriority
 /// <summary>
 /// 事件执行选项
 /// </summary>
+[Flags]
 public enum EventOptions
 {
     Default = 0,
@@ -263,9 +264,9 @@ public class EventManager : MonoBehaviour
         // 检查重复监听
         if ((options & EventOptions.NoDuplicates) != 0)
         {
-            if (_listeners.ContainsKey(eventName))
+            if (_listeners.TryGetValue(eventName, out var listener))
             {
-                bool hasDuplicate = _listeners[eventName].Any(l => l.Callback == callback);
+                bool hasDuplicate = listener.Any(l => l.Callback == callback);
                 if (hasDuplicate)
                 {
                     Debug.LogWarning($"[EventManager] 事件 '{eventName}' 已存在重复监听器");
@@ -275,7 +276,7 @@ public class EventManager : MonoBehaviour
         }
 
         // 创建监听器
-        var listener = new EventListener(eventName, callback, priority, options, owner);
+        var newListener = new EventListener(eventName, callback, priority, options, owner);
         
         // 添加到列表
         if (!_listeners.ContainsKey(eventName))
@@ -283,7 +284,7 @@ public class EventManager : MonoBehaviour
             _listeners[eventName] = new List<EventListener>();
         }
         
-        _listeners[eventName].Add(listener);
+        _listeners[eventName].Add(newListener);
         
         // 按优先级排序
         _listeners[eventName] = _listeners[eventName]
@@ -295,7 +296,7 @@ public class EventManager : MonoBehaviour
             Debug.Log($"[EventManager] 添加监听器: {eventName} (优先级: {priority})");
         }
 
-        return listener.Id;
+        return newListener.Id;
     }
 
     /// <summary>

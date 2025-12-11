@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 public class ControllerReferUserGenerator : EditorWindow
 {
-    private string outputPath = "Assets/Scripts/MVC/ControllerRefer.cs";
+    private string outputPath = "Assets/Scripts/MVC/Controller/ControllerRefer.cs";
     
     // 父类名称
     private string baseControllerName = "BaseController";

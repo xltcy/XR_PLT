@@ -28,9 +28,20 @@ public class SpeechManager : BaseController
     public static bool IsSpeaking => isSpeaking;
     public Speech2BlendshapeController speech2BlendshapeController;
 
-private bool IsRecognizing;
-    // Start is called before the first frame update
-    void Start()
+    private bool IsRecognizing;
+
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+    }
+
+    void Init()
     {
         Instance = this;
         _audioSource = GetComponent<AudioSource>();
@@ -213,7 +224,7 @@ private bool IsRecognizing;
 
     public async Task OnlySpeakText(string text, Action onSpeakComplete = null)
     {
-        if (text == null || text == "")
+        if (string.IsNullOrEmpty(text))
         {
             Debug.Log("Msg: Empty String");
             return;

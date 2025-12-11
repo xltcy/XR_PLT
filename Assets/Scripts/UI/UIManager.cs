@@ -35,7 +35,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
 
     public void TransToSelectDesUI()
     {
-        var sceneData = ControllerRefer.SceneController.GetCurSceneData();
+        var sceneData = ControllerRefer.SceneController.SceneData;
         if (sceneData == null)
         {
             // Error

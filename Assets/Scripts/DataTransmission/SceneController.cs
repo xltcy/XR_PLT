@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -18,8 +19,8 @@ public class SceneController : BaseController
         Mesh,
         initPos,
     }
-    private SummaryData summaryData;
-    private SceneData sceneData;
+    public SummaryData SummaryData { get; private set; }
+    public SceneData SceneData { get; private set; }
 
     public Text jsonLocationHint;
 
@@ -45,7 +46,7 @@ public class SceneController : BaseController
     private GameObject videoScreen;
     private ExplanationPoint selectedPoint
     {
-        get { return sceneData.explanationPoints.FindLast(item => item.id == selectedExplainationPointId); }
+        get { return SceneData.explanationPoints.FindLast(item => item.id == selectedExplainationPointId); }
     }
 
     private List<ActionBase> allActions
@@ -53,14 +54,41 @@ public class SceneController : BaseController
         get
         {
             var list = new List<ActionBase>();
-            list.AddRange(sceneData.globalActions);
+            list.AddRange(SceneData.globalActions);
             list.AddRange(selectedPoint.actions);
             return list;
         }
     }
     private GameObject scene;
-    // Start is called before the first frame update
-    void Start()
+
+    #region 生命周期函数
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+        
+        InitiatePath();
+        RequireSummaryData();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    #endregion 生命周期函数
+
+
+    #region 获取数据
+    void InitiatePath()
     {
         if (Application.platform == RuntimePlatform.Android) 
             jsonHomePath = TEST_JSON_ANDROID_HOME_PATH; 
@@ -76,30 +104,9 @@ public class SceneController : BaseController
         {
             jsonLocationHint.text = info;
         }
-        RequireSummaryData();
     }
-
-    public override void OnRegister()
-    {
-        base.OnRegister();
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
-    }
-
-    public override void OnUnregister()
-    {
-        base.OnUnregister();
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    #region 获取数据
+    
+    #region 场景列表
     /// <summary>
     /// 获取场景列表
     /// </summary>
@@ -108,9 +115,9 @@ public class SceneController : BaseController
         //如果使用测试数据
         if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
-            NetworkUtil.Instance.GetSceneSummaryTestRequest(
+            GetSceneSummaryTestRequest(
                 onSuccess: (res) => {
-                    summaryData = res;
+                    SummaryData = res;
                     ControllerRefer.MeshController.InitSceneSummary(res.items);
                     UIManager.SetLoadingStatus(false);
                 },
@@ -138,17 +145,63 @@ public class SceneController : BaseController
         {
             // 解析 JSON
             Debug.Log("下载成功: " + response.rawResponse);
-            summaryData = JsonConvert.DeserializeObject<SummaryData>(response.rawResponse);
+            SummaryData = JsonConvert.DeserializeObject<SummaryData>(response.rawResponse);
             
             // 保存到本地文件
             string localPath = Path.Combine(Application.persistentDataPath, "downloaded-summary.json");
             File.WriteAllText(localPath, response.rawResponse);
             Debug.Log("文件保存到: " + localPath);
             
-            ControllerRefer.MeshController.InitSceneSummary(summaryData.items);
+            ControllerRefer.MeshController.InitSceneSummary(SummaryData.items);
         }
     }
+    
+    /// <summary>
+    /// 获取本地测试场景列表
+    /// </summary>
+    /// <param name="onSuccess"></param>
+    /// <param name="onFail"></param>
+    public void GetSceneSummaryTestRequest(Action<SummaryData> onSuccess, Action<string> onFail)
+    {
+        // 创建模拟数据
+        string localJsonPath = "test-summary.json";
 
+        // Temp logic start
+        // dont end with .json.
+        var jsonString = Resources.Load<TextAsset>("Configs/" + "test-summary").text;
+        if (jsonString != null)
+        {
+            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(jsonString);
+            onSuccess?.Invoke(data);
+            return;
+        }
+        // temp logic end
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            localJsonPath = Application.persistentDataPath + localJsonPath;
+        } else
+        {
+            localJsonPath = SceneController.TEST_JSON_PC_HOME_PATH + localJsonPath;
+        }
+        if (!File.Exists(localJsonPath))
+        {
+            string error = "找不到 scene.json！Path:" + localJsonPath;
+            Debug.LogError(error);
+            onFail.Invoke(error);
+        }
+        else
+        {
+            string json = File.ReadAllText(localJsonPath);
+            SummaryData data = JsonConvert.DeserializeObject<SummaryData>(json);
+            Debug.Log("Get Response json: Data:" + data);
+            onSuccess.Invoke(data);
+        }
+    }
+    #endregion 场景列表
+    
+    #region 某一场景数据
+    
     /// <summary>
     /// 获取场景数据
     /// </summary>
@@ -170,12 +223,12 @@ public class SceneController : BaseController
 
         if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
-            NetworkUtil.Instance.GetSceneDataTestRequest(sceneItemData, 
+            GetSceneDataTestRequest(sceneItemData, 
                 onSuccess: (res) => {
-                    if (sceneData == null || sceneData.timestampMs < res.timestampMs)
+                    if (SceneData == null || SceneData.timestampMs < res.timestampMs)
                     {
                         // TODO save to local
-                        sceneData = res;
+                        SceneData = res;
                     } else
                     {
                         // use sceneData directly.
@@ -219,11 +272,77 @@ public class SceneController : BaseController
         File.WriteAllText(localPath, jsonText);
         Debug.Log("文件保存到: " + localPath);
         
-        if (sceneData == null || sceneData.timestampMs < data.timestampMs)
+        if (SceneData == null || SceneData.timestampMs < data.timestampMs)
         {
-            sceneData = data;
+            SceneData = data;
         }
     }
+    
+    /// <summary>
+    /// 获取本地测试场景数据
+    /// </summary>
+    /// <param name="sceneItemData"></param>
+    /// <param name="onSuccess"></param>
+    /// <param name="onFail"></param>
+    public void GetSceneDataTestRequest(SummaryItemData sceneItemData, Action<SceneData> onSuccess, Action<string> onFail)
+    {
+        string localJsonPath = sceneItemData.sceneKey;
+
+        // Temp logic start
+        var jsonString = Resources.Load<TextAsset>("Configs/" + localJsonPath).text;
+        if (jsonString != null)
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new StringEnumConverter());
+            var data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
+            onSuccess?.Invoke(data);
+        } else
+        {
+            onFail?.Invoke("jsonFail");
+        }
+    }
+
+    /// <summary>
+    /// 上传场景数据
+    /// </summary>
+    /// <returns></returns>
+    public void UploadSummaryData()
+    {
+        if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
+        {
+            return;
+        }
+        
+        var curSceneItemData = ControllerRefer.MeshController.GetCurrentSummaryItemData();
+        if (curSceneItemData == null)
+        {
+            Debug.LogWarning("当前场景数据为空，无法上传");
+            return;
+        }
+
+        var jsonText = Resources.Load<TextAsset>("Configs/" + localSceneDataJsonDict[curSceneItemData.sceneKey]).text;
+        var reqParams = new UploadSceneDataRequestParams(curSceneItemData.sceneKey, jsonText);
+        reqParams.Send(null, (result, response) =>
+        {
+            if (result)
+            {
+                Debug.Log("上传成功: " + response.rawResponse);
+            }
+            else
+            {
+                Debug.LogError("上传失败: " + response.error);
+            }
+        });
+    }
+    
+    private Dictionary<string, string> localSceneDataJsonDict = new Dictionary<string, string>()
+    {
+        {"4", "test-HKG"},
+        {"3", "test-SJS"},
+        {"6", "test-GXL"},
+    };
+
+    #endregion 某一场景数据
     
     /**
      * Preprocess SceneData.
@@ -232,7 +351,7 @@ public class SceneController : BaseController
      */
     public GameObject AnalysisSceneData()
     {
-        if (sceneData == null)
+        if (SceneData == null)
         {
             // todo error
             Debug.Log("No SceneData found!");
@@ -243,7 +362,7 @@ public class SceneController : BaseController
         // load scene
         if (scene == null)
         {
-            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + sceneData.sceneModelPath);
+            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + SceneData.sceneModelPath);
             scene = Instantiate(scenePrefab);
             scene.tag = GameObjectTag.Mesh.ToString();
         }
@@ -251,12 +370,12 @@ public class SceneController : BaseController
         // initPos
         GameObject initPos = new GameObject("initPos");
         initPos.transform.SetParent(scene.transform, false);
-        initPos.transform.localPosition = sceneData.initPosition;
+        initPos.transform.localPosition = SceneData.initPosition;
         initPos.tag = GameObjectTag.initPos.ToString();
 
         // Generate ObjectDatas
         prefabs.Clear();
-        foreach (var objectData in sceneData.objects)
+        foreach (var objectData in SceneData.objects)
         {
             GameObject prefab = (GameObject)Resources.Load("Prefab/" + objectData.url);
             if (!prefab)
@@ -271,24 +390,6 @@ public class SceneController : BaseController
         InitAllTriggers();
         return scene;
     }
-    
-    /// <summary>
-    /// 获取当前SummaryData
-    /// </summary>
-    /// <returns></returns>
-    public SummaryData GetCurSummaryData()
-    {
-        return summaryData;
-    }
-    
-    /// <summary>
-    /// 获取当前SceneData
-    /// </summary>
-    /// <returns></returns>
-    public SceneData GetCurSceneData()
-    {
-        return sceneData;
-    }
     #endregion 获取数据
     
     /**
@@ -300,11 +401,11 @@ public class SceneController : BaseController
     {
         // calculate each action's nextAction.
         var actions = new Dictionary<int, ActionBase>();
-        foreach (var action in sceneData.globalActions)
+        foreach (var action in SceneData.globalActions)
         {
             actions.Add(action.id, action);
         }
-        foreach (var point in sceneData.explanationPoints)
+        foreach (var point in SceneData.explanationPoints)
         {
             foreach (var action in point.actions)
             {
@@ -320,8 +421,8 @@ public class SceneController : BaseController
             InitActionsByTriggerType(action.stopTrigger, isStartTrigger: false, action, actions);
         }
 
-        globalTriggerCommands = GetTriggerCommands(sceneData.globalActions);
-        foreach (var p in sceneData.explanationPoints)
+        globalTriggerCommands = GetTriggerCommands(SceneData.globalActions);
+        foreach (var p in SceneData.explanationPoints)
         {
             pointTriggerCommands[p.id] = GetTriggerCommands(p.actions);
         }

@@ -20,7 +20,7 @@ public class Prompt
 
     public static string GenerateSystemPrompt()
     {
-        var sceneData = ControllerRefer.SceneController.GetCurSceneData();
+        var sceneData = ControllerRefer.SceneController.SceneData;
         string systemPrompt = sceneData != null ? sceneData.systemPrompt : string.Empty;
         
         return systemPrompt;
@@ -28,7 +28,7 @@ public class Prompt
     
     public static string GetCurSceneLLMQuestPrompt(string voiceInput)
     {
-        var sceneData = ControllerRefer.SceneController.GetCurSceneData();
+        var sceneData = ControllerRefer.SceneController.SceneData;
         if (sceneData != null)
         {
             string prompt = sceneData.questPrompt;
