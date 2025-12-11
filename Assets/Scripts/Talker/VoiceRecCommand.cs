@@ -155,10 +155,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "模型分解"; break;
             case SceneCommandType.recoverSonar:
                 matchPattern = "模型恢复"; break;
-            case SceneCommandType.showSonarLabel:
-                matchPattern = "型号"; break;
-            case SceneCommandType.showFinding:
-                matchPattern = "研究成果"; break;
             case SceneCommandType.end:
                 matchPattern = "没有"; break;
         }
@@ -176,8 +172,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.end));
         return res;
     }
@@ -192,8 +186,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         sonar,
         separateSonar,
         recoverSonar,
-        showSonarLabel,
-        showFinding,
         end
     }
 }

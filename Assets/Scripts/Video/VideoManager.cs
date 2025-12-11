@@ -79,7 +79,7 @@ public class VideoManager : MonoBehaviour
         {
             //其次寻找本地视频文件
             videoPlayer.source = VideoSource.VideoClip;
-            videoPlayer.clip = Resources.Load<VideoClip>(name);
+            videoPlayer.clip = Resources.Load<VideoClip>("video/sjs01");
         }
 
 

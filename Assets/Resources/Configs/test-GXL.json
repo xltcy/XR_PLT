@@ -16,7 +16,7 @@
           "y": -1.048873,
           "z": 3.024
       }, 
-      "initialIntroduction":"欢迎来到VR科教平台，接下来我将带你参观介绍声呐，请跟我来",
+      "initialIntroduction":"欢迎来到VR科教平台，我将带你了解声呐，请跟我来。",
       "arriveIntroduction":"我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍。",
       "thumb":"abc",
       "actions":[
@@ -33,12 +33,12 @@
           },
           "objectDataId":"wall",
           "position":{
-            "x": 2.220328,
-            "y": 0.1083427,
-            "z": -4.278635
+            "x": 10.712,
+            "y": 4.879,
+            "z": 0.192
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": 0.515744686, "z": 0, "w": 0.856742382
           },
           "scale":{
             "x": 1,
@@ -112,8 +112,7 @@
           "type": "ObjectVisible",
           "id":5,
           "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":4,
+            "mode": "Immediate",
             "delay":0
           },
           "stopTrigger": {
@@ -140,7 +139,7 @@
               "z": 2.911
           },
           "rotation":{
-            "x": 0, "y": 0.551, "z": 0, "w": 0.834
+            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
           },
           "scale":{
             "x": 1,
@@ -182,10 +181,8 @@
             "delay":1
           },
           "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":10,
-            "isWhenActionStart":false,
-            "delay":12
+            "mode": "Never",
+            "delay":0
           },
           "generateActionId":3
         },{
@@ -207,7 +204,7 @@
           "id":11,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":9,
+            "afterActionId":7,
             "delay":0
           },
           "stopTrigger": {
@@ -219,7 +216,8 @@
           "type": "GenerateObject",
           "id":12,
           "startTrigger": {
-            "mode": "Immediate",
+            "mode": "AfterAction",
+            "afterActionId":16,
             "delay":0
           },
           "stopTrigger": {
@@ -228,12 +226,12 @@
           },
           "objectDataId":"label",
           "position":{
-            "x": 2.220328,
-            "y": 0.1083427,
-            "z": -4.278635
+            "x": 10.111,
+            "y": 0.346,
+            "z": 2.803
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": -0.189457253, "z": 0, "w": 0.981889009
           },
           "scale":{
             "x": 1,
@@ -245,12 +243,13 @@
           "id":13,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":"12",
+            "afterActionId":12,
             "delay":0
           },
           "stopTrigger": {
-            "mode": "Never",
-            "delay":0
+            "mode": "AfterAction",
+            "afterActionId":13,
+            "delay":6
           },
           "generateActionId":12
         },{
@@ -264,10 +263,131 @@
           "stopTrigger": {
             "mode": "AfterAction",
             "afterActionId":14,
-            "delay":6
+            "delay":15
           },
           "generateActionId":3
-        }
+        },{
+          "type": "AvatarAnim",
+          "id":15,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":1
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"HandForward"
+        },{
+          "type": "Introduce",
+          "id":16,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"型号",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction":"这是C750D双屏图像声呐。"
+        },{
+          "type": "AvatarAnim",
+          "id":17,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":16,
+            "delay":0
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"RightHandUp"
+        },{
+          "type":"PlayVideo",
+          "id":18,
+          "startTrigger":{
+            "mode": "VoiceKeyword",
+            "matchPattern":"研究成果",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "videoPath":"video/fidings",
+          "position":{
+              "x": 9.512,
+              "y": 0.81,
+              "z": 2.911
+          },
+          "rotation":{
+            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "Introduce",
+          "id":19,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":18,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction":""
+        },{
+          "type": "AvatarAnim",
+          "id":20,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":19,
+            "delay":0
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"RightHandUp"
+        },{
+          "type": "Introduce",
+          "id":21,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction":"现在展示的是发射三维声波的动画。"
+        },{
+          "type":"HighlightObject",
+          "id":22,
+          "startTrigger":{
+            "mode":"AfterAction",
+            "afterActionId":12,
+            "delay":0
+          },
+          "stopTrigger":{
+            "mode":"AfterAction",
+            "afterActionId":22,
+            "delay":6
+          },
+          "generateActionId":3,
+          "highlightColor":{"r": 1.0,"g": 1.0,"b": 0.0,"a": 1.0},
+          "highlightWidth":3
+
+        },
       ]
     }
   ],
@@ -286,8 +406,8 @@
     },{
       "id":"sonar",
       "name":"sonar",
-      "url":"Prefab-Sonar",
-      "isExplosible":true
+      "url":"3ds_sonar",
+      "isExplosible":false
     },{
       "id":"label",
       "name":"label",
