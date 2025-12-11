@@ -188,20 +188,6 @@
           },
           "generateActionId":3
         },{
-          "type": "Explosion",
-          "id":10,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":9,
-            "delay":15
-          },
-          "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":10,
-            "delay":6
-          },
-          "generateActionId":3
-        },{
           "type": "AvatarAnim",
           "id":11,
           "startTrigger": {
