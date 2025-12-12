@@ -14,7 +14,6 @@ public class SMPLController : BaseController
     private GameObject scene;
     private Animator walkAnim;
     private Animator talkAnim;
-    private Vector3 initPos;
 
     public GameObject destination;
     public GameObject walkingModel;
@@ -65,8 +64,12 @@ public class SMPLController : BaseController
     public void InitilizeObjectWithTag()
     {
         scene = GameObject.FindGameObjectWithTag(nameof(SceneController.GameObjectTag.Mesh));
-        initPos = ControllerRefer.SceneController.SceneData.initPosition;
     }
+
+    private Vector3 initPos =>
+        (ControllerRefer.SceneController.SceneData?.initPosition ?? Vector3.zero) + (scene != null
+            ? scene.transform.position
+            : Vector3.zero);
 
     public void SetDestination(string desName)
     {
