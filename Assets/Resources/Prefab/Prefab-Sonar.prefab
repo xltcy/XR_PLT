@@ -65,6 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 85377765797212242}
   - component: {fileID: 1378268894}
+  - component: {fileID: 6758721193885841071}
   m_Layer: 0
   m_Name: Prefab-Sonar
   m_TagString: Sonar
@@ -101,6 +102,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sonar_subobj: {fileID: 7810060960593948826}
   wall: {fileID: 0}
+--- !u!114 &6758721193885841071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1235368465023494823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd012d358f542839147850f4e8848f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generateActionId: -1
 --- !u!114 &6276024274513852104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,7 +138,7 @@ GameObject:
   - component: {fileID: 527407071709855043}
   - component: {fileID: 67147731974196362}
   m_Layer: 0
-  m_Name: snoar_above
+  m_Name: sonar_above
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -179,7 +193,7 @@ GameObject:
   - component: {fileID: 5766026045318405916}
   - component: {fileID: 3200059746771018724}
   m_Layer: 0
-  m_Name: snoar_underneath
+  m_Name: sonar_underneath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -150,7 +150,7 @@ public class ComponentBinder : MonoBehaviour
         if (transformCache.TryGetValue(cacheKey, out Transform value))
             return value;
         
-        Transform result = transform.FindRecursive(childName, searchInactiveNodes);
+        Transform result = transform.FindDeep(childName, searchInactiveNodes);
         transformCache.Add(cacheKey, result);
         return result;
     }

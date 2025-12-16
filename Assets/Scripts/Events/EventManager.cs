@@ -897,15 +897,6 @@ public static class EventManagerExtensions
     }
 
     /// <summary>
-    /// 快速添加泛型监听器
-    /// </summary>
-    public static string AddEventListener<T>(this object owner, string eventName, Action<EventData<T>> callback,
-                              EventPriority priority = EventPriority.Normal)
-    {
-        return EventManager.Instance.AddListener(eventName, callback, priority, EventOptions.Default, owner);
-    }
-
-    /// <summary>
     /// 快速分发事件
     /// </summary>
     public static EventData TriggerEvent(this object sender, string eventName, object data = null)

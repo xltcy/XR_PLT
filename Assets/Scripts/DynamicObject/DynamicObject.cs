@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UniGLTF;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -27,7 +28,11 @@ public class DynamicObject : MonoBehaviour
     private Quaternion originRot;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
+    {
+    }
+
+    protected virtual void OnDestroy()
     {
     }
 
@@ -273,13 +278,18 @@ public class DynamicObject : MonoBehaviour
         rotateParts.Clear();
     }
 
-    private void SetHighlight(HighlightObjectAction highlightObjectAction, bool isStartAction)
+    protected void SetHighlight(HighlightObjectAction highlightObjectAction, bool isStartAction, Transform targetNode = null)
     {
-        Outline otl = gameObject.GetComponent<Outline>();
-        if (otl == null)
+        if (targetNode == null)
         {
-            otl = gameObject.AddComponent<Outline>();
+            targetNode = gameObject.transform;
         }
+
+        var obj = targetNode.gameObject;
+        if (!targetNode || !obj) return;
+        
+        
+        Outline otl = obj.GetOrAddComponent<Outline>();
         otl.OutlineColor = highlightObjectAction.highlightColor;
         otl.OutlineMode = Outline.Mode.OutlineAll;
         if (isStartAction)

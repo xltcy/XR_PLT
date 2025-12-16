@@ -204,7 +204,7 @@ public class MeshController : BaseController
 
     public void ClickToSummonSonarAtCamera()
     {
-        string prefabPathInResources = "Prefab/3ds_sonar";
+        string prefabPathInResources = "Prefab/Prefab-Sonar";
 
         SetStartState(StartState.Summoning);
 
