@@ -238,13 +238,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 319308203}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -156, y: 612, z: -28910.816}
+  m_LocalRotation: {x: 0.045454822, y: -0, z: -0, w: 0.99896646}
+  m_LocalPosition: {x: -156, y: 1276, z: -28721}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 5.211, y: 0, z: 0}
 --- !u!1 &350024926 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6927167198449368499, guid: 62a7796737531ec4c8d5da46d1ff3f29,
@@ -414,7 +414,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &560857327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -537,6 +537,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Prefab-SupremeHallofHarmony
       objectReference: {fileID: 0}
+    - target: {fileID: 2759185420664546453, guid: 62a7796737531ec4c8d5da46d1ff3f29,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4253212003553984453, guid: 62a7796737531ec4c8d5da46d1ff3f29,
+        type: 3}
+      propertyPath: _standardAxis.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4253212003553984453, guid: 62a7796737531ec4c8d5da46d1ff3f29,
+        type: 3}
+      propertyPath: _standardAxis.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4518634856202025760, guid: 62a7796737531ec4c8d5da46d1ff3f29,
         type: 3}
       propertyPath: m_RootOrder
@@ -599,6 +614,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6765919961194061584, guid: 62a7796737531ec4c8d5da46d1ff3f29,
         type: 3}
+      propertyPath: _factor
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6765919961194061584, guid: 62a7796737531ec4c8d5da46d1ff3f29,
+        type: 3}
       propertyPath: _isLeafNode
       value: 1
       objectReference: {fileID: 0}
@@ -606,6 +626,11 @@ PrefabInstance:
         type: 3}
       propertyPath: _isLeafNode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8507335501440783275, guid: 62a7796737531ec4c8d5da46d1ff3f29,
+        type: 3}
+      propertyPath: _factor
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8507335501440783275, guid: 62a7796737531ec4c8d5da46d1ff3f29,
         type: 3}
@@ -1112,6 +1137,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927121900}
   m_CullTransparentMesh: 1
+--- !u!1 &968558858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 968558859}
+  - component: {fileID: 968558860}
+  m_Layer: 0
+  m_Name: Demo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &968558859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 968558858}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2561.0725, y: 1483.1711, z: -25727.38}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &968558860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 968558858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99b57bdcaa6ff1345a27b0f38287afe8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  "\u592A\u548C\u6BBF": {fileID: 984759842}
+  "\u5C4B\u9876": {fileID: 149583696}
+  "\u4E0A\u5C4B\u9876": {fileID: 350024926}
+  "\u4E0B\u5C4B\u9876": {fileID: 1915114265}
+  "\u5C4B\u8EAB": {fileID: 615012815}
 --- !u!1 &984759842 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5739556066866568511, guid: 62a7796737531ec4c8d5da46d1ff3f29,
@@ -1715,7 +1788,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 984759844}
         m_TargetAssemblyTypeName: ModelTreeNode, Assembly-CSharp
-        m_MethodName: OneDofExplosion
+        m_MethodName: TwoDofExplosion
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 149583696}
