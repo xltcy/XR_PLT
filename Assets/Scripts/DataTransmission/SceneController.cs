@@ -590,6 +590,9 @@ public class SceneController : BaseController
             case ActionType.ControllerFunction:
                 ConsoleControllerFunction(actionData as ControllerFunctionAction, isStartAction);
                 break;
+            case ActionType.ProgramEvent:
+                ConsoleProgramEvent(actionData as ProgramEventAction, isStartAction);
+                break;
             default:
                 throw new Exception($"Unknown action type: {actionData.type}");
         }
@@ -601,67 +604,7 @@ public class SceneController : BaseController
             StartCoroutine(ConsoleAction(nextAction, item.Value));
         }
     }
-
-    /// <summary>
-    /// 自定义函数调用，直接调用
-    /// </summary>
-    /// <param name="actionData"></param>
-    /// <param name="isStartAction"></param>
-    public void ConsoleControllerFunction(ControllerFunctionAction actionData, bool isStartAction)
-    {
-        if (actionData.controllerName.IsNullOrEmpty())
-        {
-            return;
-        }
-
-        var script = ControllerRefer.GetByName(actionData.controllerName);
-        if (!script)
-        {
-            return;
-        }
-        
-        var functionName = actionData.controllerFunctionName;
-        if (string.IsNullOrEmpty(functionName))
-        {
-            Debug.LogWarning($"action id:{actionData.id}-{functionName}为空");
-            return;
-        }
-
-        try
-        {
-            var method = script.GetType().GetMethod(functionName, System.Reflection.BindingFlags.Public |
-                                                                  System.Reflection.BindingFlags.Instance |
-                                                                  System.Reflection.BindingFlags.NonPublic);
-            if (method != null)
-            {
-                ParameterInfo[] parameters = method.GetParameters();
-
-                if (parameters.Length == 0)
-                {
-                    method.Invoke(script, null);
-                }
-                else if (parameters.Length == 1)
-                {
-                    // 直接传递参数，依赖类型兼容性
-                    method.Invoke(script, new object[] { isStartAction });
-                }
-                else if (parameters.Length == 2)
-                {
-                    // 直接传递两个参数
-                    method.Invoke(script, new object[] { isStartAction, actionData.controllerFunctionParam });
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"调用失败: action id:{actionData.id}-{functionName}() - 未找到对应函数");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"调用失败: action id{actionData.id}-{functionName}() - {e.Message}");
-        }
-    }
-
+    
     /**
      *  Get commands used in a point.Include global actions.
      *  return a command list include global actions & pointId's actions.
@@ -796,4 +739,90 @@ public class SceneController : BaseController
     {
         Debug.LogWarning("SceneController.TestForFunctionCall |" + isStartAction);
     }
+    
+        #region 处理函数调用
+    /// <summary>
+    /// 自定义函数调用，直接调用
+    /// </summary>
+    /// <param name="actionData"></param>
+    /// <param name="isStartAction"></param>
+    public void ConsoleControllerFunction(ControllerFunctionAction actionData, bool isStartAction)
+    {
+        if (actionData.controllerName.IsNullOrEmpty())
+        {
+            return;
+        }
+
+        var script = ControllerRefer.GetByName(actionData.controllerName);
+        if (!script)
+        {
+            return;
+        }
+        
+        var functionName = actionData.controllerFunctionName;
+        if (string.IsNullOrEmpty(functionName))
+        {
+            Debug.LogWarning($"action id:{actionData.id}-{functionName}为空");
+            return;
+        }
+
+        try
+        {
+            var method = script.GetType().GetMethod(functionName, System.Reflection.BindingFlags.Public |
+                                                                  System.Reflection.BindingFlags.Instance |
+                                                                  System.Reflection.BindingFlags.NonPublic);
+            if (method != null)
+            {
+                ParameterInfo[] parameters = method.GetParameters();
+
+                if (parameters.Length == 0)
+                {
+                    method.Invoke(script, null);
+                }
+                else if (parameters.Length == 1)
+                {
+                    // 直接传递参数，依赖类型兼容性
+                    method.Invoke(script, new object[] { isStartAction });
+                }
+                else if (parameters.Length == 2)
+                {
+                    // 直接传递两个参数
+                    method.Invoke(script, new object[] { isStartAction, actionData.controllerFunctionParam });
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"调用失败: action id:{actionData.id}-{functionName}() - 未找到对应函数");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"调用失败: action id{actionData.id}-{functionName}() - {e.Message}");
+        }
+    }
+    #endregion 处理函数调用
+    
+    #region 处理程序事件
+    public class ProgramEventData
+    {
+        public ProgramEventAction actionData;
+        public bool isStartAction;
+        
+        public ProgramEventData(ProgramEventAction actionData, bool isStartAction)
+        {
+            this.actionData = actionData;
+            this.isStartAction = isStartAction;
+        }
+    }
+    
+    /// <summary>
+    /// 处理程序事件
+    /// </summary>
+    public void ConsoleProgramEvent(ProgramEventAction actionData, bool isStartAction)
+    {
+        if (actionData?.eventData == null) return;
+        if (actionData.eventData.GetEventConstant().IsNullOrEmpty()) return;
+        this.TriggerEvent(actionData.eventData.GetEventConstant(), new ProgramEventData(actionData, isStartAction));
+    }
+    #endregion 处理程序事件
 }

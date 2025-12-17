@@ -374,8 +374,57 @@
           "generateActionId":3,
           "highlightColor":{"r": 1.0,"g": 1.0,"b": 0.0,"a": 1.0},
           "highlightWidth":3
-
         },
+        {
+          "type": "ProgramEvent",
+          "id":23,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"高亮声呐上",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction", 
+            "afterActionId":23,
+            "delay":5
+          },
+          "eventData": {
+            "type":"HIGHLIGHT_OBJECT",
+            "highlightColor": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 0.0,
+              "a": 1.0
+            },
+            "highlightWidth": 3,
+            "nodeName": "sonar_above"
+          }        
+        },
+        {
+          "type": "ProgramEvent",
+          "id":24,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"高亮声呐下",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":24,
+            "delay":5
+          },
+          "eventData": {
+            "type":"HIGHLIGHT_OBJECT",
+            "highlightColor": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 0.0,
+              "a": 1.0
+            },
+            "highlightWidth": 3,
+            "nodeName": "sonar_underneath"
+          }
+        }
       ]
     }
   ],
