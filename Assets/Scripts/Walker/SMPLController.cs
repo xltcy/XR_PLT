@@ -14,7 +14,6 @@ public class SMPLController : BaseController
     private GameObject scene;
     private Animator walkAnim;
     private Animator talkAnim;
-    private GameObject initPos;
 
     public GameObject destination;
     public GameObject walkingModel;
@@ -45,6 +44,17 @@ public class SMPLController : BaseController
     private float minDistance = 0.1f;
     private float maxDistance = 15.0f;
 
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+    }
+
     public static void SetConsPos(Vector3 pos)
     {
         consPos = pos;
@@ -53,9 +63,13 @@ public class SMPLController : BaseController
 
     public void InitilizeObjectWithTag()
     {
-        scene = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.Mesh.ToString());
-        initPos = GameObject.FindGameObjectWithTag(SceneController.GameObjectTag.initPos.ToString());
+        scene = GameObject.FindGameObjectWithTag(nameof(SceneController.GameObjectTag.Mesh));
     }
+
+    private Vector3 initPos =>
+        (ControllerRefer.SceneController.SceneData?.initPosition ?? Vector3.zero) + (scene != null
+            ? scene.transform.position
+            : Vector3.zero);
 
     public void SetDestination(string desName)
     {
@@ -63,10 +77,8 @@ public class SMPLController : BaseController
     }
 
     // Start is called before the first frame update
-    void Start()
+    void Init()
     {
-        // InitilizeObjectWithTag();
-
         walkAnim = walkingModel.GetComponent<Animator>();
         talkAnim = talkingModel.GetComponent<Animator>();
 
@@ -89,7 +101,7 @@ public class SMPLController : BaseController
             animState = talkAnim.GetCurrentAnimatorStateInfo(0);
         }
 
-        if (initPos != null && destination != null)
+        if (destination != null)
         {
             WalkCheck();
         }
@@ -114,7 +126,7 @@ public class SMPLController : BaseController
             }
         }
 
-        if (initPos.transform.position != destination.transform.position)
+        if (initPos != destination.transform.position)
         {
             isInitPos = false;
         }
@@ -213,9 +225,9 @@ public class SMPLController : BaseController
     {
         InitilizeObjectWithTag();
 
-        walkingModel.transform.position = initPos.transform.position;
-        talkingModel.transform.position = initPos.transform.position;
-        destination.transform.position = initPos.transform.position;
+        walkingModel.transform.position = initPos;
+        talkingModel.transform.position = initPos;
+        destination.transform.position = initPos;
 
         SwitchToTalkMode();
         LookAtMe();
@@ -398,5 +410,22 @@ public class SMPLController : BaseController
             graph.rotation = boundrotate;
             graph.RelocateNodes(graph.CalculateTransform());
         });
+    }
+
+    class PositionParam
+    {
+        public float x;
+        public float y;
+        public float z;
+        public string initialIntro;
+        public string arriveIntro;
+        public Vector3 pos => new Vector3(x, y, z);
+    }
+
+    public void JsonSetDestination(bool isStartAction, string paramJson)
+    {
+        var param = JsonUtility.FromJson<PositionParam>(paramJson);
+
+        SetDestination(param.pos, param.initialIntro, param.arriveIntro);
     }
 }

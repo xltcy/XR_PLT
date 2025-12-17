@@ -6,7 +6,7 @@ using UnityEngine.XR.ARFoundation;
 /// <summary>
 /// Manage to play video on an ARTrackedImage.
 /// </summary>
-public class VideoManager : BaseController
+public class VideoManager : MonoBehaviour
 {
     public VideoPlayer videoPlayer;
 
@@ -20,6 +20,20 @@ public class VideoManager : BaseController
     // Start is called before the first frame update
     void Start()
     {
+        if (videoPlayer)
+        {
+            videoPlayer.loopPointReached += OnVideoFinish;
+            videoPlayer.prepareCompleted += OnVideoPrepared;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (videoPlayer)
+        {
+            videoPlayer.loopPointReached -= OnVideoFinish;
+            videoPlayer.prepareCompleted -= OnVideoPrepared;
+        }
     }
 
     // Update is called once per frame
@@ -58,28 +72,43 @@ public class VideoManager : BaseController
         gameObject.SetActive(true);
         //todo
         // string name = "video";
+        
+        
+        //优先寻找clips里面的视频
         Regex regex = new Regex(name);
-        foreach (var clip in clips)
+        if (clips != null)
         {
-            if (regex.IsMatch(clip.originalPath))
+            foreach (var clip in clips)
             {
-                //videoPlayer.prepareCompleted += OnVideoPrepare;
-                videoPlayer.loopPointReached += OnVideoFinish;
-                videoPlayer.clip = clip;
-                //videoPlayer.Play();
-                videoPlayer.prepareCompleted += OnVideoPrepared;
-                videoPlayer.Prepare();
-                break;
+                if (clip != null && regex.IsMatch(clip.originalPath))
+                {
+                    videoPlayer.clip = clip;
+                    break;
+                }
             }
         }
 
-        // video_url = Application.persistentDataPath + "/Videos/video_file.mp4";
-        // video_url = "T:/Desktop/video.mp4";
-        Debug.Log("videoUrl: " + video_url);
-        // videoPlayer.url = video_url;
-        // videoPlayer.Play();
-        // videoPlayer.Prepare();
+        var needLoad = videoPlayer.clip == null;
+        if (!needLoad)
+        {
+            var list = name.Split('/');
+            needLoad = list[list.Length - 1] != videoPlayer.clip.name;
+        }
+        
+        if (needLoad)
+        {
+            //其次寻找本地视频文件
+            videoPlayer.source = VideoSource.VideoClip;
+            videoPlayer.clip = Resources.Load<VideoClip>(name);
+        }
 
+
+        if (videoPlayer.clip != null)
+        {
+            videoPlayer.Prepare();
+        }
+        
+        Debug.Log("videoUrl: " + video_url);
     }
 
     void OnVideoPrepare(VideoPlayer vp)

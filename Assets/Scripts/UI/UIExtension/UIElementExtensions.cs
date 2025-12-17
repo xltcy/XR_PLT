@@ -97,7 +97,7 @@ public static class UIElementExtensions
     /// <param name="targetName"></param>
     /// <param name="includeInactive"></param>
     /// <returns></returns>
-    public static Transform FindRecursive(this Transform current, string targetName, bool includeInactive = true)
+    private static Transform FindRecursive(this Transform current, string targetName, bool includeInactive = true)
     {
         if (current.name == targetName) return current;
         foreach (Transform child in current)

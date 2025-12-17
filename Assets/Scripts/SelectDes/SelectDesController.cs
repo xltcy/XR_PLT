@@ -159,7 +159,7 @@ public class SelectDesController : BaseController
 
     public void GenerateDesList()
     {
-        var sceneData = ControllerRefer.SceneController.GetCurSceneData();
+        var sceneData = ControllerRefer.SceneController.SceneData;
         // generate hint string
         hintString = "欢迎来到" + sceneData.sceneName +"，请选择想要参观的区域\n点击屏幕上的选项";
 

@@ -96,7 +96,7 @@ public class VirHumanVoiceRecCommand : VoiceRecCommand
                 introduction = "";
                 break;
             case VirHumanCommandType.shengNa:
-                matchPattern = "声呐";
+                matchPattern = "111";
                 desLocalPosition = new Vector3(1.655281f, -1.048873f, -8.6174285f);
                 introduction = "我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问";
                 break;
@@ -149,20 +149,12 @@ public class SceneVoiceRecCommand : VoiceRecCommand
                 matchPattern = "隐藏按钮"; break;
             case SceneCommandType.showButton:
                 matchPattern = "显示按钮"; break;
-            case SceneCommandType.screen:
-                matchPattern = "讲解原理"; break;
             case SceneCommandType.sonar:
                 matchPattern = "展示模型"; break;
             case SceneCommandType.separateSonar:
                 matchPattern = "模型分解"; break;
             case SceneCommandType.recoverSonar:
                 matchPattern = "模型恢复"; break;
-            case SceneCommandType.showSonarWave:
-                matchPattern = "声波"; break;
-            case SceneCommandType.showSonarLabel:
-                matchPattern = "型号"; break;
-            case SceneCommandType.showFinding:
-                matchPattern = "研究成果"; break;
             case SceneCommandType.end:
                 matchPattern = "没有"; break;
         }
@@ -180,9 +172,6 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.sonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.separateSonar));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.recoverSonar));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarWave));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showSonarLabel));
-        res.Add(new SceneVoiceRecCommand("", SceneCommandType.showFinding));
         res.Add(new SceneVoiceRecCommand("", SceneCommandType.end));
         return res;
     }
@@ -194,13 +183,9 @@ public class SceneVoiceRecCommand : VoiceRecCommand
         showScene,
         hideButton,
         showButton,
-        screen,
         sonar,
         separateSonar,
         recoverSonar,
-        showSonarWave,
-        showSonarLabel,
-        showFinding,
         end
     }
 }

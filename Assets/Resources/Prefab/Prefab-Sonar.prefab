@@ -55,7 +55,6 @@ MonoBehaviour:
   _standardIntensity: 1
   _factor: 1
   _center: {x: 0, y: 0, z: 0}
-  _axis: {x: 0, y: 0, z: 0}
 --- !u!1 &1235368465023494823
 GameObject:
   m_ObjectHideFlags: 0
@@ -66,13 +65,14 @@ GameObject:
   m_Component:
   - component: {fileID: 85377765797212242}
   - component: {fileID: 1378268894}
+  - component: {fileID: 6758721193885841071}
   m_Layer: 0
   m_Name: Prefab-Sonar
   m_TagString: Sonar
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &85377765797212242
 Transform:
   m_ObjectHideFlags: 0
@@ -102,6 +102,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sonar_subobj: {fileID: 7810060960593948826}
   wall: {fileID: 0}
+--- !u!114 &6758721193885841071
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1235368465023494823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd012d358f542839147850f4e8848f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generateActionId: -1
 --- !u!114 &6276024274513852104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,7 +138,7 @@ GameObject:
   - component: {fileID: 527407071709855043}
   - component: {fileID: 67147731974196362}
   m_Layer: 0
-  m_Name: snoar_underneath
+  m_Name: sonar_above
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -169,7 +182,6 @@ MonoBehaviour:
   _standardIntensity: 1
   _factor: 1
   _center: {x: 0, y: 0, z: 0}
-  _axis: {x: 0, y: 0, z: 0}
 --- !u!1 &5154192182201951780
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,7 +193,7 @@ GameObject:
   - component: {fileID: 5766026045318405916}
   - component: {fileID: 3200059746771018724}
   m_Layer: 0
-  m_Name: snoar_above
+  m_Name: sonar_underneath
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -225,7 +237,6 @@ MonoBehaviour:
   _standardIntensity: 1
   _factor: 1
   _center: {x: 0, y: 0, z: 0}
-  _axis: {x: 0, y: 0, z: 0}
 --- !u!114 &7162030424629947467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,16 +274,16 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7810060960593948826}
-  m_LocalRotation: {x: -0.7289104, y: 0.0009842516, z: 0.6845955, w: 0.0042179474}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.0011, y: 0.0011, z: 0.0011}
+  m_LocalRotation: {x: -0.00017452026, y: -0, z: 1, w: 0}
+  m_LocalPosition: {x: 0.015, y: 0.017, z: -0.2703}
+  m_LocalScale: {x: 0.00105, y: 0.00105, z: 0.001}
   m_Children:
   - {fileID: 5766026045318405916}
   - {fileID: 5047673151215872356}
   - {fileID: 527407071709855043}
   m_Father: {fileID: 85377765797212242}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -0.43, y: -93.59, z: 179.751}
+  m_LocalEulerAnglesHint: {x: 0, y: -0.02, z: 180}
 --- !u!114 &3843042677588583246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,7 +309,6 @@ MonoBehaviour:
   _standardIntensity: 100
   _factor: 1
   _center: {x: 0, y: 0, z: 0}
-  _axis: {x: 0, y: 0, z: 0}
 --- !u!114 &487427550
 MonoBehaviour:
   m_ObjectHideFlags: 0

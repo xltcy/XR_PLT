@@ -18,7 +18,8 @@ public class WaveReflector : MonoBehaviour
     int index = 0;
     void Start()
     {
-
+        SonarWaveManager manager = FindObjectOfType<SonarWaveManager>();
+        manager.wall = transform;
     }
 
     // Update is called once per frame

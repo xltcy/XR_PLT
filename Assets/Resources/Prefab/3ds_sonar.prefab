@@ -90,6 +90,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7863291170987832301}
+  - component: {fileID: -776892193849717934}
+  - component: {fileID: -2057902866907368269}
   m_Layer: 0
   m_Name: 3ds_sonar
   m_TagString: Untagged
@@ -112,3 +114,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-776892193849717934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7380226627776653655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b063035257a028e4ead993b82269cf9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sonar_subobj: {fileID: 7380226627776653655}
+  wall: {fileID: 0}
+--- !u!114 &-2057902866907368269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7380226627776653655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e91cff647623944ac66420554c93a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wave: {fileID: 7606380433806973667, guid: 450ae561461fa274bbc030aa7472569b, type: 3}
+  distance: 0.3
+  timeRound: 1.5
+  ori_radius: 0.3
+  count: 15

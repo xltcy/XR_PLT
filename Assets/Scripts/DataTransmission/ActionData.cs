@@ -20,6 +20,7 @@ public enum ActionType
     AvatarAnim,
     CustomObjectFunction,
     ControllerFunction,
+    ProgramEvent,   //这个是程序事件，通过EventManager触发，和json里面的Start End的Trigger无关
 }
 
 [JsonConverter(typeof(ActionConverter))] // 关键
@@ -100,11 +101,18 @@ public class AvatarAnimAction: ActionBase
 //调用函数
 public class ControllerFunctionAction : ActionBase
 {
+    // 需要调用的函数所属Controller名称
     public string controllerName;
-    // 需要调用的自定义函数名称
+    // 需要调用的函数名称
     public string controllerFunctionName;
     // 需要传递的参数，以字符串（json）形式传递，需要自己在函数内进行解析
     public string controllerFunctionParam;
+}
+
+public class ProgramEventAction : ActionBase
+{
+    // 需要触发的程序事件数据
+    public ProgramEvent.ProgramEventParamBase eventData;
 }
 
 /**
@@ -164,6 +172,9 @@ public class ActionConverter : JsonConverter
                 break;
             case ActionType.ControllerFunction:
                 action = new ControllerFunctionAction();
+                break;
+            case ActionType.ProgramEvent:
+                action = new ProgramEventAction();
                 break;
             default:
                 throw new Exception($"Unknown action type: {type}");

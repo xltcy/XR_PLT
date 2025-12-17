@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SonarWaveManager : BaseController
+public class SonarWaveManager : MonoBehaviour
 {
     public GameObject sonar_subobj;
     public Transform wall;
@@ -12,9 +12,9 @@ public class SonarWaveManager : BaseController
     }
     public void StopGenerateAndDestroyWave()
     {
+        sonar_subobj.GetComponent<WaveGenerator>().StopGenerate();
         DestroyWaveRecursive(transform);
         DestroyWaveRecursive(wall);
-        sonar_subobj.GetComponent<WaveGenerator>().StopGenerate();
     }
     private void DestroyWaveRecursive(Transform current)
     {

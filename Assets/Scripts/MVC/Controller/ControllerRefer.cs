@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2025-12-03 20:38:43
-// 包含 17 个继承 BaseController 的类
+// 生成时间: 2025-12-11 19:41:41
+// 包含 15 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -105,15 +105,6 @@ public static class ControllerRefer
         }
     }
 
-    private static SonarWaveManager _sonarWaveManager;
-    public static SonarWaveManager SonarWaveManager
-    {
-        get
-        {
-            return _sonarWaveManager ??= ControllerRegister.Instance?.GetController<SonarWaveManager>();
-        }
-    }
-
     private static SpeechManager _speechManager;
     public static SpeechManager SpeechManager
     {
@@ -147,15 +138,6 @@ public static class ControllerRefer
         get
         {
             return _uIManager ??= ControllerRegister.Instance?.GetController<UIManager>();
-        }
-    }
-
-    private static VideoManager _videoManager;
-    public static VideoManager VideoManager
-    {
-        get
-        {
-            return _videoManager ??= ControllerRegister.Instance?.GetController<VideoManager>();
         }
     }
 
@@ -212,8 +194,6 @@ public static class ControllerRefer
                 return SelectDesController;
             case "SMPLController":
                 return SMPLController;
-            case "SonarWaveManager":
-                return SonarWaveManager;
             case "SpeechManager":
                 return SpeechManager;
             case "SwipeManager":
@@ -222,8 +202,6 @@ public static class ControllerRefer
                 return TrackingImageManager;
             case "UIManager":
                 return UIManager;
-            case "VideoManager":
-                return VideoManager;
             case "VoiceController":
                 return VoiceController;
             default:
@@ -247,12 +225,10 @@ public static class ControllerRefer
         _sceneController = null;
         _selectDesController = null;
         _sMPLController = null;
-        _sonarWaveManager = null;
         _speechManager = null;
         _swipeManager = null;
         _trackingImageManager = null;
         _uIManager = null;
-        _videoManager = null;
         _voiceController = null;
     }
 }

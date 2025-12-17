@@ -62,7 +62,23 @@ public class MeshController : BaseController
         Summoning
     }
 
-    void Start()
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+    }
+
+    void Init()
     {
         //modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
         //SetDropDownAddListener(模型切换);
@@ -86,14 +102,11 @@ public class MeshController : BaseController
     
     void OnEnable()
     {
-        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+
     }
     
     void OnDisable()
     {
-        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
 
     }
 
@@ -155,8 +168,22 @@ public class MeshController : BaseController
     public static float GetModelScale(GameObject modelInstance)
     {
         Transform mesh = modelInstance.transform.GetChildByName("mesh");
-        if (mesh == null) return 1f;
-        return mesh.localScale.x;
+        if (mesh != null)
+        {
+            return mesh.localScale.x;
+        }
+
+        for (int i = 0; i < modelInstance.transform.childCount; i++)
+        {
+            var childTrans = modelInstance.transform.GetChild(i);
+            if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
+            {
+                continue;
+            }
+            return childTrans.localScale.x;
+        }
+        
+        return modelInstance.transform.localScale.x;
     }
 
     public void ClickToSummonAtCamera()
@@ -177,7 +204,7 @@ public class MeshController : BaseController
 
     public void ClickToSummonSonarAtCamera()
     {
-        string prefabPathInResources = "Prefab/3ds_sonar";
+        string prefabPathInResources = "Prefab/Prefab-Sonar";
 
         SetStartState(StartState.Summoning);
 
@@ -594,12 +621,7 @@ public class MeshController : BaseController
             return false;
         }
     }
-
-    void Update()
-    {
-    }
-
-
+    
     byte[] ReadImageBytes(string path)
     {
         try

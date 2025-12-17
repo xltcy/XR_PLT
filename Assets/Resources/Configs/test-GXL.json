@@ -2,9 +2,9 @@
   "sceneModelPath": "Prefab-GXL",
   "sceneName": "工训楼",
   "initPosition": {
-    "x": -1.179,
-    "y": -0.709,
-    "z": -15.45
+    "x": -11.86,
+    "y": -1.048873,
+    "z": 1.21
   },
   "timestampMs": 123,
   "explanationPoints": [
@@ -12,19 +12,20 @@
       "id":"智慧海洋系统1",
       "title":"智慧海洋系统1",
       "position":{
-          "x": 1.655281,
+          "x": 11.491,
           "y": -1.048873,
-          "z": -8.6174285
+          "z": 3.024
       }, 
-      "initialIntroduction":"欢迎来到工训楼，接下来我将带你参观介绍声呐，请跟我来",
-      "arriveIntroduction":"我们已经到达声呐处，通过语音播放视频可以观看声呐介绍，如果有什么想了解的点击中间的按钮向我提问",
+      "initialIntroduction":"欢迎来到VR科教平台，我将带你了解声呐，请跟我来。",
+      "arriveIntroduction":"我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍。",
       "thumb":"abc",
       "actions":[
         {
           "type": "GenerateObject",
           "id":1,
           "startTrigger": {
-            "mode": "Immediate",
+            "mode": "AfterAction",
+            "afterActionId":9,
             "delay":0
           },
           "stopTrigger": {
@@ -33,12 +34,12 @@
           },
           "objectDataId":"wall",
           "position":{
-            "x": 2.220328,
-            "y": 0.1083427,
-            "z": -4.278635
+            "x": 10.712,
+            "y": 4.879,
+            "z": 0.192
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": 0.515744686, "z": 0, "w": 0.856742382
           },
           "scale":{
             "x": 1,
@@ -58,12 +59,12 @@
           },
           "objectDataId":"curtain",
           "position":{
-            "x": 2.706551,
-            "y": 1.253959,
-            "z": -6.9591
+            "x": 9.48,
+            "y": 1.41,
+            "z": 2.923
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0.021, "y": 0.83, "z": -0.014, "w": -0.555
           },
           "scale":{
             "x": 0.5,
@@ -83,12 +84,12 @@
           },
           "objectDataId":"sonar",
           "position":{
-            "x": 2.32,
-            "y": -0.071, 
-            "z": -7.391
+            "x": 9.69,
+            "y": 0.03, 
+            "z": 2.65
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": 0.978, "z": 0, "w": 0.21
           },
           "scale":{
             "x": 1,
@@ -100,7 +101,7 @@
           "id":4,
           "startTrigger": {
             "mode": "VoiceKeyword",
-            "matchPattern":"播放视频",
+            "matchPattern":"讲解原理",
             "delay":0
           },
           "stopTrigger": {
@@ -113,7 +114,7 @@
           "id":5,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":4,
+            "afterActionId":1,
             "delay":0
           },
           "stopTrigger": {
@@ -133,14 +134,14 @@
             "mode": "Never",
             "delay":0
           },
-          "videoPath":"test",
+          "videoPath":"video/shengna",
           "position":{
-              "x": 2.5861,
-              "y": 0.6083161,
-              "z": -6.951444
+              "x": 9.512,
+              "y": 0.81,
+              "z": 2.911
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
           },
           "scale":{
             "x": 1,
@@ -159,7 +160,7 @@
             "mode": "Never",
             "delay":0
           },
-          "introduction":"声呐作为先进的水下探测技术，正改变着我们对海洋的认知。声呐在工作时，会向海底发射宽扇区覆盖的声波。当声波接触到海底或障碍物时，就会产生反射和散射回波信号，此时接收换能器迅速捕捉这些回波，并将其转化为数据，通过线缆快速传输到船上的数据处理系统，最终生成直观的三维影像。在海洋牧场智能化监测、核电站冷源水口生物监测、城市管网污水井监测、海洋工程、科研等领域能够发挥重要作用。2025年中央进一步强调“建设海上牧场”，并将海洋牧场与生物农业、智慧农业结合，拓展全产业链。声呐在海洋牧场中扮演“水下之眼”的角色，结合AI算法和无人平台，对养殖区进行多角度观测，通过深度学习实时监测分析数据，实现鱼群数量统计、生长监测和健康监控等功能，在饲料成本优化、病害防控与鱼群成活率提升、人力与运维成本优化方面有着显著作用。核电站冷源水通常用于冷却反应堆。水口的生物监测是连接核安全、生态保护与经济效益的核心纽带，为填补网兜海生物量监测的技术空缺，保障电厂的安全取水，实现了一套基于声纳传感器的智能监测系统。该系统融合图像处理技术、人工智能目标检测算法、深度学习算法，以及密度估计网络的综合使用，实现对水下生物的实时监测。当声呐探测到水母群靠近入水口时，其回波信号能清晰显示水母群的位置、数量和大小等信息。一旦达到预警阈值，系统立即发出警报。核电站工作人员收到预警后，会迅速采取相应措施，如启动防护装置或清理网兜设备，有效防止水母堵塞入水口，确保核电站的安全稳定运行。在城市地下排水管网调查中，通过特定算法分析声呐回波信号，精确检测出污水井的井壁。是否存在裂缝、破损、变形等问题以及井底是否有淤积异物堆积等情况。能够快速、高效地获取污水井内部的详细信息，有助于准确判断污水井的状况制定合理的维护和修复方案.声呐，以其独特的工作原理，在海洋牧场、核电站、城市管网污水井检测、海底管道检测、海洋科研、海洋工程等众多领域发挥着重要作用，未来也将继续助力人类探索海洋奥秘。"
+          "introduction":"声呐是通过发射声波并接收目标反射的回波，分析时间延迟、强度及频率变化，计算目标的位置、距离及性质的设备，在复杂的水下环境中，水体浑浊度、光线随深度衰减、水体介质吸收和散射的特性的限制，通过光学成像获得水下理想的图像受到极大限制，因此声呐凭借其在穿透力、远距离、环境适应性方面的优势成为水下探测的主要设备，在海洋牧场智能化监测、核电站冷源水口生物监测、水下地基设施监测和城市大型输水管渠运维监测等领域发挥重要作用。"
         },{
           "type": "ObjectVisible",
           "id":8,
@@ -182,24 +183,8 @@
             "delay":1
           },
           "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":10,
-            "isWhenActionStart":false,
-            "delay":12
-          },
-          "generateActionId":3
-        },{
-          "type": "Explosion",
-          "id":10,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":9,
-            "delay":15
-          },
-          "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":10,
-            "delay":6
+            "mode": "Never",
+            "delay":0
           },
           "generateActionId":3
         },{
@@ -207,19 +192,20 @@
           "id":11,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":9,
+            "afterActionId":7,
             "delay":0
           },
           "stopTrigger": {
              "mode": "Never",
             "delay":0
           },
-          "animTrigger":"HandForward"
+          "animTrigger":"RightHandUp"
         },{
           "type": "GenerateObject",
           "id":12,
           "startTrigger": {
-            "mode": "Immediate",
+            "mode": "AfterAction",
+            "afterActionId":16,
             "delay":0
           },
           "stopTrigger": {
@@ -228,12 +214,12 @@
           },
           "objectDataId":"label",
           "position":{
-            "x": 2.220328,
-            "y": 0.1083427,
-            "z": -4.278635
+            "x": 10.111,
+            "y": 0.346,
+            "z": 2.803
           },
           "rotation":{
-            "x": 0, "y": 0, "z": 0, "w": 1 
+            "x": 0, "y": -0.189457253, "z": 0, "w": 0.981889009
           },
           "scale":{
             "x": 1,
@@ -245,14 +231,199 @@
           "id":13,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId":"12",
+            "afterActionId":12,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":13,
+            "delay":6
+          },
+          "generateActionId":12
+        },{
+          "type":"WaveGenerate",
+          "id":14,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"发射",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":20
+          },
+          "generateActionId":3
+        },{
+          "type": "AvatarAnim",
+          "id":15,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":1
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"HandForward"
+        },{
+          "type": "Introduce",
+          "id":16,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"型号",
             "delay":0
           },
           "stopTrigger": {
             "mode": "Never",
             "delay":0
           },
-          "generateActionId":12
+          "introduction":"这是C750D双屏图像声呐。"
+        },{
+          "type": "AvatarAnim",
+          "id":17,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":16,
+            "delay":0
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"RightHandUp"
+        },{
+          "type":"PlayVideo",
+          "id":18,
+          "startTrigger":{
+            "mode": "VoiceKeyword",
+            "matchPattern":"研究成果",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "videoPath":"video/findings",
+          "position":{
+              "x": 9.512,
+              "y": 0.81,
+              "z": 2.911
+          },
+          "rotation":{
+            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
+          },
+          "scale":{
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },{
+          "type": "Introduce",
+          "id":19,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":18,
+            "delay":1.9
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction":"为了将声呐更好的应用于水下监测，我们在声呐图像预处理、声呐图像目标检测与数量估计方面开展了研究并取得了阶段性成果，在声呐图像预处理方面，实现了高效的滤波与图像增强方法，采用基于高斯混合的背景建模方法，采用了帧间同步技术，通过多帧关联建立噪声统计模型自适应性去除噪声，获得更加“干净”、目标更加清晰的图像。在声呐图像目标检测方面，通过形态学重建和模糊聚类方法实现了声呐图像轮廓检测，提取出声呐图像中的目标信息；同时运用人工智能方法，搭建深度学习网络，建立鱼群检测数据集，实现了高效的声呐图像目标检测方法；在数量估计方面，实现了基于目标检测的计数、运动轨迹计数和基于AI的密度估计多种计数方法。基于研究成果我们设计了基于声呐的水下生物监测系统并开展示范应用，在海洋牧场方面，声呐扮演“水下之眼”的角色，通过监测系统可以实现对养殖物的数量统计、生长监测和健康监控等功能，对当前海产养殖人力效率低、产量估算不科学、喂养过程无依据和生长状态不透明等问题提供了新途径；在核电站运维方面，监测系统能够有效的对核电站冷源水口生物进行实时监测，通过融合声学探测、AI识别与智能预警技术，构建“监测-预警-响应”一体化体系，在海洋生物堵塞冷源水口时进行报警，从而减小重大安全问题的出现。"
+        },{
+          "type": "AvatarAnim",
+          "id":20,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":19,
+            "delay":0
+          },
+          "stopTrigger": {
+             "mode": "Never",
+            "delay":0
+          },
+          "animTrigger":"RightHandUp"
+        },{
+          "type": "Introduce",
+          "id":21,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":14,
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "Never",
+            "delay":0
+          },
+          "introduction":"现在展示的是发射三维声波的动画。"
+        },{
+          "type":"HighlightObject",
+          "id":22,
+          "startTrigger":{
+            "mode":"AfterAction",
+            "afterActionId":12,
+            "delay":0
+          },
+          "stopTrigger":{
+            "mode":"AfterAction",
+            "afterActionId":22,
+            "delay":6
+          },
+          "generateActionId":3,
+          "highlightColor":{"r": 1.0,"g": 1.0,"b": 0.0,"a": 1.0},
+          "highlightWidth":3
+        },
+        {
+          "type": "ProgramEvent",
+          "id":23,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"高亮声呐上",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction", 
+            "afterActionId":23,
+            "delay":5
+          },
+          "eventData": {
+            "type":"HIGHLIGHT_OBJECT",
+            "highlightColor": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 0.0,
+              "a": 1.0
+            },
+            "highlightWidth": 3,
+            "nodeName": "sonar_above"
+          }        
+        },
+        {
+          "type": "ProgramEvent",
+          "id":24,
+          "startTrigger": {
+            "mode": "VoiceKeyword",
+            "matchPattern":"高亮声呐下",
+            "delay":0
+          },
+          "stopTrigger": {
+            "mode": "AfterAction",
+            "afterActionId":24,
+            "delay":5
+          },
+          "eventData": {
+            "type":"HIGHLIGHT_OBJECT",
+            "highlightColor": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 0.0,
+              "a": 1.0
+            },
+            "highlightWidth": 3,
+            "nodeName": "sonar_underneath"
+          }
         }
       ]
     }
@@ -272,8 +443,8 @@
     },{
       "id":"sonar",
       "name":"sonar",
-      "url":"Prefab-Sonar",
-      "isExplosible":true
+      "url":"3ds_sonar",
+      "isExplosible":false
     },{
       "id":"label",
       "name":"label",

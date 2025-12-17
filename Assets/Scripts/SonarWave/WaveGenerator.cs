@@ -11,7 +11,7 @@ public class WaveGenerator : MonoBehaviour
     public int count = 5;
     float timer = 0f;
     int index = 0;
-    bool generate_on;
+    bool generate_on = false;
     // Start is called before the first frame update
     void Start()
     {

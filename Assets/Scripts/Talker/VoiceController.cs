@@ -18,7 +18,18 @@ public class VoiceController : BaseController
     private List<VoiceRecCommand> voiceRecCommands = new List<VoiceRecCommand>();
     public LLMGenerator llmGenerator;
 
-    void Start()
+    public override void OnRegister()
+    {
+        base.OnRegister();
+        Init();
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+    }
+
+    void Init()
     {
         voiceActiveButton.ResetBtn();
         voiceActiveButton.onPointerDown.AddListener(StartVoiceRecognize);

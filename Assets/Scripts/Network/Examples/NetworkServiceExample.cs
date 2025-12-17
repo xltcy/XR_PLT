@@ -73,12 +73,12 @@ public class NetworkServiceExample : MonoBehaviour
 
     private void OnEnable()
     {
-        NetworkServiceSystem.Instance.AddResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
     }
 
     private void OnDisable()
     {
-        NetworkServiceSystem.Instance.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
     }
 
     private void TestGetRequest()
@@ -149,7 +149,7 @@ public class NetworkServiceExample : MonoBehaviour
         });
 
         // 添加事件监听
-        NetworkServiceSystem.Instance.AddResponseListener(requestId, (result, response) =>
+        NetworkServiceSystem.AddResponseListener(requestId, (result, response) =>
         {
             if (response.success)
             {

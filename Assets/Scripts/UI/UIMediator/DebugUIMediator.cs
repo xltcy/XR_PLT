@@ -7,11 +7,11 @@ public class DebugUIMediator : BaseUIMediator
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
-    [BindChild("RelocateSonar"), ButtonCallback(nameof(OnRelocateSonarClick))]
+    [BindChild("p_RelocateSonar"), ButtonCallback(nameof(OnRelocateSonarClick))]
     private Button RelocateSonar;
-    [BindChild("SummonSonar"), ButtonCallback(nameof(OnSummonSonarClick))]
+    [BindChild("p_SummonSonar"), ButtonCallback(nameof(OnSummonSonarClick))]
     private Button SummonSonar;
-    [BindChild("Relocate"), ButtonCallback(nameof(OnRelocateClick))]
+    [BindChild("p_Relocate"), ButtonCallback(nameof(OnRelocateClick))]
     private Button Relocate;
 
     [BindChild("p_DebugView")]

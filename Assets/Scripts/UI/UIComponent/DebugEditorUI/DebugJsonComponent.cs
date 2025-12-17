@@ -17,6 +17,6 @@ public class DebugJsonComponent : BaseStateComponent
 
     private void OnRequestSceneUploadButtonClick()
     {
-        NetworkUtil.Instance.UploadSummaryData();
+        ControllerRefer.SceneController.UploadSummaryData();
     }
 }
