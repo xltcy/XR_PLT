@@ -13,6 +13,10 @@ public class DebugUIMediator : BaseUIMediator
     private Button SummonSonar;
     [BindChild("p_Relocate"), ButtonCallback(nameof(OnRelocateClick))]
     private Button Relocate;
+    [BindChild("p_HideSonar"), ButtonCallback(nameof(OnHideSonarClick))]
+    private Button HideSonar;
+    [BindChild("p_ShowSonar"), ButtonCallback(nameof(OnShowSonarClick))]
+    private Button ShowSonar;
 
     [BindChild("p_DebugView")]
     private Transform debugView;
@@ -76,5 +80,13 @@ public class DebugUIMediator : BaseUIMediator
     private void OnRelocateClick()
     {
         ControllerRefer.MeshController.ClickToGetPoseByCapture(MeshController.RelocateType.Scene);
+    }
+    private void OnHideSonarClick()
+    {
+        ControllerRefer.MeshController.HideSonarRender();
+    }
+    private void OnShowSonarClick()
+    {
+        ControllerRefer.MeshController.ShowSonarRender();
     }
 }

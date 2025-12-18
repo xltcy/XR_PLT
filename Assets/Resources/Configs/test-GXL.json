@@ -4,7 +4,7 @@
   "initPosition": {
     "x": -11.86,
     "y": -1.048873,
-    "z": 1.21
+    "z": 0
   },
   "timestampMs": 123,
   "explanationPoints": [
@@ -24,8 +24,7 @@
           "type": "GenerateObject",
           "id":1,
           "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":9,
+            "mode": "Immediate",
             "delay":0
           },
           "stopTrigger": {
@@ -70,31 +69,6 @@
             "x": 0.5,
             "y": 0.5,
             "z": 0.5
-          }
-        },{
-          "type": "GenerateObject",
-          "id":3,
-          "startTrigger": {
-            "mode": "Immediate",
-            "delay":0
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay":0
-          },
-          "objectDataId":"sonar",
-          "position":{
-            "x": 9.69,
-            "y": 0.03, 
-            "z": 2.65
-          },
-          "rotation":{
-            "x": 0, "y": 0.978, "z": 0, "w": 0.21
-          },
-          "scale":{
-            "x": 1,
-            "y": 1,
-            "z": 1
           }
         },{
           "type": "ObjectVisible",
@@ -175,19 +149,6 @@
           },
           "generateActionId":2
         },{
-          "type": "ObjectVisible",
-          "id":9,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":3,
-            "delay":1
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay":0
-          },
-          "generateActionId":3
-        },{
           "type": "AvatarAnim",
           "id":11,
           "startTrigger": {
@@ -240,33 +201,6 @@
             "delay":6
           },
           "generateActionId":12
-        },{
-          "type":"WaveGenerate",
-          "id":14,
-          "startTrigger": {
-            "mode": "VoiceKeyword",
-            "matchPattern":"发射",
-            "delay":0
-          },
-          "stopTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":14,
-            "delay":20
-          },
-          "generateActionId":3
-        },{
-          "type": "AvatarAnim",
-          "id":15,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":14,
-            "delay":1
-          },
-          "stopTrigger": {
-             "mode": "Never",
-            "delay":0
-          },
-          "animTrigger":"HandForward"
         },{
           "type": "Introduce",
           "id":16,
@@ -345,35 +279,6 @@
             "delay":0
           },
           "animTrigger":"RightHandUp"
-        },{
-          "type": "Introduce",
-          "id":21,
-          "startTrigger": {
-            "mode": "AfterAction",
-            "afterActionId":14,
-            "delay":0
-          },
-          "stopTrigger": {
-            "mode": "Never",
-            "delay":0
-          },
-          "introduction":"现在展示的是发射三维声波的动画。"
-        },{
-          "type":"HighlightObject",
-          "id":22,
-          "startTrigger":{
-            "mode":"AfterAction",
-            "afterActionId":12,
-            "delay":0
-          },
-          "stopTrigger":{
-            "mode":"AfterAction",
-            "afterActionId":22,
-            "delay":6
-          },
-          "generateActionId":3,
-          "highlightColor":{"r": 1.0,"g": 1.0,"b": 0.0,"a": 1.0},
-          "highlightWidth":3
         },
         {
           "type": "ProgramEvent",
