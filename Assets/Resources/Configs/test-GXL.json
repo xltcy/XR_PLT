@@ -2,9 +2,9 @@
   "sceneModelPath": "Prefab-GXL",
   "sceneName": "工训楼",
   "initPosition": {
-    "x": -11.86,
-    "y": -1.048873,
-    "z": 0
+    "x": -12.76873,
+    "y": -0.7105495,
+    "z": -1.532024
   },
   "timestampMs": 123,
   "explanationPoints": [
@@ -12,9 +12,9 @@
       "id":"智慧海洋系统1",
       "title":"智慧海洋系统1",
       "position":{
-          "x": 11.491,
-          "y": -1.048873,
-          "z": 3.024
+          "x": 8.284536,
+          "y": -0.7254204,
+          "z": 3.983959
       }, 
       "initialIntroduction":"欢迎来到VR科教平台，我将带你了解声呐，请跟我来。",
       "arriveIntroduction":"我们已经到达声呐处，通过语音讲解原理可以观看声呐介绍。",
@@ -32,19 +32,9 @@
             "delay":0
           },
           "objectDataId":"wall",
-          "position":{
-            "x": 10.712,
-            "y": 4.879,
-            "z": 0.192
-          },
-          "rotation":{
-            "x": 0, "y": 0.515744686, "z": 0, "w": 0.856742382
-          },
-          "scale":{
-            "x": 1,
-            "y": 1,
-            "z": 1
-          }
+          "position":{"x":8.4399995803833,"y":0.5099999904632568,"z":1.2200000286102296},
+          "rotation":{"x":0.0,"y":0.44865304231643679,"z":0.0,"w":0.8937060236930847},
+          "scale":{"x":1.0,"y":1.0,"z":1.0}
         },{
           "type": "GenerateObject",
           "id":2,
@@ -58,13 +48,13 @@
           },
           "objectDataId":"curtain",
           "position":{
-            "x": 9.48,
-            "y": 1.41,
-            "z": 2.923
+            "x": 6.77,
+            "y": 1.5,
+            "z": 3.5
           },
           "rotation":{
-            "x": 0.021, "y": 0.83, "z": -0.014, "w": -0.555
-          },
+            "x":0.009174740873277188,"y":-0.4713926613330841,"z":0.022282661870121957,"w":-0.881594181060791
+            },
           "scale":{
             "x": 0.5,
             "y": 0.5,
@@ -110,12 +100,10 @@
           },
           "videoPath":"video/shengna",
           "position":{
-              "x": 9.512,
-              "y": 0.81,
-              "z": 2.911
+            "x":6.776000022888184,"y":0.8799999952316284,"z":3.494999885559082
           },
           "rotation":{
-            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
+            "x":0.022461865097284318,"y":0.8719809651374817,"z":-0.008726842701435089,"w":-0.4889462888240814
           },
           "scale":{
             "x": 1,
@@ -128,7 +116,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":6,
-            "delay":1.9
+            "delay":0
           },
           "stopTrigger": {
             "mode": "Never",
@@ -180,7 +168,7 @@
             "z": 2.803
           },
           "rotation":{
-            "x": 0, "y": -0.189457253, "z": 0, "w": 0.981889009
+            "x":0.022461865097284318,"y":0.8719809651374817,"z":-0.008726842701435089,"w":-0.4889462888240814
           },
           "scale":{
             "x": 1,
@@ -213,7 +201,7 @@
             "mode": "Never",
             "delay":0
           },
-          "introduction":"这是C750D双屏图像声呐。"
+          "introduction":"我们面前的这台C750D双屏图像声纳是一台先进的水下探测设备。它有两个屏幕，一个用于显示750kHz频率下的图像，适合大范围搜索；另一个显示1200kHz的图像，分辨率更高，适合近距离观察。"
         },{
           "type": "AvatarAnim",
           "id":17,
@@ -226,7 +214,7 @@
              "mode": "Never",
             "delay":0
           },
-          "animTrigger":"RightHandUp"
+          "animTrigger":"HandForward"
         },{
           "type":"PlayVideo",
           "id":18,
@@ -241,12 +229,10 @@
           },
           "videoPath":"video/findings",
           "position":{
-              "x": 9.512,
-              "y": 0.81,
-              "z": 2.911
+            "x":6.776000022888184,"y":0.8799999952316284,"z":3.494999885559082
           },
           "rotation":{
-            "x": 0.865394652, "y": 0.00172533607, "z": -0.501073062, "w": 0.00386243477
+            "x":0.022461865097284318,"y":0.8719809651374817,"z":-0.008726842701435089,"w":-0.4889462888240814
           },
           "scale":{
             "x": 1,
@@ -259,7 +245,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":18,
-            "delay":1.9
+            "delay":0
           },
           "stopTrigger": {
             "mode": "Never",
@@ -284,9 +270,9 @@
           "type": "ProgramEvent",
           "id":23,
           "startTrigger": {
-            "mode": "VoiceKeyword",
-            "matchPattern":"高亮声呐上",
-            "delay":0
+            "mode": "AfterAction",
+            "afterActionId":16,
+            "delay":3
           },
           "stopTrigger": {
             "mode": "AfterAction", 
@@ -309,9 +295,9 @@
           "type": "ProgramEvent",
           "id":24,
           "startTrigger": {
-            "mode": "VoiceKeyword",
-            "matchPattern":"高亮声呐下",
-            "delay":0
+            "mode": "AfterAction",
+            "afterActionId":16,
+            "delay":8
           },
           "stopTrigger": {
             "mode": "AfterAction",
