@@ -66,10 +66,14 @@ public class SMPLController : BaseController
         scene = GameObject.FindGameObjectWithTag(nameof(SceneController.GameObjectTag.Mesh));
     }
 
-    private Vector3 initPos =>
-        (ControllerRefer.SceneController.SceneData?.initPosition ?? Vector3.zero) + (scene != null
-            ? scene.transform.position
-            : Vector3.zero);
+    private Vector3 initPos
+    {
+        get
+        {
+            var pos = ControllerRefer.SceneController.SceneData?.initPosition ?? Vector3.zero;
+            return scene.transform.TransformPoint(pos);
+        }
+    }
 
     public void SetDestination(string desName)
     {
