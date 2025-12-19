@@ -272,7 +272,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":16,
-            "delay":3
+            "delay":4
           },
           "stopTrigger": {
             "mode": "AfterAction", 
@@ -298,12 +298,12 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId":16,
-            "delay":8
+            "delay":9
           },
           "stopTrigger": {
             "mode": "AfterAction",
             "afterActionId":24,
-            "delay":5
+            "delay":7
           },
           "eventData": {
             "type":"HIGHLIGHT_OBJECT",
