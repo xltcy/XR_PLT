@@ -27,10 +27,12 @@ public class MeshController : BaseController
 {
     public Camera arCamera;
     private GameObject modelInstance;
+    private GameObject sonarGO;
 
     public Dropdown sceneSelectDropdown;
 
     private Pose relocatedPose;
+    private Pose relocatedSonarPose;
 
     public Button buttonGetPose;
     public Button buttonSummonAtCamera;
@@ -65,17 +67,19 @@ public class MeshController : BaseController
     public override void OnRegister()
     {
         base.OnRegister();
+        
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetPoseCallBack);
+        NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetSonarPoseCallBack);
 
         Init();
     }
 
     public override void OnUnregister()
     {
-        base.OnUnregister();
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetPoseCallBack);
+        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetSonarPoseCallBack);
+        
+        base.OnUnregister();
     }
 
     void Init()
@@ -215,19 +219,22 @@ public class MeshController : BaseController
             return;
         }
 
-        modelInstance = Instantiate(prefab);
+        if (!sonarGO)
+        {
+            sonarGO = Instantiate(prefab);
+        }
 
-        float scale = GetModelScale(modelInstance);
+        float scale = GetModelScale(sonarGO);
         //绕z轴旋转180
-        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedPose.rotation * Vector3.forward);
+        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedSonarPose.rotation * Vector3.forward);
 
         // 更新 Pose 的旋转
-        relocatedPose.rotation = rot180 * relocatedPose.rotation;
+        relocatedSonarPose.rotation = rot180 * relocatedSonarPose.rotation;
 
-        modelInstance.transform.position = relocatedPose.position * scale;
-        modelInstance.transform.rotation = relocatedPose.rotation;
-
-        SetStartState(StartState.Normal);
+        sonarGO.transform.position = relocatedSonarPose.position * scale;
+        sonarGO.transform.rotation = relocatedSonarPose.rotation;
+        
+        sonarGO.SetVisible(true);
     }
 
     public void ClickRotateR()
@@ -310,7 +317,7 @@ public class MeshController : BaseController
         StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(summary[selectedSceneIndex], datasetLoc?.text ?? "", rawData,
             onSuccess: (res) => {
                 // TODO Console res;
-                relocatedPose = TransArrayToWorldPose(res);
+                relocatedPose = TransArrayToWorldPose(camPoseT0, res);
                 countdownEvent.Signal();
 
             },
@@ -331,14 +338,13 @@ public class MeshController : BaseController
 
     private void SendImage(byte[] rawData)
     {
-        bool hasError = false;
-        SetStartState(StartState.GettingPos);
-        UIManager.SetLoadingStatus(true);
-
+        // Record Camera Pose
+        var camPose = Matrix4x4.TRS(arCamera.transform.position, arCamera.transform.rotation, Vector3.one);
         var req = new GetSonarPoseParams("sonar", rawData);
+        req.localData = camPose; 
         req.Send();
     }
-    [Serializable]
+
     public class GetSonarPoseResponseData
     {
         public string message;
@@ -398,12 +404,15 @@ public class MeshController : BaseController
             return new Pose(position, rotation);
         }
     }
-    private void GetPoseCallBack(bool result, NetworkResponse response)
+    private void GetSonarPoseCallBack(bool result, NetworkResponse response)
     {
         if (result)
         {
-            var data = JsonUtility.FromJson<GetSonarPoseResponseData>(response.rawResponse);
+            var data = response.GetData<GetSonarPoseResponseData>();
             Debug.Log(data.message);
+            
+            // 获取相机位姿
+            var camPose = response.localData is Matrix4x4 ? (Matrix4x4)response.localData : default;
 
             // 2️⃣ 手动解析 pose 字段
             data.ParsePoseFromJson(response.rawResponse);
@@ -412,10 +421,10 @@ public class MeshController : BaseController
             //Matrix4x4 matrix = data.ToMatrix();
 
             // 4️⃣ 转 Pose
-            relocatedPose = TransArrayToWorldPose(data.poseMatrix);
+            relocatedSonarPose = TransArrayToWorldPose(camPose, data.poseMatrix);
 
             // 5️⃣ 输出测试
-            Debug.Log($"Position: {relocatedPose.position}, Rotation: {relocatedPose.rotation}");
+            Debug.Log($"Position: {relocatedSonarPose.position}, Rotation: {relocatedSonarPose.rotation}");
         }
     }
 
@@ -478,7 +487,7 @@ public class MeshController : BaseController
     //}
 
 
-    public Pose TransArrayToWorldPose(float[,] num)
+    public Pose TransArrayToWorldPose(Matrix4x4 camPose, float[,] num)
     {
         Matrix4x4 res = Matrix4x4.identity;
         for (int i = 0; i < num.GetLength(0); i++)
@@ -490,7 +499,7 @@ public class MeshController : BaseController
 
         Matrix4x4 world2Camera = res.inverse;
         // world2Camera = KeepModelYUp(world2Camera);
-        var resModelPoseWorld = camPoseT0 * world2Camera;
+        var resModelPoseWorld = camPose * world2Camera;
         return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
     }
 
@@ -504,7 +513,7 @@ public class MeshController : BaseController
             { 0f, 0f, 0f, 1f }
         };
 
-        return TransArrayToWorldPose(temp);
+        return TransArrayToWorldPose(camPoseT0, temp);
     }
 
     private void SetStartState(StartState newState)
