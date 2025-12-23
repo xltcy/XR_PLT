@@ -10,17 +10,15 @@ public class ProgramEvent
     public enum ProgramEventType
     {
         HIGHLIGHT_OBJECT,
+        GENERATE_WAVE,
     }
     
     #region jsonConverter
     [JsonConverter(typeof(ProgramEventParamConverter))] // 关键
-    public class ProgramEventParamBase
+    public abstract class ProgramEventParamBase
     {
         public ProgramEventType type;
-        public virtual string GetEventConstant()
-        {
-            return string.Empty;
-        }
+        public abstract string GetEventConstant();
     }
 
     public class ProgramEventParamConverter : JsonConverter
@@ -46,6 +44,9 @@ public class ProgramEvent
                 case ProgramEventType.HIGHLIGHT_OBJECT:
                     programEventParam = new HighlightNodeEventParam();
                     break;
+                case ProgramEventType.GENERATE_WAVE:
+                    programEventParam = new GenerateWaveEventParam();
+                    break;
                 //... 添加更多事件类型
                 default:
                     throw new Exception($"Unknown ProgramEvent type: {type}");
@@ -70,10 +71,20 @@ public class ProgramEvent
         public string nodeName;
         public Color highlightColor;
         public float highlightWidth;
+        public string EventObjectID;
         
         public override string GetEventConstant()
         {
             return EventConstant.HIGHLIGHT_OBJECT;
+        }
+    }
+
+    public class GenerateWaveEventParam : ProgramEventParamBase
+    {
+        public string EventObjectID;
+        public override string GetEventConstant()
+        {
+            return EventConstant.GENERATE_WAVE;
         }
     }
     

@@ -15,11 +15,15 @@ public class WaveReflector : MonoBehaviour
     public GameObject received_wave;
     public int count = 5;
     public Vector3 emission_position = new Vector3();
+    List<Object> waveObjects = new List<Object>();
     int index = 0;
     void Start()
     {
         SonarWaveManager manager = FindObjectOfType<SonarWaveManager>();
-        manager.wall = transform;
+        if (manager)
+        {
+            manager.AddReflector(this);
+        }
     }
 
     // Update is called once per frame
@@ -39,7 +43,7 @@ public class WaveReflector : MonoBehaviour
             float angle = Vector3.SignedAngle(vec, right, Vector3.up);
             Debug.Log(angle);
             Debug.Log(wave_generator);
-            GameObject child = Instantiate(wave);
+            GameObject child = Instantiate(wave, transform, true);
             ArcSegmentGenerator waveScript = child.GetComponent<ArcSegmentGenerator>();
             WaveGenerator waveGeneratorScript = wave_generator.GetComponent<WaveGenerator>();
             waveScript.ori_radius = ori_radius;
@@ -47,10 +51,21 @@ public class WaveReflector : MonoBehaviour
             waveScript.count = waveGeneratorScript.count;
             waveScript.centerAngle = angle;
             waveScript.SetEmissionPosition(emission_position);
-            child.transform.SetParent(transform);
             child.name = "wave" + index;
             index += 1;
             is_on = 0;
+            
+            waveObjects.Add(child);
+
         }
+    }
+    
+    public void DestroyAllWave()
+    {
+        foreach (var obj in waveObjects)
+        {
+            Destroy(obj);
+        }
+        waveObjects.Clear();
     }
 }

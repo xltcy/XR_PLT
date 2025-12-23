@@ -126,8 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b063035257a028e4ead993b82269cf9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sonar_subobj: {fileID: 7380226627776653655}
-  wall: {fileID: 0}
+  sonar_subobj: {fileID: -2057902866907368269}
 --- !u!114 &-2057902866907368269
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -302,7 +302,7 @@ public class DynamicObject : MonoBehaviour
         }
     }
 
-    private void GenerateWave(bool isStartAction)
+    protected void GenerateWave(bool isStartAction)
     {
         var generator = gameObject.GetComponent<SonarWaveManager>();
         if (isStartAction)

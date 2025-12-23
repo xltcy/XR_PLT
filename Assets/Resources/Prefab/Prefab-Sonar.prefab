@@ -100,8 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b063035257a028e4ead993b82269cf9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sonar_subobj: {fileID: 7810060960593948826}
-  wall: {fileID: 0}
+  sonar_subobj: {fileID: 487427550}
 --- !u!114 &6758721193885841071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,6 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generateActionId: -1
+  EventObjectID: Sonar
 --- !u!114 &6276024274513852104
 MonoBehaviour:
   m_ObjectHideFlags: 0

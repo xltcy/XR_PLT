@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class WaveGenerator : MonoBehaviour
 {
@@ -12,6 +14,8 @@ public class WaveGenerator : MonoBehaviour
     float timer = 0f;
     int index = 0;
     bool generate_on = false;
+    
+    List<Object> waveObjects = new List<Object>();
     // Start is called before the first frame update
     void Start()
     {
@@ -35,19 +39,31 @@ public class WaveGenerator : MonoBehaviour
             timer += Time.deltaTime;
             if (timer >= timeRound)
             {
-                GameObject child = Instantiate(wave);
+                GameObject child = Instantiate(wave, transform, true);
                 ArcSegmentGenerator waveScript = child.GetComponent<ArcSegmentGenerator>();
                 waveScript.ori_radius = ori_radius;
                 waveScript.distance = distance;
                 waveScript.count = count;
                 waveScript.centerAngle = 90.0f;
                 waveScript.SetWaveGenerator(gameObject);
-                child.transform.SetParent(transform);
                 child.name = "wave" + index;
                 timer = 0;
                 index += 1;
+                
+                waveObjects.Add(child);
             }
         }
 
     }
+
+    public void DestroyAllWave()
+    {
+        foreach (var obj in waveObjects)
+        {
+            Destroy(obj);
+        }
+        waveObjects.Clear();
+    }
+    
+    
 }
