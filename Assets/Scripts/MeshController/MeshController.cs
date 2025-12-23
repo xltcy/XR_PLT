@@ -283,8 +283,18 @@ public class MeshController : BaseController
         }
         else
         {
-            // load from file
-            rawData = ReadImageBytes(testImagePath);
+            
+            //尝试读取DebugSwitch中的路径
+            string debugImagePath = DebugSwitch.Instance.GetRelocateDebugImgPath(relocateType);
+            if (!debugImagePath.IsNullOrEmpty())
+            {
+                rawData = ReadImageBytes(debugImagePath);
+            }
+            else
+            {
+                // load from file
+                rawData = ReadImageBytes(testImagePath);
+            }
         }
         switch (relocateType)
         {
