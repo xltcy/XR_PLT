@@ -11,7 +11,6 @@ using UnityEngine.UI;
 public class SwipeManager : BaseController
 {
     #region PublicVariable
-    public UnityEvent _onSwipeUp;
     public UnityEvent _onSwipeLeft;
     public UnityEvent _onSwipeRight;
     public List<UnityEvent> _swipeHandlers;
@@ -28,12 +27,7 @@ public class SwipeManager : BaseController
     private void HandleSwipe(LeanFinger finger)
     {
         // 检查滑动方向
-        if (IsSwipeUp(finger))
-        {
-            // 调用你的函数
-            _onSwipeUp?.Invoke();
-        }
-        else if (IsSwipeLeft(finger))
+        if (IsSwipeLeft(finger))
         {
             _onSwipeLeft?.Invoke();
         }
@@ -45,7 +39,6 @@ public class SwipeManager : BaseController
 
     private void HandlerListInit()
     {
-        _swipeHandlers.Add(_onSwipeUp);
         _swipeHandlers.Add(_onSwipeLeft);
         _swipeHandlers.Add(_onSwipeRight);
     }
@@ -79,15 +72,6 @@ public class SwipeManager : BaseController
     #endregion
 
     #region Other
-
-    private bool IsSwipeUp(LeanFinger finger)
-    {
-        // 获取滑动的方向
-        var swipeDelta = finger.SwipeScreenDelta;
-
-        // 判断滑动是否主要是向上的
-        return swipeDelta.y > 0 && swipeDelta.y > Math.Abs(swipeDelta.x) && IsTagUI(finger)==false;
-    }
 
     private bool IsSwipeLeft(LeanFinger finger)
     {

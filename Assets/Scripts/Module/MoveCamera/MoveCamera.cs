@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
 {
-    public float moveSpeed = 500f; // 相机移动速度
+    public float moveSpeed = 5f; // 相机移动速度
     private float lookSpeed = 2f;  // 相机旋转速度
 
     private float pitch = 0f; // 上下旋转角度
