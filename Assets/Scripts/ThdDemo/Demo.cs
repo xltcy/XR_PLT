@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using TreeEditor;
 using UnityEngine;
@@ -14,8 +15,8 @@ public class Demo : MonoBehaviour
     public GameObject door;
     public GameObject big_monster;
 
-    private string _video_path = "D:\\D-Dataset\\thd_demo\\video\\thd_video.mp4";
-    private string _pose_path = "D:\\D-Dataset\\thd_demo\\camera_poses.txt";
+    private string _video_path = "Resources/video/thd_video-480p_24fps.mp4";
+    private string _pose_path = "Resources/Pose/thd_video_pose.txt";
 
     private VideoPlayManager _video_play_manager;
     private CamTrajManager _cam_traj_manager;
@@ -24,6 +25,8 @@ public class Demo : MonoBehaviour
 
     void Start()
     {
+        _video_path = Path.Combine(Application.dataPath, _video_path);
+        _pose_path = Path.Combine(Application.dataPath, _pose_path);
 
         _video_play_manager = FindObjectOfType<VideoPlayManager>();
         _cam_traj_manager = FindObjectOfType<CamTrajManager>();
