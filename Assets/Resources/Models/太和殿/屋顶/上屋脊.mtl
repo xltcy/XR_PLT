@@ -1,0 +1,67 @@
+# Blender 4.3.2 MTL File: 'SupermeHallofHarmony.blend'
+# www.blender.org
+
+newmtl 3d66_Standardmaterial_17342430_099
+Ns 43.999985
+Ka 1.000000 1.000000 1.000000
+Ks 0.416400 0.416400 0.416400
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-013.bmp
+map_Bump ../textures/3d66Model-17342430-files-013.bmp
+
+newmtl 3d66_Standardmaterial_17342430_100
+Ns 40.999992
+Ka 1.000000 1.000000 1.000000
+Ks 0.345667 0.345667 0.345667
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-001.bmp
+
+newmtl 3d66_Standardmaterial_17342430_101
+Ns 32.000008
+Ka 1.000000 1.000000 1.000000
+Ks 0.377100 0.377100 0.377100
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-088.jpg
+map_Bump ../textures/3d66Model-17342430-files-088.jpg
+
+newmtl 3d66_Standardmaterial_17342430_102
+Ns 38.000011
+Ka 1.000000 1.000000 1.000000
+Ks 0.377100 0.377100 0.377100
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-001.bmp
+map_Bump ../textures/3d66Model-17342430-files-001.bmp
+
+newmtl 3d66_Standardmaterial_17342430_103
+Ns 41.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.384933 0.384933 0.384933
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-013.bmp
+map_Bump ../textures/3d66Model-17342430-files-013.bmp
+
+newmtl 3d66_Standardmaterial_17342430_104
+Ns 37.000004
+Ka 1.000000 1.000000 1.000000
+Ks 0.377100 0.377100 0.377100
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/3d66Model-17342430-files-054.jpg
+map_Bump ../textures/3d66Model-17342430-files-054.jpg

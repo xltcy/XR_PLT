@@ -42,15 +42,16 @@ public class ModelComponent : MonoBehaviour
 
     void Start()
     {
-/*        MeshCollider collider = gameObject.AddComponent<MeshCollider>();
-        collider.convex = true;
-        collider.isTrigger = true;
-        collider.sharedMesh = GetComponentInChildren<MeshFilter>().sharedMesh;
+        //gameObject.AddComponent<BoxCollider>();
+        //MeshCollider collider = gameObject.AddComponent<MeshCollider>();
+        //collider.convex = true;
+        //collider.isTrigger = true;
+        //collider.sharedMesh = GetComponentInChildren<MeshFilter>().sharedMesh;
 
-        ClickableObject clickableObject = gameObject.AddComponent<ClickableObject>();
-        // TBD.
-        clickableObject.objIntroduction = "测试点击" + this.name;
+        //ClickableObject clickableObject = gameObject.AddComponent<ClickableObject>();
+        //// TBD.
+        //clickableObject.objIntroduction = "测试点击" + this.name;
 
-        ControllerRefer.Click3DObjectManager.AddClickableObjs(clickableObject);*/
+        //ControllerRefer.Click3DObjectManager.RegisteClickableObject(clickableObject);
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MoveCamera : MonoBehaviour
 {
-    private float moveSpeed = 5f; // 相机移动速度
+    public float moveSpeed = 5f; // 相机移动速度
     private float lookSpeed = 2f;  // 相机旋转速度
 
     private float pitch = 0f; // 上下旋转角度
@@ -33,8 +33,8 @@ public class MoveCamera : MonoBehaviour
         if (Input.GetKey(KeyCode.D)) move += camera.transform.right;
 
         // QE 控制上下
-        if (Input.GetKey(KeyCode.Q)) move -= transform.up;
-        if (Input.GetKey(KeyCode.E)) move += transform.up;
+        if (Input.GetKey(KeyCode.E)) move -= transform.up;
+        if (Input.GetKey(KeyCode.Q)) move += transform.up;
 
         camera.transform.position += move * moveSpeed * Time.deltaTime;
 

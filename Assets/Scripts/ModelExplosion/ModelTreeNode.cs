@@ -122,7 +122,7 @@ public class ModelTreeNode : MonoBehaviour
         // 如果当前节点是叶子节点，则模型的中心即为当前节点的中心
         if (_isLeafNode == true)
         {
-            // Debug.Log("[tcluan Debug] " + name + " calcualates center.\n");
+             //Debug.Log("[tcluan Debug] " + name + " calcualates center.\n");
             _center = _children[0].GetComponent<ModelComponent>().CalculateCenter();
         }
         // 否则，当前节点为内部节点，则模型的中心为其各个子节点的中心
@@ -139,7 +139,7 @@ public class ModelTreeNode : MonoBehaviour
             }
             _center /= totalMass;
         }
-        // Debug.Log("[tcluan Debug] " + name + " center: " + _center);
+         //Debug.Log("[tcluan Debug] " + name + " center: " + _center);
     }
 
     /// <summary>

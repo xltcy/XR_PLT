@@ -1,0 +1,12 @@
+# Blender 4.3.2 MTL File: 'SupermeHallofHarmony.blend'
+# www.blender.org
+
+newmtl 3d66_Standardmaterial_17342430_086
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/3d66Model-17342430-files-060.jpg
