@@ -30,8 +30,10 @@ public class DebugSwitch : Singleton<DebugSwitch>
     public Texture2D DebugSceneImg;
 
     private Texture2D curImg;
+
     public string GetRelocateDebugImgPath(MeshController.RelocateType type)
     {
+    #if UNITY_EDITOR
         Texture2D img = null;
         switch (type)
         {
@@ -48,8 +50,11 @@ public class DebugSwitch : Singleton<DebugSwitch>
         string assetPath = AssetDatabase.GetAssetPath(img);
         string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
         return Path.GetFullPath(Path.Combine(projectRoot, assetPath));
+    #else
+            return string.Empty;
+    #endif
     }
-    
+
     public void ToggleImgDisplay()
     {
         this.TriggerEvent(EventConstant.DEBUG_TOGGLE_SCREEN_IMG, curImg);

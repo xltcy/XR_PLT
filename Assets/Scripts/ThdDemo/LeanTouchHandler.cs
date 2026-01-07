@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UniGLTF;
 using UnityEngine;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
+//using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 
 public class LeanTouchHandler : MonoBehaviour
