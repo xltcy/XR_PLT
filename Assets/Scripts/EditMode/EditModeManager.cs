@@ -25,7 +25,7 @@ public class EditModeManager : BaseController
         switch (target)
         {
             case OperationTarget.Ground:
-                tag = "ground";
+                tag = "Sonar";
                 break;
             case OperationTarget.Mesh:
             default:
