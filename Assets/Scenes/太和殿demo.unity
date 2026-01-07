@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 30134452}
   - component: {fileID: 30134453}
   m_Layer: 0
-  m_Name: MaterialManager
+  m_Name: MaterialController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,7 +152,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1932647417}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &30134453
 MonoBehaviour:
@@ -320,7 +320,7 @@ GameObject:
   - component: {fileID: 202304534}
   - component: {fileID: 202304535}
   m_Layer: 0
-  m_Name: CamTrajManager
+  m_Name: CamTrajController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -353,6 +353,54 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cam: {fileID: 621027973}
+--- !u!1 &361320423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 361320425}
+  - component: {fileID: 361320424}
+  m_Layer: 0
+  m_Name: Register
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &361320424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361320423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d55997e4444ec3930eae291bdfc4cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logInitialization: 1
+  warnInitialization: 1
+  errorInitialization: 1
+  controllers:
+    m_Values: []
+--- !u!4 &361320425
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 361320423}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 303.44247, y: 419.25867, z: 33617.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &380821036
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,7 +751,7 @@ GameObject:
   - component: {fileID: 1317606654}
   - component: {fileID: 1317606655}
   m_Layer: 0
-  m_Name: VideoPlayManager
+  m_Name: VideoPlayController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -742,49 +790,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 980375184156276391}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1653734572
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1653734573}
-  - component: {fileID: 1653734574}
-  m_Layer: 0
-  m_Name: OutlineHighlightManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1653734573
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653734572}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1932647417}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1653734574
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653734572}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37264f19cd936e24490c75e38d846c1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1669134598 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1617832851698265989, guid: 6521549b8d294ca4fa4ce759f53dca87,
@@ -912,7 +917,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1932647417}
   m_Layer: 0
-  m_Name: Manager
+  m_Name: Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -931,7 +936,6 @@ Transform:
   m_Children:
   - {fileID: 1317606654}
   - {fileID: 202304534}
-  - {fileID: 1653734573}
   - {fileID: 30134452}
   m_Father: {fileID: 0}
   m_RootOrder: 3
