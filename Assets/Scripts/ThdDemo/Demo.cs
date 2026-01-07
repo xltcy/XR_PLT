@@ -18,68 +18,66 @@ public class Demo : MonoBehaviour
     private string _video_path = "Resources/video/thd_video-480p_24fps.mp4";
     private string _pose_path = "Resources/Pose/thd_video_pose.txt";
 
-    private VideoPlayManager _video_play_manager;
-    private CamTrajManager _cam_traj_manager;
-    private OutlineHighlightManager _outline_highlight_manager;
-    private MaterialManager _material_manager;
+    private VideoPlayController videoPlayController;
+    private CamTrajController camTrajController;
+    private MaterialController materialController;
 
     void Start()
     {
         _video_path = Path.Combine(Application.dataPath, _video_path);
         _pose_path = Path.Combine(Application.dataPath, _pose_path);
 
-        _video_play_manager = FindObjectOfType<VideoPlayManager>();
-        _cam_traj_manager = FindObjectOfType<CamTrajManager>();
-        _outline_highlight_manager = FindObjectOfType<OutlineHighlightManager>();
-        _material_manager = FindObjectOfType<MaterialManager>();
+        videoPlayController = ControllerRefer.VideoPlayController;
+        camTrajController = ControllerRefer.CamTrajController;
+        materialController = ControllerRefer.MaterialController;
     }
 
     void Update()
     {
         //if (Input.GetKeyUp(KeyCode.Alpha1)) ModelTreeNode.OneDofExplosion(???;
         //if (Input.GetKeyUp(KeyCode.Alpha2)) ModelTreeNode.TwoDofExplosion(??;
-        //if (Input.GetKeyUp(KeyCode.Alpha3)) ModelTreeNode.ThreeDofExplosion(ùù??;
-        //if (Input.GetKeyUp(KeyCode.Alpha4)) ModelTreeNode.ThreeDofExplosion(ùù??;
-        //if (Input.GetKeyUp(KeyCode.Alpha5)) ModelTreeNode.TwoDofExplosion(ùùùù);
+        //if (Input.GetKeyUp(KeyCode.Alpha3)) ModelTreeNode.ThreeDofExplosion(ÔøΩÔøΩ??;
+        //if (Input.GetKeyUp(KeyCode.Alpha4)) ModelTreeNode.ThreeDofExplosion(ÔøΩÔøΩ??;
+        //if (Input.GetKeyUp(KeyCode.Alpha5)) ModelTreeNode.TwoDofExplosion(ÔøΩÔøΩÔøΩÔøΩ);
         if (Input.GetKeyUp(KeyCode.Alpha1))
         {
-            _video_play_manager.LoadAndPlay(_video_path);
-            _cam_traj_manager.StartCamMovment(_pose_path);
-            _material_manager.SetTransparent(thd);
+            videoPlayController.LoadAndPlay(_video_path);
+            camTrajController.StartCamMovement(_pose_path);
+            materialController.SetTransparent(thd);
         }
         else if (Input.GetKeyUp(KeyCode.A))
         {
-            _material_manager.SetTransparent(thd);
+            materialController.SetTransparent(thd);
         }
         else if (Input.GetKeyUp(KeyCode.Q))
         {
-            _material_manager.RestoreMaterials();
+            materialController.RestoreMaterials();
         }
         else if (Input.GetKeyUp(KeyCode.Alpha3))
         {
-            _outline_highlight_manager.HighlightObject(monster);
+            monster.HighlightObject();
         }
         else if (Input.GetKeyUp(KeyCode.E))
         {
-            _outline_highlight_manager.HideHighlight(monster);
+            monster.HideHighlight();
         }
         else if (Input.GetKeyUp(KeyCode.Alpha4))
         {
-            _outline_highlight_manager.HighlightObject(door);
+            door.HighlightObject();
         }
         else if (Input.GetKeyUp(KeyCode.R))
         {
-            _outline_highlight_manager.HideHighlight(door);
+            door.HideHighlight();
         }
         else if (Input.GetKeyUp(KeyCode.Alpha2))
         {
-            _outline_highlight_manager.HighlightObject(up_roof);
-            _outline_highlight_manager.HighlightObject(down_roof);
+            up_roof.HighlightObject();
+            down_roof.HighlightObject();
         }
         else if (Input.GetKeyUp(KeyCode.W))
         {
-            _outline_highlight_manager.HideHighlight(up_roof);
-            _outline_highlight_manager.HideHighlight(down_roof);
+            up_roof.HideHighlight();
+            down_roof.HideHighlight();
         }
         else if (Input.GetKeyUp(KeyCode.S))
         {

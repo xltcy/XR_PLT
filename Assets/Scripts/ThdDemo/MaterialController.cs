@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaterialManager : MonoBehaviour
+public class MaterialController : BaseController
 {
     public Material _transparent_material;
     public bool _enableDebug = true;
@@ -54,7 +54,7 @@ public class MaterialManager : MonoBehaviour
 
         BackupMaterials(renderer);
 
-        // ´´½¨ÐÂµÄ²ÄÖÊÊý×é
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         Material[] newMaterials = new Material[renderer.materials.Length];
 
         for (int i = 0; i < newMaterials.Length; i++)
@@ -62,12 +62,12 @@ public class MaterialManager : MonoBehaviour
             newMaterials[i] = _transparent_material;
         }
 
-        // Ó¦ÓÃÐÂ²ÄÖÊ
+        // Ó¦ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½
         renderer.materials = newMaterials;
 
         if (_enableDebug)
         {
-            Debug.Log($"ÒÑ½« {renderer.gameObject.name} µÄ {newMaterials.Length} ¸ö²ÄÖÊÌæ»»ÎªÍ¸Ã÷²ÄÖÊ");
+            Debug.Log($"ï¿½Ñ½ï¿½ {renderer.gameObject.name} ï¿½ï¿½ {newMaterials.Length} ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ»»ÎªÍ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         }
     }
 

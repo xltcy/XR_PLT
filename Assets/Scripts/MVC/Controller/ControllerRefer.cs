@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2025-12-11 19:41:41
-// 包含 15 个继承 BaseController 的类
+// 生成时间: 2026-01-07 11:30:57
+// 包含 18 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -15,6 +15,15 @@ using UnityEngine;
 /// </summary>
 public static class ControllerRefer
 {
+    private static CamTrajController _camTrajController;
+    public static CamTrajController CamTrajController
+    {
+        get
+        {
+            return _camTrajController ??= ControllerRegister.Instance?.GetController<CamTrajController>();
+        }
+    }
+
     private static Click3DObjectManager _click3DObjectManager;
     public static Click3DObjectManager Click3DObjectManager
     {
@@ -48,6 +57,15 @@ public static class ControllerRefer
         get
         {
             return _loadingViewController ??= ControllerRegister.Instance?.GetController<LoadingViewController>();
+        }
+    }
+
+    private static MaterialController _materialController;
+    public static MaterialController MaterialController
+    {
+        get
+        {
+            return _materialController ??= ControllerRegister.Instance?.GetController<MaterialController>();
         }
     }
 
@@ -141,6 +159,15 @@ public static class ControllerRefer
         }
     }
 
+    private static VideoPlayController _videoPlayController;
+    public static VideoPlayController VideoPlayController
+    {
+        get
+        {
+            return _videoPlayController ??= ControllerRegister.Instance?.GetController<VideoPlayController>();
+        }
+    }
+
     private static VoiceController _voiceController;
     public static VoiceController VoiceController
     {
@@ -174,6 +201,8 @@ public static class ControllerRefer
         // 使用 switch 语句根据名称返回对应的 Controller
         switch (controllerName)
         {
+            case "CamTrajController":
+                return CamTrajController;
             case "Click3DObjectManager":
                 return Click3DObjectManager;
             case "EditModeManager":
@@ -182,6 +211,8 @@ public static class ControllerRefer
                 return ExternalModelController;
             case "LoadingViewController":
                 return LoadingViewController;
+            case "MaterialController":
+                return MaterialController;
             case "MeshController":
                 return MeshController;
             case "MoveController":
@@ -202,6 +233,8 @@ public static class ControllerRefer
                 return TrackingImageManager;
             case "UIManager":
                 return UIManager;
+            case "VideoPlayController":
+                return VideoPlayController;
             case "VoiceController":
                 return VoiceController;
             default:
@@ -215,10 +248,12 @@ public static class ControllerRefer
     /// </summary>
     public static void ResetAll()
     {
+        _camTrajController = null;
         _click3DObjectManager = null;
         _editModeManager = null;
         _externalModelController = null;
         _loadingViewController = null;
+        _materialController = null;
         _meshController = null;
         _moveController = null;
         _rotateController = null;
@@ -229,6 +264,7 @@ public static class ControllerRefer
         _swipeManager = null;
         _trackingImageManager = null;
         _uIManager = null;
+        _videoPlayController = null;
         _voiceController = null;
     }
 }

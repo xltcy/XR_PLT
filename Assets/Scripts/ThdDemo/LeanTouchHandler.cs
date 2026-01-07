@@ -31,10 +31,10 @@ public class LeanTouchHandler : MonoBehaviour
 
         if (count % 2 == 0)
         {
-            // »Ö¸´²ÄÖÊ
-            FindObjectOfType<MaterialManager>().RestoreMaterials(gameObject.transform.GetComponent<MeshRenderer>());
+            // ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
+            FindObjectOfType<MaterialController>().RestoreMaterials(gameObject.transform.GetComponent<MeshRenderer>());
 
-            // °ÑÎïÌåÒÆ¶¯µ½Ïà»úÇ°
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°
             _origin_parent = transform.parent;
             var cam = Camera.main;
             gameObject.transform.SetParent(cam.transform, false);
@@ -56,10 +56,10 @@ public class LeanTouchHandler : MonoBehaviour
         }
         else
         {
-            // Òþ²Ø²ÄÖÊ
-            FindObjectOfType<MaterialManager>().ReplaceAllMaterials(gameObject.transform.GetComponent<MeshRenderer>());
+            // ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½
+            FindObjectOfType<MaterialController>().ReplaceAllMaterials(gameObject.transform.GetComponent<MeshRenderer>());
 
-            // °ÑÎïÌå·Å»ØÔ­Î»
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½Ô­Î»
             transform.SetParent(_origin_parent, false);
             transform.localPosition = Vector3.zero;
             transform.rotation = Quaternion.identity;
@@ -73,31 +73,31 @@ public class LeanTouchHandler : MonoBehaviour
 
         if (IsSwipeLeft(finger))
         {
-            // ÎïÌåÈÆzÖáË³Ê±Õë×ªangle¶È
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½Ë³Ê±ï¿½ï¿½×ªangleï¿½ï¿½
             RotateController.RotateToTarget(gameObject, ROTATE_ANGLE, Camera.main.transform.up);
         }
         else if (IsSwipeRight(finger))
         {
-            // ÎïÌåÈÆzÖáÄæÊ±Õë×ªangle¶È
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½×ªangleï¿½ï¿½
             RotateController.RotateToTarget(gameObject, -ROTATE_ANGLE, Camera.main.transform.up);
         }
     }
 
     private bool IsSwipeLeft(LeanFinger finger)
     {
-        // »ñÈ¡»¬¶¯µÄ·½Ïò
+        // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
         var swipeDelta = finger.SwipeScreenDelta.normalized;
 
-        // ÅÐ¶Ï»¬¶¯ÊÇ·ñÖ÷ÒªÊÇÏò×óµÄ
+        // ï¿½Ð¶Ï»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         return swipeDelta.x < 0 && -swipeDelta.x > Math.Abs(swipeDelta.y);
     }
 
     private bool IsSwipeRight(LeanFinger finger)
     {
-        // »ñÈ¡»¬¶¯µÄ·½Ïò
+        // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
         var swipeDelta = finger.SwipeScreenDelta.normalized;
 
-        // ÅÐ¶Ï»¬¶¯ÊÇ·ñÖ÷ÒªÊÇÏòÓÒµÄ
+        // ï¿½Ð¶Ï»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½
         return swipeDelta.x > 0 && swipeDelta.x > Math.Abs(swipeDelta.y);
     }
 

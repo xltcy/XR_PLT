@@ -4,26 +4,29 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
-public class VideoPlayManager : MonoBehaviour
+public class VideoPlayController : BaseController
 {
     public RawImage videoDisplay;
     private VideoPlayer videoPlayer;
     private AudioSource audioSource;
 
-    void Start()
+    public override void OnRegister()
     {
+        base.OnRegister();
+        
+        
         videoPlayer = gameObject.AddComponent<VideoPlayer>();
         audioSource = gameObject.AddComponent<AudioSource>();
 
-        // ÅäÖÃVideoPlayer
+        // ï¿½ï¿½ï¿½ï¿½VideoPlayer
         videoPlayer.playOnAwake = false;
         videoPlayer.waitForFirstFrame = true;
 
-        // ÉèÖÃÒôÆµÊä³ö
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½
         videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
         videoPlayer.SetTargetAudioSource(0, audioSource);
 
-        // ÉèÖÃäÖÈ¾µ½RawImage
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¾ï¿½ï¿½RawImage
         videoPlayer.renderMode = VideoRenderMode.RenderTexture;
         RenderTexture renderTexture = new RenderTexture(1920, 1080, 24);
         videoPlayer.targetTexture = renderTexture;

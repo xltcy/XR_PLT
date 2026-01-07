@@ -6,7 +6,7 @@ using UnityEngine.XR.ARFoundation;
 /// <summary>
 /// Manage to play video on an ARTrackedImage.
 /// </summary>
-public class VideoManager : MonoBehaviour
+public class VideoPlayComponent : MonoBehaviour
 {
     public VideoPlayer videoPlayer;
 

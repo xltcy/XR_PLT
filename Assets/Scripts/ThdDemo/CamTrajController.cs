@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class CamTrajManager : MonoBehaviour
+public class CamTrajController : BaseController
 {
     public Camera _cam;
     private Queue<string> _pose_lines = new Queue<string>();
 
-    public void StartCamMovment(string pose_path)
+    public void StartCamMovement(string pose_path)
     {
         ReadAllLines(pose_path);
-        InvokeRepeating("PlaceNextCam", 0.0f, 0.2f);
+        InvokeRepeating(nameof(PlaceNextCam), 0.0f, 0.2f);
     }
 
     private void ReadAllLines(string pose_path)

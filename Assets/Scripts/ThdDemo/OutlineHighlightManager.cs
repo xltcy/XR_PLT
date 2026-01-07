@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UniGLTF;
 using UnityEngine;
 
-public class OutlineHighlightManager : MonoBehaviour
+public static class GameObjectOutlineExtensions
 {
-    public void HighlightObject(GameObject target)
+    public static void HighlightObject(this GameObject target)
     {
         var otl = target.GetOrAddComponent<Outline>();
         otl.enabled = true;
@@ -14,7 +14,7 @@ public class OutlineHighlightManager : MonoBehaviour
         otl.OutlineWidth = 3.0f;
     }
 
-    public void HideHighlight(GameObject target)
+    public static void HideHighlight(this GameObject target)
     {
         var otl = target.GetOrAddComponent<Outline>();
         otl.enabled = false;
