@@ -63,7 +63,7 @@ public class SMPLController : BaseController
 
     public void InitilizeObjectWithTag()
     {
-        scene = GameObject.FindGameObjectWithTag(nameof(SceneController.GameObjectTag.Mesh));
+        scene = ControllerRefer.SceneController.scene;
     }
 
     private Vector3 initPos

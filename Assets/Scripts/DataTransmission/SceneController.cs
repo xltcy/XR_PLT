@@ -58,7 +58,13 @@ public class SceneController : BaseController
             return list;
         }
     }
-    private GameObject scene;
+
+    private GameObject _scene;
+    public GameObject scene
+    {
+        private set => _scene = value;
+        get => _scene;
+    }
 
     #region 生命周期函数
     public override void OnRegister()
