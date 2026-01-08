@@ -37,7 +37,7 @@ public class MeshController : BaseController
     [Header("本地图片路径")]
     public string testImagePath;
 
-    private Matrix4x4 camPoseT0, camPoseT1;
+    private Matrix4x4 camPoseT0;
 
     private List<SummaryItemData> summary = new List<SummaryItemData>();
     private int selectedSceneIndex = 0;
@@ -134,109 +134,7 @@ public class MeshController : BaseController
         buttonHideSonar.gameObject.SetActive(true);
     }
 
-    //public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
-    //{
-    //    GameObject obj = GameObject.FindGameObjectWithTag(tag);
-    //    MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
-    //    foreach (MeshRenderer meshRenderer in meshRenderers)
-    //    {
-    //        Material[] materials = meshRenderer.materials;
-    //        foreach (Material material in materials)
-    //        {
-    //            material.shader = targetShader;
-    //        }
-    //    }
-    //}
-
-    public static float GetModelScale(GameObject modelInstance)
-    {
-        Transform mesh = modelInstance.transform.GetChildByName("mesh");
-        if (mesh != null)
-        {
-            return mesh.localScale.x;
-        }
-
-        for (int i = 0; i < modelInstance.transform.childCount; i++)
-        {
-            var childTrans = modelInstance.transform.GetChild(i);
-            if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
-            {
-                continue;
-            }
-            return childTrans.localScale.x;
-        }
-        
-        return modelInstance.transform.localScale.x;
-    }
-
-    public void ClickToSummonAtCamera()
-    {
-        SetStartState(StartState.Summoning);
-
-        // init modelInstance
-        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
-        // set AstarPath ConsPos;
-        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
-        SMPLController.SetConsPos(centerPos);
-        
-        modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
-        modelInstance.transform.rotation = relocatedPose.rotation;
-
-        SetStartState(StartState.Normal);
-    }
-
-    public void ClickToSummonSonarAtCamera()
-    {
-        string prefabPathInResources = "Prefab/Prefab-Sonar";
-
-        SetStartState(StartState.Summoning);
-
-        GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
-        if (prefab == null)
-        {
-            Debug.LogError("找不到 prefab：" + prefabPathInResources);
-            return;
-        }
-
-        if (!sonarGO)
-        {
-            sonarGO = Instantiate(prefab);
-        }
-
-        float scale = GetModelScale(sonarGO);
-        //绕z轴旋转180
-        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedSonarPose.rotation * Vector3.forward);
-
-        // 更新 Pose 的旋转
-        relocatedSonarPose.rotation = rot180 * relocatedSonarPose.rotation;
-
-        sonarGO.transform.position = relocatedSonarPose.position * scale;
-        sonarGO.transform.rotation = relocatedSonarPose.rotation;
-        
-        
-        //todo 删除临时代码
-        Vector3 tempPos = new Vector3(7.007f, 0.179f, 3.184f); //相对场景的坐标
-        sonarGO.transform.position = ControllerRefer.SceneController.scene.transform.TransformPoint(tempPos);
-        Quaternion rotationOffset = new Quaternion(0, 0.958146751f, 0, 0.286277622f); //相对场景的旋转
-        sonarGO.transform.rotation = ControllerRefer.SceneController.scene.transform.rotation * rotationOffset;
-        
-        sonarGO.SetVisible(true);
-    }
-
-    public void ClickRotateR()
-    {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.right, 90f);
-    }
-
-    public void ClickRotateF()
-    {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.forward, 90f);
-    }
-
-    public void ClickRotateU()
-    {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.up, 90f);
-    }
+    #region 前后端通信
     public enum RelocateType
     {
         Scene = 0,
@@ -269,16 +167,17 @@ public class MeshController : BaseController
         }
         else
         {
-            
             //尝试读取DebugSwitch中的路径
             string debugImagePath = DebugSwitch.Instance.GetRelocateDebugImgPath(relocateType);
             if (!debugImagePath.IsNullOrEmpty())
             {
+                Debug.Log($"重定位图片：{debugImagePath.ToString()}");
                 rawData = ReadImageBytes(debugImagePath);
             }
             else
             {
                 // load from file
+                Debug.Log($"重定位图片：{testImagePath.ToString()}");
                 rawData = ReadImageBytes(testImagePath);
             }
         }
@@ -291,7 +190,6 @@ public class MeshController : BaseController
                 SendImage(rawData);
                 break;
         }
-        Debug.Log(testImagePath.ToString());
     }
 
     private void SendImageAndReadJson(byte[] rawData)
@@ -375,18 +273,7 @@ public class MeshController : BaseController
         /// </summary>
         public Matrix4x4 ToMatrix()
         {
-            if (poseMatrix == null) return Matrix4x4.identity;
-
-            Matrix4x4 m = Matrix4x4.identity;
-
-            for (int r = 0; r < 3; r++)
-                for (int c = 0; c < 4; c++)
-                    m[r, c] = poseMatrix[r, c];
-
-            // 补最后一行
-            m[3, 0] = 0; m[3, 1] = 0; m[3, 2] = 0; m[3, 3] = 1;
-
-            return m;
+            return MatrixUtil.FloatArrayToMatrix(poseMatrix);
         }
 
         /// <summary>
@@ -394,12 +281,10 @@ public class MeshController : BaseController
         /// </summary>
         public Pose ToPose()
         {
-            Matrix4x4 m = ToMatrix();
-            Vector3 position = m.GetColumn(3);
-            Quaternion rotation = Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
-            return new Pose(position, rotation);
+            return MatrixUtil.FloatArrayToPose(poseMatrix);
         }
     }
+
     private void GetSonarPoseCallBack(bool result, NetworkResponse response)
     {
         if (result)
@@ -423,7 +308,6 @@ public class MeshController : BaseController
             Debug.Log($"Position: {relocatedSonarPose.position}, Rotation: {relocatedSonarPose.rotation}");
         }
     }
-
 
     private byte[] GetImageByARFoundation()
     {
@@ -452,45 +336,83 @@ public class MeshController : BaseController
         renderTexture = Texture2DRotateUtil.RotateByOrientation(renderTexture);
         return renderTexture.EncodeToJPG();
     }
+    #endregion
 
-    //todo 好像是合并到ClickToGetPoseByCapture()里面？
-    //public void ClickToGetPoseWithImage()
+    #region 放置模型
+    public void ClickToSummonAtCamera()
+    {
+        SetStartState(StartState.Summoning);
+
+        // init modelInstance
+        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
+        // set AstarPath ConsPos;
+        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
+        SMPLController.SetConsPos(centerPos);
+        
+        modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
+        modelInstance.transform.rotation = relocatedPose.rotation;
+
+        SetStartState(StartState.Normal);
+    }
+
+    public void ClickToSummonSonarAtCamera()
+    {
+        string prefabPathInResources = "Prefab/Prefab-Sonar";
+
+        SetStartState(StartState.Summoning);
+
+        GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
+        if (prefab == null)
+        {
+            Debug.LogError("找不到 prefab：" + prefabPathInResources);
+            return;
+        }
+
+        if (!sonarGO)
+        {
+            sonarGO = Instantiate(prefab);
+        }
+
+        float scale = GetModelScale(sonarGO);
+        //绕z轴旋转180
+        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedSonarPose.rotation * Vector3.forward);
+
+        // 更新 Pose 的旋转
+        relocatedSonarPose.rotation = rot180 * relocatedSonarPose.rotation;
+
+        sonarGO.transform.position = relocatedSonarPose.position * scale;
+        sonarGO.transform.rotation = relocatedSonarPose.rotation;
+        
+        
+        //todo 删除临时代码
+        Vector3 tempPos = new Vector3(7.007f, 0.179f, 3.184f); //相对场景的坐标
+        sonarGO.transform.position = ControllerRefer.SceneController.scene.transform.TransformPoint(tempPos);
+        Quaternion rotationOffset = new Quaternion(0, 0.958146751f, 0, 0.286277622f); //相对场景的旋转
+        sonarGO.transform.rotation = ControllerRefer.SceneController.scene.transform.rotation * rotationOffset;
+        
+        sonarGO.SetVisible(true);
+    }
+
+    //public void ClickToSummonSonar()
     //{
-    //    buttonGetPose.GetComponent<Button>().interactable = false;
-    //    buttonSummonAtCamera.gameObject.SetActive(false);
-
-    //    string url = serverUrl;
-
-    //    // Record Camera Pose
-    //    Vector3 camPosition = arCamera.transform.position;
-    //    Quaternion camRotation = arCamera.transform.rotation;
-    //    camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
-
-    //    string imagePath = testImagePath;
-    //    byte[] fileData = File.ReadAllBytes(imagePath);
-    //    var texture = ExifUtil.FixOrientation(fileData);
-
-    //    Debug.Log(imagePath.ToString());
-
-
-    //    if (datasetLoc != null)
-    //    {
-    //        url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
-    //    }
-
-    //    StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
-
+    //    Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
+    //    Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
+    //    world2Camera = world2Camera * rotationMatrixTest;
+    //    return world2Camera;
     //}
-
 
     public Pose TransArrayToWorldPose(Matrix4x4 camPose, float[,] num)
     {
         Matrix4x4 c2w = MatrixUtil.FloatArrayToMatrix(num);
         Matrix4x4 w2c = camPose * c2w.inverse;
+        // 目前假设模型是3D Scanner重建的(RUB)，且是obj文件(is_wavefront)
+        // TODO 把模型的坐标系和是否为obj文件写入到场景的json中
         Matrix4x4 coord_xform = MatrixUtil.GetCoordXform("RUB", is_wavefront: true);
         return MatrixUtil.MatrixToPose(w2c * coord_xform);
     }
+    #endregion
 
+    #region PC测试
     private Pose testPose()
     {
         float[,] temp = new float[4, 4]
@@ -502,13 +424,6 @@ public class MeshController : BaseController
         };
 
         return TransArrayToWorldPose(camPoseT0, temp);
-    }
-
-    private void SetStartState(StartState newState)
-    {
-        buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
-        buttonGetPose.gameObject.SetActive(newState != StartState.WaitSummon && newState != StartState.Summoning);
-        buttonSummonAtCamera.gameObject.SetActive(newState == StartState.WaitSummon);
     }
 
     public void tempGetPose()
@@ -557,19 +472,34 @@ public class MeshController : BaseController
         SetStartState(StartState.Normal);
     }
 
-    public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
-    {
-        GameObject obj = GameObject.FindGameObjectWithTag(tag);
-        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
-        foreach(MeshRenderer meshRenderer in meshRenderers)
-        {
-            Material[] materials = meshRenderer.materials;
-            foreach(Material material in materials)
-            {
-                material.shader = targetShader;
-            }
-        }
-    }
+    //todo 好像是合并到ClickToGetPoseByCapture()里面？
+    //public void ClickToGetPoseWithImage()
+    //{
+    //    buttonGetPose.GetComponent<Button>().interactable = false;
+    //    buttonSummonAtCamera.gameObject.SetActive(false);
+
+    //    string url = serverUrl;
+
+    //    // Record Camera Pose
+    //    Vector3 camPosition = arCamera.transform.position;
+    //    Quaternion camRotation = arCamera.transform.rotation;
+    //    camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+
+    //    string imagePath = testImagePath;
+    //    byte[] fileData = File.ReadAllBytes(imagePath);
+    //    var texture = ExifUtil.FixOrientation(fileData);
+
+    //    Debug.Log(imagePath.ToString());
+
+
+    //    if (datasetLoc != null)
+    //    {
+    //        url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
+    //    }
+
+    //    StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
+
+    //}
 
     byte[] ReadImageBytes(string path)
     {
@@ -586,6 +516,79 @@ public class MeshController : BaseController
             return null;
         }
     }
+    #endregion
+
+    //public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
+    //{
+    //    GameObject obj = GameObject.FindGameObjectWithTag(tag);
+    //    MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
+    //    foreach (MeshRenderer meshRenderer in meshRenderers)
+    //    {
+    //        Material[] materials = meshRenderer.materials;
+    //        foreach (Material material in materials)
+    //        {
+    //            material.shader = targetShader;
+    //        }
+    //    }
+    //}
+
+    public static float GetModelScale(GameObject modelInstance)
+    {
+        Transform mesh = modelInstance.transform.GetChildByName("mesh");
+        if (mesh != null)
+        {
+            return mesh.localScale.x;
+        }
+
+        for (int i = 0; i < modelInstance.transform.childCount; i++)
+        {
+            var childTrans = modelInstance.transform.GetChild(i);
+            if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
+            {
+                continue;
+            }
+            return childTrans.localScale.x;
+        }
+        
+        return modelInstance.transform.localScale.x;
+    }
+
+
+    public void ClickRotateR()
+    {
+        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.right, 90f);
+    }
+
+    public void ClickRotateF()
+    {
+        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.forward, 90f);
+    }
+
+    public void ClickRotateU()
+    {
+        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.up, 90f);
+    }
+
+    private void SetStartState(StartState newState)
+    {
+        buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
+        buttonGetPose.gameObject.SetActive(newState != StartState.WaitSummon && newState != StartState.Summoning);
+        buttonSummonAtCamera.gameObject.SetActive(newState == StartState.WaitSummon);
+    }
+    
+    public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
+    {
+        GameObject obj = GameObject.FindGameObjectWithTag(tag);
+        MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
+        foreach(MeshRenderer meshRenderer in meshRenderers)
+        {
+            Material[] materials = meshRenderer.materials;
+            foreach(Material material in materials)
+            {
+                material.shader = targetShader;
+            }
+        }
+    }
 
     private IEnumerator WaitUnitCountDownComplete(CountdownEvent countdownEvent, Action onComplete)
     {
@@ -593,16 +596,6 @@ public class MeshController : BaseController
         onComplete?.Invoke();
     }
 
-    //public void ClickToSummonSonar()
-    //{
-    //    Quaternion rot = Quaternion.Euler(0f, 0f, 0f);
-    //    Matrix4x4 rotationMatrixTest = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one).inverse;
-    //    world2Camera = world2Camera * rotationMatrixTest;
-    //    return world2Camera;
-    //}
-    
-    
-        
     /// <summary>
     /// 获取当前选择的场景摘要数据
     /// </summary>
