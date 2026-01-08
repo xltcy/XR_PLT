@@ -35,7 +35,7 @@ public class CamTrajController : BaseController
             var m = MatrixUtil.ParseMatrix(s_m);
             c2w = m * c2w * m.transpose;
 
-            var pose = MatrixUtil.GetPose(c2w);
+            var pose = MatrixUtil.MatrixToPose(c2w);
             _cam.transform.position = pose.position;
             _cam.transform.rotation = pose.rotation;
         }

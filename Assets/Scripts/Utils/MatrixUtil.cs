@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Globalization;
@@ -7,16 +8,17 @@ using UnityEditor;
 
 public class MatrixUtil
 {
+    #region çŸ©é˜µè¯»å–
     /// <summary>
-    /// ´ÓÎÄ¼ş¶ÁÈ¡Matrix4x4
+    /// ä»æ–‡ä»¶è¯»å–Matrix4x4
     /// </summary>
-    /// <param name="filePath">ÎÄ¼şÂ·¾¶</param>
-    /// <returns>UnityEngine.Matrix4x4¶ÔÏó</returns>
+    /// <param name="filePath">æ–‡ä»¶è·¯å¾„</param>
+    /// <returns>UnityEngine.Matrix4x4å¯¹è±¡</returns>
     public static Matrix4x4 ReadMatrixFromFile(string filePath)
     {
         if (!File.Exists(filePath))
         {
-            Debug.LogError($"ÎÄ¼şÎ´ÕÒµ½: {filePath}");
+            Debug.LogError($"æ–‡ä»¶æœªæ‰¾åˆ°: {filePath}");
             return Matrix4x4.identity;
         }
 
@@ -27,19 +29,19 @@ public class MatrixUtil
         }
         catch (Exception e)
         {
-            Debug.LogError($"¶ÁÈ¡ÎÄ¼şÊ§°Ü: {e.Message}");
+            Debug.LogError($"è¯»å–æ–‡ä»¶å¤±è´¥: {e.Message}");
             return Matrix4x4.identity;
         }
     }
 
     /// <summary>
-    /// ½âÎö¾ØÕó×Ö·û´®ÎªMatrix4x4
+    /// è§£æçŸ©é˜µå­—ç¬¦ä¸²ä¸ºMatrix4x4
     /// </summary>
-    /// <param name="matrixString">°üº¬16¸öÊıÖµµÄ×Ö·û´®</param>
-    /// <returns>Matrix4x4¶ÔÏó</returns>
+    /// <param name="matrixString">åŒ…å«16ä¸ªæ•°å€¼çš„å­—ç¬¦ä¸²</param>
+    /// <returns>Matrix4x4å¯¹è±¡</returns>
     public static Matrix4x4 ParseMatrix(string matrixString)
     {
-        // ÇåÀí×Ö·û´®£¬·Ö¸îÎªÊıÖµÊı×é
+        // æ¸…ç†å­—ç¬¦ä¸²ï¼Œåˆ†å‰²ä¸ºæ•°å€¼æ•°ç»„
         string[] stringValues = matrixString
             .Replace('\n', ' ')
             .Replace('\r', ' ')
@@ -48,11 +50,11 @@ public class MatrixUtil
 
         if (stringValues.Length != 16)
         {
-            Debug.LogError($"ĞèÒª16¸öÊıÖµ£¬µ«ÕÒµ½ÁË {stringValues.Length} ¸ö");
+            Debug.LogError($"éœ€è¦16ä¸ªæ•°å€¼ï¼Œä½†æ‰¾åˆ°äº† {stringValues.Length} ä¸ª");
             return Matrix4x4.identity;
         }
 
-        // ½âÎöÎªfloatÊı×é
+        // è§£æä¸ºfloatæ•°ç»„
         float[] values = new float[16];
         for (int i = 0; i < 16; i++)
         {
@@ -81,24 +83,116 @@ public class MatrixUtil
     }
 
     /// <summary>
-    /// ½âÎö¿ÆÑ§¼ÆÊı·¨µÄ¸¡µãÊı
+    /// è§£æç§‘å­¦è®¡æ•°æ³•çš„æµ®ç‚¹æ•°
     /// </summary>
     private static float ParseFloat(string value)
     {
         try
         {
-            // Ê¹ÓÃ²»±äÇøÓòĞÔÈ·±£ÕıÈ·½âÎö¿ÆÑ§¼ÆÊı·¨
+            // ä½¿ç”¨ä¸å˜åŒºåŸŸæ€§ç¡®ä¿æ­£ç¡®è§£æç§‘å­¦è®¡æ•°æ³•
             return float.Parse(value, CultureInfo.InvariantCulture);
         }
         catch (FormatException)
         {
-            Debug.LogError($"ÎŞ·¨½âÎöÊıÖµ: {value}");
+            Debug.LogError($"æ— æ³•è§£ææ•°å€¼: {value}");
             return 0f;
         }
     }
+    #endregion
 
+    #region æ•°æ®ç»“æ„è½¬æ¢
     /// <summary>
-    /// ´òÓ¡¾ØÕóĞÅÏ¢
+    /// å°†çŸ©é˜µè½¬æ¢ä¸ºTransformçš„positionå’Œrotation
+    /// </summary>
+    public static Pose MatrixToPose(Matrix4x4 matrix)
+    {
+        return new Pose(matrix.GetColumn(3), matrix.rotation);
+    }
+
+    public static Pose FloatArrayToPose(float[,] floatArray)
+    {
+        return MatrixToPose(FloatArrayToMatrix(floatArray));
+    }
+    
+    public static Matrix4x4 PoseToMatrix(Pose pose)
+    {
+        return Matrix4x4.TRS(pose.position, pose.rotation, Vector3.one);
+    }
+
+    public static Matrix4x4 FloatArrayToMatrix(float[,] floatArray)
+    {
+        // è·å–æ•°ç»„ç»´åº¦
+        int rows = floatArray.GetLength(0);
+        int cols = floatArray.GetLength(1);
+
+        // æ£€æŸ¥æ•°ç»„ç»´åº¦
+        if ((rows != 3 && rows != 4) || cols != 4)
+        {
+            throw new ArgumentException($"æ•°ç»„å¿…é¡»æ˜¯3x4æˆ–4x4çš„ï¼Œå½“å‰å½¢çŠ¶æ˜¯[{rows},{cols}]");
+        }
+
+        // åˆ›å»ºå¹¶è¿”å›Matrix4x4
+        return new Matrix4x4(
+            new Vector4(floatArray[0, 0], floatArray[1, 0], floatArray[2, 0], 0),
+            new Vector4(floatArray[0, 1], floatArray[1, 1], floatArray[2, 1], 0),
+            new Vector4(floatArray[0, 2], floatArray[1, 2], floatArray[2, 2], 0),
+            new Vector4(floatArray[0, 3], floatArray[1, 3], floatArray[2, 3], 1)
+        );
+    }
+    #endregion
+
+    #region åæ ‡ç³»å˜æ¢
+    private static Dictionary<char, Vector3> coordAxisMap = new Dictionary<char, Vector3>()
+    {
+        {'R', new Vector4(1, 0, 0, 0)},
+        {'L', new Vector4(-1, 0, 0, 0)},
+        {'U', new Vector4(0, 1, 0, 0)},
+        {'D', new Vector4(0, -1, 0, 0)},
+        {'F', new Vector4(0, 0, 1, 0)},
+        {'B', new Vector4(0, 0, -1, 0)},
+        {'r', new Vector4(1, 0, 0, 0)},
+        {'l', new Vector4(-1, 0, 0, 0)},
+        {'u', new Vector4(0, 1, 0, 0)},
+        {'d', new Vector4(0, -1, 0, 0)},
+        {'f', new Vector4(0, 0, 1, 0)},
+        {'b', new Vector4(0, 0, -1, 0)}
+    };
+
+    public static Matrix4x4 GetCoordXform(string src_coord, string dst_coord="RUF", bool is_wavefront=true)
+    {
+        Matrix4x4 coord_xform = Matrix4x4.identity;
+
+        Matrix4x4 src_base = new Matrix4x4(
+            coordAxisMap[src_coord[0]],
+            coordAxisMap[src_coord[1]],
+            coordAxisMap[src_coord[2]],
+            new Vector4(0, 0, 0, 1)
+        );
+        Matrix4x4 dst_base = new Matrix4x4(
+            coordAxisMap[dst_coord[0]],
+            coordAxisMap[dst_coord[1]],
+            coordAxisMap[dst_coord[2]],
+            new Vector4(0, 0, 0, 1)
+        );
+
+        coord_xform = dst_base.transpose * src_base;
+
+        // objæ–‡ä»¶åˆ™ç¿»è½¬Xè½´
+        if (!is_wavefront) return coord_xform;
+
+        Matrix4x4 x_axis_flip =new Matrix4x4(
+            new Vector4(-1, 0, 0, 0),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(0, 0, 0, 1)
+        );
+        return coord_xform * x_axis_flip;
+    }
+    #endregion
+
+    #region Debug
+    /// <summary>
+    /// æ‰“å°çŸ©é˜µä¿¡æ¯
     /// </summary>
     public static void PrintMatrix(Matrix4x4 matrix, string name = "Matrix")
     {
@@ -108,12 +202,5 @@ public class MatrixUtil
             $"[{matrix.m20:F8}, {matrix.m21:F8}, {matrix.m22:F8}, {matrix.m23:F8}]\n" +
             $"[{matrix.m30:F8}, {matrix.m31:F8}, {matrix.m32:F8}, {matrix.m33:F8}]");
     }
-
-    /// <summary>
-    /// ½«¾ØÕó×ª»»ÎªTransformµÄpositionºÍrotation
-    /// </summary>
-    public static Pose GetPose(Matrix4x4 matrix)
-    {
-        return new Pose(matrix.GetColumn(3), matrix.rotation);
-    }
+    #endregion
 }

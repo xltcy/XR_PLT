@@ -1,8 +1,6 @@
-using Pathfinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -12,15 +10,6 @@ using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Threading;
-using Unity.Collections;
-using UnityEngine.Events;
-using UnityEngine.Networking;
-using UnityEngine.UI;
-using static UnityEngine.UI.Button;
-using UnityEngine.XR.ARFoundation;
-using UnityEngine.XR.ARSubsystems;
-using static UnityEngine.GraphicsBuffer;
-using static VirHumanVoiceRecCommand;
 using UniGLTF;
 
 public class MeshController : BaseController
@@ -104,16 +93,6 @@ public class MeshController : BaseController
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
     }
     
-    void OnEnable()
-    {
-
-    }
-    
-    void OnDisable()
-    {
-
-    }
-
     public void InitSceneSummary(List<SummaryItemData> items)
     {
         summary = items;
@@ -506,18 +485,10 @@ public class MeshController : BaseController
 
     public Pose TransArrayToWorldPose(Matrix4x4 camPose, float[,] num)
     {
-        Matrix4x4 res = Matrix4x4.identity;
-        for (int i = 0; i < num.GetLength(0); i++)
-        {
-            res.SetRow(i, new Vector4(num[i, 0], num[i, 1], num[i, 2], num[i, 3]));
-        }
-        res.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
-        Debug.Log(res.ToString());
-
-        Matrix4x4 world2Camera = res.inverse;
-        // world2Camera = KeepModelYUp(world2Camera);
-        var resModelPoseWorld = camPose * world2Camera;
-        return new Pose(GetPosition(resModelPoseWorld), GetRotation(resModelPoseWorld));
+        Matrix4x4 c2w = MatrixUtil.FloatArrayToMatrix(num);
+        Matrix4x4 w2c = camPose * c2w.inverse;
+        Matrix4x4 coord_xform = MatrixUtil.GetCoordXform("RUB", is_wavefront: true);
+        return MatrixUtil.MatrixToPose(w2c * coord_xform);
     }
 
     private Pose testPose()
@@ -585,40 +556,6 @@ public class MeshController : BaseController
 
         SetStartState(StartState.Normal);
     }
-    Quaternion GetRotation(Matrix4x4 matrix)
-    {
-        float qw = Mathf.Sqrt(1f + matrix.m00 + matrix.m11 + matrix.m22) / 2;
-        float w = 4 * qw;
-        float qx = (matrix.m21 - matrix.m12) / w;
-        float qy = (matrix.m02 - matrix.m20) / w;
-        float qz = (matrix.m10 - matrix.m01) / w;
-
-        return new Quaternion(qx, qy, qz, qw);
-    }
-    Vector3 GetPosition(Matrix4x4 matrix)
-    {
-        return matrix.GetColumn(3);
-    }
-    Vector3 GetScale(Matrix4x4 matrix)
-    {
-        Vector3 scale;
-        scale.x = matrix.GetColumn(0).magnitude;
-        scale.y = matrix.GetColumn(1).magnitude;
-        scale.z = matrix.GetColumn(2).magnitude;
-        return scale;
-    }
-
-    private void DecomposePoseMatrix(Matrix4x4 pose, out Vector3 position, out Quaternion rotation, out Vector3 scale)
-    {
-        // 提取位置
-        position = GetPosition(pose);
-
-        // 提取缩放
-        scale = GetScale(pose);
-
-        // 提取旋转
-        rotation = GetRotation(pose);
-    }
 
     public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
     {
@@ -634,20 +571,6 @@ public class MeshController : BaseController
         }
     }
 
-    private bool IsEnlarge(Vector2 oP1, Vector2 oP2, Vector2 nP1, Vector2 nP2)
-    {
-        float length1 = Mathf.Sqrt((oP1.x - oP2.x) * (oP1.x - oP2.x) + (oP1.y - oP2.y) * (oP1.y - oP2.y));
-        float length2 = Mathf.Sqrt((nP1.x - nP2.x) * (nP1.x - nP2.x) + (nP1.y - nP2.y) * (nP1.y - nP2.y));
-        if (length1 < length2)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    
     byte[] ReadImageBytes(string path)
     {
         try
