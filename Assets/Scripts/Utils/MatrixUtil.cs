@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Globalization;
-using static UnityEngine.GraphicsBuffer;
-using UnityEditor;
 
 public class MatrixUtil
 {

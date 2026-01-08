@@ -404,10 +404,12 @@ public class MeshController : BaseController
     public Pose TransArrayToWorldPose(Matrix4x4 camPose, float[,] num)
     {
         Matrix4x4 c2w = MatrixUtil.FloatArrayToMatrix(num);
+        MatrixUtil.PrintMatrix(c2w, "后端返回的原始Pose");
         Matrix4x4 w2c = camPose * c2w.inverse;
         // 目前假设模型是3D Scanner重建的(RUB)，且是obj文件(is_wavefront)
         // TODO 把模型的坐标系和是否为obj文件写入到场景的json中
         Matrix4x4 coord_xform = MatrixUtil.GetCoordXform("RUB", is_wavefront: true);
+        MatrixUtil.PrintMatrix(w2c * coord_xform, "放置模型时使用的Pose");
         return MatrixUtil.MatrixToPose(w2c * coord_xform);
     }
     #endregion
