@@ -4308,7 +4308,7 @@ GameObject:
   - component: {fileID: 698180111}
   - component: {fileID: 698180112}
   m_Layer: 0
-  m_Name: MeshManager
+  m_Name: MeshController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5698,7 +5698,7 @@ GameObject:
   - component: {fileID: 930431121}
   - component: {fileID: 930431120}
   m_Layer: 0
-  m_Name: VoiceManager
+  m_Name: VoiceController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9587,7 +9587,7 @@ GameObject:
   - component: {fileID: 1454047320}
   - component: {fileID: 1454047321}
   m_Layer: 0
-  m_Name: SceneManager
+  m_Name: SceneController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12197,7 +12197,7 @@ GameObject:
   - component: {fileID: 1823502598}
   - component: {fileID: 1823502597}
   m_Layer: 0
-  m_Name: SpeechManager
+  m_Name: SpeechController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
