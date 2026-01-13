@@ -38,7 +38,7 @@ public class DebugMeshComponent : BaseStateComponent
     
     private EditModeManager.OperationTarget targetType;
     EditModeManager.OperationType operationType;
-    EditModeManager.OperationSpace operationSpace;
+    EditModeManager.OperationSpace operationSpace = EditModeManager.OperationSpace.Camera;
     GameObject meshObj;
 
     private void OnEnable()

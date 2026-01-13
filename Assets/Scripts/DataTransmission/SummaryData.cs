@@ -17,4 +17,6 @@ public class SummaryItemData
     public string sceneKey;
     //场景重定位算法，临时方案
     public string sceneRelocateAlgo;
+    //模型选择，原本填充在DataSetLoc，现在配置在json里
+    public string sceneDataSet;
 }

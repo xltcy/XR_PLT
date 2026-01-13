@@ -80,8 +80,7 @@ public class MeshController : BaseController
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
         buttonGetPose.gameObject.SetActive(true);
         buttonSummonAtCamera.gameObject.SetActive(false);
-
-
+        
         sceneSelectDropdown.ClearOptions();
 
         SetStartState(StartState.Normal);
@@ -100,7 +99,22 @@ public class MeshController : BaseController
         items.ForEach(item => options.Add(item.sceneName));
         sceneSelectDropdown.ClearOptions();
         sceneSelectDropdown.AddOptions(options);
+        
+        //手动初始化一次场景选择DropDown
+        OnSceneSelectChanged(sceneSelectDropdown.value);
     }
+
+    
+    //设置模型选择
+    private void SetDataSetLoc()
+    {
+        var curSummary = GetCurrentSummaryItemData();
+        if (datasetLoc)
+        {
+            datasetLoc.text = curSummary?.sceneDataSet;
+        }
+    }
+
 
     public void HideMeshRender()
     {
@@ -612,6 +626,7 @@ public class MeshController : BaseController
     private void OnSceneSelectChanged(int index)
     {
         selectedSceneIndex = index;
+        SetDataSetLoc();
     }
     
     #endregion callback

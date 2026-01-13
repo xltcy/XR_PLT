@@ -3,20 +3,18 @@
     {
       "sceneName": "北航工训楼展厅",
       "sceneKey": "test-GXL",
-      "sceneRelocateAlgo":"request_NVLAD_redir"
+      "sceneRelocateAlgo":"request_NVLAD_redir",
+      "sceneDataSet": "gxl"
     },{
       "sceneName": "北航航空博物馆",
       "sceneKey": "test-HKG",
-      "sceneRelocateAlgo":"request_NVLAD_redir"
+      "sceneRelocateAlgo":"request_NVLAD_redir",
+      "sceneDataSet": "hkg"
     },{
       "sceneName": "石景山",
       "sceneKey": "test-SJS",
-      "sceneRelocateAlgo":"request_NVLAD_redir"
-    },
-    {
-      "sceneName":"逸夫博物馆",
-      "sceneKey":"test-YF",
-      "sceneRelocateAlgo":"vggt_camera_locate"
+      "sceneRelocateAlgo":"request_NVLAD_redir",
+      "sceneDataSet": "sjs01"
     }
   ]
 }
