@@ -60,8 +60,15 @@ public class EditModeManager : BaseController
         Down
     }
     
+    public enum OperationSpace
+    {
+        Local,
+        World,
+        Camera
+    }
+    
     //处理物体变换
-    public void ProcessGoTransform(GameObject go, OperationType opType, OperationDirection opDir, float stepLen)
+    public void ProcessGoTransform(GameObject go, OperationType opType, OperationDirection opDir, float stepLen, OperationSpace space = OperationSpace.Local)
     {
         if (go == null) return;
         Vector3 vec = Vector3.one;
@@ -78,19 +85,43 @@ public class EditModeManager : BaseController
                 opDir == OperationDirection.Back ? -stepLen : opDir == OperationDirection.Forward ? stepLen : 0);
         }
 
-        switch (opType)
+        
+        if (space == OperationSpace.Local || space == OperationSpace.World)
         {
-            case OperationType.Move:
-                go.transform.Translate(vec);
-                break;
-            case OperationType.Rotate:
-                go.transform.Rotate(vec);
-                break;
-            case OperationType.Scale:
-                float factor = opDir == OperationDirection.Down || opDir == OperationDirection.Left || opDir == OperationDirection.Back ? -1 : 1;
-                go.transform.localScale += factor * new Vector3(stepLen, stepLen, stepLen);
-                break;
+            var unitySpace = space == OperationSpace.Local ? Space.Self : Space.World;
+            switch (opType)
+            {
+                case OperationType.Move:
+                    go.transform.Translate(vec, unitySpace);
+                    break;
+                case OperationType.Rotate:
+                    go.transform.Rotate(vec, unitySpace);
+                    break;
+                case OperationType.Scale:
+                    float factor = opDir == OperationDirection.Down || opDir == OperationDirection.Left || opDir == OperationDirection.Back ? -1 : 1;
+                    go.transform.localScale += factor * new Vector3(stepLen, stepLen, stepLen);
+                    break;
+            }      
         }
+        else if (space == OperationSpace.Camera)
+        {
+            switch (opType)
+            {
+                case OperationType.Move:
+                    Vector3 camVec = arCamera.transform.TransformDirection(vec);
+                    go.transform.position += camVec;
+                    break;
+                case OperationType.Rotate:
+                    Vector3 camRotVec = arCamera.transform.TransformDirection(vec);
+                    go.transform.Rotate(camRotVec, Space.World);
+                    break;
+                case OperationType.Scale:
+                    float factor = opDir == OperationDirection.Down || opDir == OperationDirection.Left || opDir == OperationDirection.Back ? -1 : 1;
+                    go.transform.localScale += factor * new Vector3(stepLen, stepLen, stepLen);
+                    break;
+            }      
+        }
+
     }
 
 }

@@ -13,6 +13,9 @@ public class DebugMeshComponent : BaseStateComponent
     [BindChild("p_Mesh操作对象")]
     private Dropdown dropdownOpTargetType;
     
+    [BindChild("p_Mesh_OperationSpace")]
+    private Dropdown dropdownOpSpace;
+    
     [BindChild("p_模型大小调节")]
     private Slider sliderModelScale;
 
@@ -35,6 +38,7 @@ public class DebugMeshComponent : BaseStateComponent
     
     private EditModeManager.OperationTarget targetType;
     EditModeManager.OperationType operationType;
+    EditModeManager.OperationSpace operationSpace;
     GameObject meshObj;
 
     private void OnEnable()
@@ -43,6 +47,7 @@ public class DebugMeshComponent : BaseStateComponent
         dropdownOpAmp?.AddValueChangeListener(OnOperationAmpChange);
         dropdownOpTargetType?.AddValueChangeListener(OnOperationTargetChange);
         dropDownOpType?.AddValueChangeListener(OnOperationTypeChange);
+        dropdownOpSpace?.AddValueChangeListener(OnOperationSpaceChange);
         
         // 初始化操作对象的类型，以获取物体
         if (dropdownOpTargetType)
@@ -57,6 +62,7 @@ public class DebugMeshComponent : BaseStateComponent
         dropdownOpAmp?.RemoveAllValueChangeListeners();
         dropdownOpTargetType?.RemoveAllValueChangeListeners();
         dropDownOpType?.RemoveAllValueChangeListeners();
+        dropdownOpSpace?.RemoveAllValueChangeListeners();
     }
 
     /// <summary>
@@ -79,7 +85,7 @@ public class DebugMeshComponent : BaseStateComponent
                 break;
             
         }
-        ControllerRefer.EditModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen);
+        ControllerRefer.EditModeManager.ProcessGoTransform(meshObj, operationType, opDir, stepLen, operationSpace);
     }
     
     public void OnBtnLeftClick()
@@ -182,6 +188,22 @@ public class DebugMeshComponent : BaseStateComponent
                 break;
             case 2:
                 operationType = EditModeManager.OperationType.Scale;
+                break;
+        }
+    }
+    
+    void OnOperationSpaceChange(int value)
+    {
+        switch (value)
+        {
+            case 0:
+                operationSpace = EditModeManager.OperationSpace.Camera;
+                break;
+            case 1:
+                operationSpace = EditModeManager.OperationSpace.World;
+                break;
+            case 2:
+                operationSpace = EditModeManager.OperationSpace.Local;
                 break;
         }
     }
