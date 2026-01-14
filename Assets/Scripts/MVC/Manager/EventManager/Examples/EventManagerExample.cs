@@ -8,13 +8,13 @@ public class EventManagerExample : MonoBehaviour
     private void Start()
     {
         // 1. 基本事件监听
-        EventManager.Instance.AddListener("Player.Damage", OnPlayerDamaged);
+        ManagerRefer.EventManager.AddListener("Player.Damage", OnPlayerDamaged);
         
         // 2. 泛型事件监听
-        EventManager.Instance.AddListener<PlayerData>("Player.Update", OnPlayerUpdated);
+        ManagerRefer.EventManager.AddListener<PlayerData>("Player.Update", OnPlayerUpdated);
         
         // 3. 带优先级和选项的监听器
-        _playerDamageListenerId = EventManager.Instance.AddListener(
+        _playerDamageListenerId = ManagerRefer.EventManager.AddListener(
             "Player.Damage.Critical",
             OnCriticalDamage,
             EventPriority.Critical,
@@ -24,23 +24,23 @@ public class EventManagerExample : MonoBehaviour
         this.AddEventListener("UI.Button.Click", OnButtonClick);
         
         // 5. 分发事件
-        EventManager.Instance.Dispatch("Game.Start", this, new { Level = 1 });
+        ManagerRefer.EventManager.Dispatch("Game.Start", this, new { Level = 1 });
         
         // 6. 分发泛型事件
         var playerData = new PlayerData { Health = 100, Score = 0 };
-        EventManager.Instance.Dispatch("Player.Spawn", playerData, this);
+        ManagerRefer.EventManager.Dispatch("Player.Spawn", playerData, this);
         
         // 7. 使用扩展方法分发事件
         this.TriggerEvent("Enemy.Destroyed", new { EnemyType = "Goblin", Score = 100 });
         
         // 8. 异步分发事件
-        EventManager.Instance.DispatchAsync("Background.Task", this, new { Task = "Processing" });
+        ManagerRefer.EventManager.DispatchAsync("Background.Task", this, new { Task = "Processing" });
         
         // 9. 等待事件（协程）
         StartCoroutine(WaitForLevelComplete());
         
         // 10. 系统消息
-        EventManager.Instance.SendSystemMessage("游戏初始化完成");
+        ManagerRefer.EventManager.SendSystemMessage("游戏初始化完成");
     }
 
     private void OnPlayerDamaged(EventData evt)
@@ -66,7 +66,7 @@ public class EventManagerExample : MonoBehaviour
 
     private System.Collections.IEnumerator WaitForLevelComplete()
     {
-        yield return EventManager.Instance.WaitForEvent("Level.Complete", evt =>
+        yield return ManagerRefer.EventManager.WaitForEvent("Level.Complete", evt =>
         {
             Debug.Log("关卡完成事件触发！");
         });
@@ -77,16 +77,16 @@ public class EventManagerExample : MonoBehaviour
     private void OnDestroy()
     {
         // 清理监听器
-        EventManager.Instance.RemoveListener("Player.Damage", OnPlayerDamaged);
+        ManagerRefer.EventManager.RemoveListener("Player.Damage", OnPlayerDamaged);
         
         // 通过ID移除
-        EventManager.Instance.RemoveListenerById(_playerDamageListenerId);
+        ManagerRefer.EventManager.RemoveListenerById(_playerDamageListenerId);
         
         // 移除对象所有监听器
         this.RemoveAllEventListener();
         
         // 打印状态
-        EventManager.Instance.PrintStatus();
+        ManagerRefer.EventManager.PrintStatus();
     }
 
     // 示例数据类

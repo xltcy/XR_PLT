@@ -164,31 +164,17 @@ public class EventListener<T> : EventListener
 /// <summary>
 /// 事件管理器 - 单例模式
 /// </summary>
-public class EventManager : MonoBehaviour
+public class EventManager : BaseManager
 {
-    #region Singleton
-    private static EventManager _instance;
-    public static EventManager Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                GameObject go = new GameObject("EventManager");
-                _instance = go.AddComponent<EventManager>();
-                DontDestroyOnLoad(go);
-            }
-            return _instance;
-        }
-    }
-    #endregion
-
     [Header("配置")]
-    [SerializeField] private bool enableLogging = true;
-    [SerializeField] private int maxEventHistory = 1000;
-    [SerializeField] private float asyncQueueInterval = 0.016f; // 约60Hz
-    [SerializeField] private bool autoCleanup = true;
-    [SerializeField] private float cleanupInterval = 60f; // 每60秒清理一次
+    private bool enableLogging = true;
+    private int maxEventHistory = 1000;
+    private float asyncQueueInterval = 0.016f; // 约60Hz
+    private bool autoCleanup = true;
+    private float cleanupInterval = 60f; // 每60秒清理一次
+    
+    //协程管理器 引用
+    private CoroutineManager _coroutineManager => ManagerRefer.CoroutineManager;
 
     // 事件监听器存储
     private Dictionary<string, List<EventListener>> _listeners = 
@@ -214,35 +200,31 @@ public class EventManager : MonoBehaviour
     public event EventDelegate OnEventConsumed;
 
     #region 初始化
-    private void Awake()
+
+    public override void OnRegister()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
+        base.OnRegister();
         _startTime = DateTime.Now;
         _lastCleanupTime = Time.time;
+        
+        _coroutineManager.StartManagedCoroutine(ProcessEventQueue(), this);
+        
+        if (autoCleanup)
+        {
+            _coroutineManager.StartManagedCoroutine(AutoCleanup(), this);
+        }
         
         Debug.Log("[EventManager] 初始化完成");
     }
 
-    private void Start()
+    public override void OnUnregister()
     {
-        StartCoroutine(ProcessEventQueue());
-        
-        if (autoCleanup)
-        {
-            StartCoroutine(AutoCleanup());
-        }
-    }
-
-    private void OnDestroy()
-    {
+        base.OnUnregister();
+        _coroutineManager.StopManagedCoroutines(this);
+        ClearEventQueue();
+        ClearEventHistory();
         ClearAllListeners();
+        Debug.Log("[EventManager] 已注销");
     }
     #endregion
 
@@ -568,7 +550,7 @@ public class EventManager : MonoBehaviour
     /// <summary>
     /// 清空事件队列
     /// </summary>
-    public void ClearEventQueue()
+    private void ClearEventQueue()
     {
         lock (_eventQueue)
         {
@@ -705,7 +687,7 @@ public class EventManager : MonoBehaviour
     /// <summary>
     /// 清理无效监听器
     /// </summary>
-    public void CleanupInvalidListeners()
+    private void CleanupInvalidListeners()
     {
         int totalRemoved = 0;
         var eventsToRemove = new List<string>();
@@ -893,7 +875,7 @@ public static class EventManagerExtensions
     public static string AddEventListener(this object owner, string eventName, Action<EventData> callback,
                            EventPriority priority = EventPriority.Normal)
     {
-        return EventManager.Instance.AddListener(eventName, callback, priority, EventOptions.Default, owner);
+        return ManagerRefer.EventManager.AddListener(eventName, callback, priority, EventOptions.Default, owner);
     }
 
     /// <summary>
@@ -901,7 +883,7 @@ public static class EventManagerExtensions
     /// </summary>
     public static EventData TriggerEvent(this object sender, string eventName, object data = null)
     {
-        return EventManager.Instance.Dispatch(eventName, sender, data);
+        return ManagerRefer.EventManager.Dispatch(eventName, sender, data);
     }
 
     /// <summary>
@@ -909,7 +891,7 @@ public static class EventManagerExtensions
     /// </summary>
     public static EventData<T> TriggerEvent<T>(this object sender, string eventName, T data)
     {
-        return EventManager.Instance.Dispatch(eventName, data, sender);
+        return ManagerRefer.EventManager.Dispatch(eventName, data, sender);
     }
 
     /// <summary>
@@ -917,7 +899,7 @@ public static class EventManagerExtensions
     /// </summary>
     public static void RemoveEventListener(this object owner, string eventName, Action<EventData> callback)
     {
-        EventManager.Instance.RemoveListener(eventName, callback);
+        ManagerRefer.EventManager.RemoveListener(eventName, callback);
     }
 
     /// <summary>
@@ -925,6 +907,6 @@ public static class EventManagerExtensions
     /// </summary>
     public static void RemoveAllEventListener(this object owner)
     {
-        EventManager.Instance.RemoveListenersByOwner(owner);
+        ManagerRefer.EventManager.RemoveListenersByOwner(owner);
     }
 }

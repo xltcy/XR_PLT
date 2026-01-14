@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 /// <summary>
 /// 调试用的开关，在DebugSwitch节点Editor界面上修改
@@ -17,7 +14,6 @@ public class DebugSwitch : Singleton<DebugSwitch>
     public bool DEBUG_FAKE_RELOCATE = false; 
     [SerializeField, Header("使用网络下载json")]
     public bool DEBUG_USING_NETWORK_JSON = false;
-    
     #endregion
     
     /*=========================================================================*/
@@ -30,10 +26,12 @@ public class DebugSwitch : Singleton<DebugSwitch>
     public Texture2D DebugSceneImg;
 
     private Texture2D curImg;
+    private bool isImgDisplay = false;
+    private ScreenImgComp.ScreenImgLayer imgLayer = ScreenImgComp.ScreenImgLayer.UI;
 
     public string GetRelocateDebugImgPath(MeshController.RelocateType type)
     {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         Texture2D img = null;
         switch (type)
         {
@@ -50,14 +48,35 @@ public class DebugSwitch : Singleton<DebugSwitch>
         string assetPath = AssetDatabase.GetAssetPath(img);
         string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
         return Path.GetFullPath(Path.Combine(projectRoot, assetPath));
-    #else
-            return string.Empty;
-    #endif
+#else
+        return string.Empty;
+#endif
     }
 
     public void ToggleImgDisplay()
     {
-        this.TriggerEvent(EventConstant.DEBUG_TOGGLE_SCREEN_IMG, curImg);
+        isImgDisplay = !isImgDisplay;
+        this.TriggerEvent(EventConstant.DEBUG_SET_SCREEN_IMG,
+            new ScreenImgComp.SetScreenImgEventData
+            {
+                curImg = curImg,
+                enabled = isImgDisplay,
+                imgLayer = imgLayer
+            }
+        );
+    }
+
+    public void ToggleImgLayer()
+    {
+        imgLayer = imgLayer == ScreenImgComp.ScreenImgLayer.UI ? ScreenImgComp.ScreenImgLayer.Space : ScreenImgComp.ScreenImgLayer.UI;
+        this.TriggerEvent(EventConstant.DEBUG_SET_SCREEN_IMG,
+            new ScreenImgComp.SetScreenImgEventData
+            {
+                curImg = curImg,
+                enabled = isImgDisplay,
+                imgLayer = imgLayer
+            }
+        );
     }
     
     #endregion

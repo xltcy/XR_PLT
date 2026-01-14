@@ -23,9 +23,9 @@ public class RequestParams
     // 新的 FormData 属性，支持多种类型
     public List<FormField> FormDataFields { get; set; }
 
-    public void Send(Transform lockable = null, NetworkServiceSystem.ResponseEvent callback = null)
+    public void Send(Transform lockable = null, NetworkServiceManager.ResponseEvent callback = null)
     {
-        NetworkServiceSystem.Instance.SendRequest(this, lockable, callback);
+        ManagerRefer.NetworkServiceManager.SendRequest(this, lockable, callback);
     }
 }
 
@@ -33,7 +33,7 @@ public class GetSummaryJsonRequestParams : RequestParams
 {
     public GetSummaryJsonRequestParams()
     {
-        url = NetworkServiceSystem.Instance.BuildUrl(NetworkUtil.GET_SCENE_LIST_INTERFACE);
+        url = ManagerRefer.NetworkServiceManager.BuildUrl(NetworkUtil.GET_SCENE_LIST_INTERFACE);
         networkConstant = NetworkConstant.SUMMARY_JSON;
     }
 }
@@ -43,7 +43,7 @@ public class GetSceneDataRequestParams : RequestParams
     public GetSceneDataRequestParams(SummaryItemData sceneItemData)
     {
         localData = sceneItemData;
-        url = NetworkServiceSystem.Instance.BuildUrl($"{NetworkUtil.GET_SCENE_CONFIG_INTERFACE}?sceneKey={UnityWebRequest.EscapeURL(sceneItemData.sceneKey)}");
+        url = ManagerRefer.NetworkServiceManager.BuildUrl($"{NetworkUtil.GET_SCENE_CONFIG_INTERFACE}?sceneKey={UnityWebRequest.EscapeURL(sceneItemData.sceneKey)}");
         networkConstant = NetworkConstant.SCENE_DATA;
     }
 }
@@ -52,7 +52,7 @@ public class UploadSceneDataRequestParams : RequestParams
 {
     public UploadSceneDataRequestParams(string sceneKey, string json)
     {
-        url = NetworkServiceSystem.Instance.BuildUrl($"{NetworkUtil.UPLOAD_SCENE_CONFIG_INTERFACE}?key={UnityWebRequest.EscapeURL(sceneKey)}");
+        url = ManagerRefer.NetworkServiceManager.BuildUrl($"{NetworkUtil.UPLOAD_SCENE_CONFIG_INTERFACE}?key={UnityWebRequest.EscapeURL(sceneKey)}");
         method = "POST";
 
         networkConstant = NetworkConstant.UPLOAD_SCENE_DATA;
@@ -66,7 +66,7 @@ public class GetSonarPoseParams : RequestParams
 {
     public GetSonarPoseParams(string name, byte[] imageData)
     {
-        url = NetworkServiceSystem.Instance.BuildUrl($"/media_app/obj_pose_estimate/?obj_name={name}");
+        url = ManagerRefer.NetworkServiceManager.BuildUrl($"/media_app/obj_pose_estimate/?obj_name={name}");
         method = "POST";
         networkConstant = NetworkConstant.GET_SONAR_POSE;
         

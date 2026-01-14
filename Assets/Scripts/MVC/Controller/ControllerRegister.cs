@@ -6,7 +6,8 @@ using UniGLTF;
 using UnityEngine;
 using UnityEngine.Rendering;
 /// <summary>
-/// Controller注册表，用于管理所有Controller和Manager
+/// Controller注册表，用于管理所有Controller
+/// Controller不同于Manager，Controller依赖于MonoBehaviour，必须挂载在GameObject上
 /// </summary>
 public class ControllerRegister : Singleton<ControllerRegister>
 {
@@ -29,7 +30,7 @@ public class ControllerRegister : Singleton<ControllerRegister>
     protected override void Awake()
     {
         // 添加 PersistentSingleton 组件
-        gameObject.GetOrAddComponent<PersistentSingleton>();
+        // gameObject.GetOrAddComponent<PersistentSingleton>();
 
         
         base.Awake();

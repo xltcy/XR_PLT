@@ -58,7 +58,7 @@ public class MeshController : BaseController
         base.OnRegister();
         
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetSonarPoseCallBack);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetSonarPoseCallBack);
 
         Init();
     }
@@ -66,7 +66,7 @@ public class MeshController : BaseController
     public override void OnUnregister()
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetSonarPoseCallBack);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetSonarPoseCallBack);
         
         base.OnUnregister();
     }

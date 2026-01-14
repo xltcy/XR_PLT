@@ -70,8 +70,8 @@ public class SceneController : BaseController
     public override void OnRegister()
     {
         base.OnRegister();
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
         
         InitiatePath();
         RequireSummaryData();
@@ -80,8 +80,8 @@ public class SceneController : BaseController
     public override void OnUnregister()
     {
         base.OnUnregister();
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, RequireSummaryDataCallback);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
     }
 
     // Update is called once per frame
@@ -212,7 +212,7 @@ public class SceneController : BaseController
     /// </summary>
     /// <param name="sceneItemData"></param>
     /// <param name="onComplete"></param>
-    public void RequestSceneDataByKey(SummaryItemData sceneItemData , NetworkServiceSystem.ResponseEvent onComplete = null)
+    public void RequestSceneDataByKey(SummaryItemData sceneItemData , NetworkServiceManager.ResponseEvent onComplete = null)
     {
         if (sceneItemData == null)
         {

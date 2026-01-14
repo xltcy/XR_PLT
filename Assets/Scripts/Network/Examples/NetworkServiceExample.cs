@@ -73,19 +73,19 @@ public class NetworkServiceExample : MonoBehaviour
 
     private void OnEnable()
     {
-        NetworkServiceSystem.AddResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
     }
 
     private void OnDisable()
     {
-        NetworkServiceSystem.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.SUMMARY_JSON, TestSummaryJsonCallback);
     }
 
     private void TestGetRequest()
     {
         Debug.Log("=== 测试GET请求 ===");
         
-        NetworkServiceSystem.Instance.Get("api/user/profile", null, callback: (result, response) =>
+        ManagerRefer.NetworkServiceManager.Get("api/user/profile", null, callback: (result, response) =>
         {
             if (response.success)
             {
@@ -113,7 +113,7 @@ public class NetworkServiceExample : MonoBehaviour
             deviceId = SystemInfo.deviceUniqueIdentifier
         };
 
-        string requestId = NetworkServiceSystem.Instance.Post("api/user/login", loginData, null, (result, response) =>
+        string requestId = ManagerRefer.NetworkServiceManager.Post("api/user/login", loginData, null, (result, response) =>
         {
             if (response.success)
             {
@@ -138,7 +138,7 @@ public class NetworkServiceExample : MonoBehaviour
     {
         Debug.Log("=== 测试带事件监听的请求 ===");
         
-        string requestId = NetworkServiceSystem.Instance.Get("api/game/data", null, callback: (result, response) =>
+        string requestId = ManagerRefer.NetworkServiceManager.Get("api/game/data", null, callback: (result, response) =>
         {
             // 主回调
             if (response.success)
@@ -149,7 +149,7 @@ public class NetworkServiceExample : MonoBehaviour
         });
 
         // 添加事件监听
-        NetworkServiceSystem.AddResponseListener(requestId, (result, response) =>
+        ManagerRefer.NetworkServiceManager.AddResponseListener(requestId, (result, response) =>
         {
             if (response.success)
             {
@@ -167,7 +167,7 @@ public class NetworkServiceExample : MonoBehaviour
         Debug.Log("=== 测试批量请求 ===");
         
         // 监听活跃请求数量
-        NetworkServiceSystem.Instance.OnActiveRequestsChanged += count =>
+        ManagerRefer.NetworkServiceManager.OnActiveRequestsChanged += count =>
         {
             Debug.Log($"活跃请求数: {count}");
         };
@@ -175,7 +175,7 @@ public class NetworkServiceExample : MonoBehaviour
         // 同时发送多个请求
         for (int i = 0; i < 3; i++)
         {
-            NetworkServiceSystem.Instance.Get($"api/game/item/{i}", null, callback: (result, response) =>
+            ManagerRefer.NetworkServiceManager.Get($"api/game/item/{i}", null, callback: (result, response) =>
             {
                 Debug.Log($"物品{i}请求完成: {response.success}");
             });
@@ -185,7 +185,7 @@ public class NetworkServiceExample : MonoBehaviour
     private void TestSummaryJson()
     {
         var getSummaryJsonRequestParams = new GetSummaryJsonRequestParams();
-        NetworkServiceSystem.Instance.SendRequest(getSummaryJsonRequestParams);
+        ManagerRefer.NetworkServiceManager.SendRequest(getSummaryJsonRequestParams);
     }
 
     private void TestSummaryJsonCallback(bool result, NetworkResponse response)
@@ -207,6 +207,6 @@ public class NetworkServiceExample : MonoBehaviour
     private void OnDestroy()
     {
         // 清理所有网络请求
-        NetworkServiceSystem.Instance.ClearAllRequests();
+        ManagerRefer.NetworkServiceManager.ClearAllRequests();
     }
 }

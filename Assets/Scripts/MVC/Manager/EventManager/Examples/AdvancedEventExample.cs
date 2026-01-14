@@ -7,12 +7,12 @@ public class AdvancedEventExample : MonoBehaviour
     private void Start()
     {
         // 1. 事件链
-        EventManager.Instance.AddListener("Order.Placed", OnOrderPlaced);
-        EventManager.Instance.AddListener("Payment.Processed", OnPaymentProcessed);
-        EventManager.Instance.AddListener("Shipping.Scheduled", OnShippingScheduled);
+        ManagerRefer.EventManager.AddListener("Order.Placed", OnOrderPlaced);
+        ManagerRefer.EventManager.AddListener("Payment.Processed", OnPaymentProcessed);
+        ManagerRefer.EventManager.AddListener("Shipping.Scheduled", OnShippingScheduled);
         
         // 2. 事件元数据
-        EventManager.Instance.AddListener("Analytics.Event", evt =>
+        ManagerRefer.EventManager.AddListener("Analytics.Event", evt =>
         {
             // 获取元数据
             string userId = evt.GetMetadata<string>("UserId", "anonymous");
@@ -22,7 +22,7 @@ public class AdvancedEventExample : MonoBehaviour
         });
         
         // 3. 条件事件处理
-        EventManager.Instance.AddListener("Game.State.Changed", evt =>
+        ManagerRefer.EventManager.AddListener("Game.State.Changed", evt =>
         {
             var stateData = evt.GetData<GameStateData>();
             
@@ -37,13 +37,13 @@ public class AdvancedEventExample : MonoBehaviour
         });
         
         // 4. 事件广播模式
-        EventManager.Instance.AddListener("Broadcast.*", evt =>
+        ManagerRefer.EventManager.AddListener("Broadcast.*", evt =>
         {
             Debug.Log($"收到广播: {evt.EventName}");
         });
         
         // 5. 性能监控
-        EventManager.Instance.OnEventDispatched += (eventName, eventData) =>
+        ManagerRefer.EventManager.OnEventDispatched += (eventName, eventData) =>
         {
             Debug.Log($"事件分发: {eventName} at {eventData.Timestamp}");
         };
@@ -55,13 +55,13 @@ public class AdvancedEventExample : MonoBehaviour
         Debug.Log($"订单已下: {order.Id}");
         
         // 触发下一个事件
-        EventManager.Instance.Dispatch("Payment.Processed", this, order);
+        ManagerRefer.EventManager.Dispatch("Payment.Processed", this, order);
     }
     
     private void OnPaymentProcessed(EventData evt)
     {
         Debug.Log("支付已处理");
-        EventManager.Instance.Dispatch("Shipping.Scheduled", this, evt.Data);
+        ManagerRefer.EventManager.Dispatch("Shipping.Scheduled", this, evt.Data);
     }
     
     private void OnShippingScheduled(EventData evt)

@@ -8,10 +8,12 @@ using UnityEngine.Networking;
 /// <summary>
 /// 网络服务管理器 - 单例模式
 /// </summary>
-public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
+public class NetworkServiceManager : BaseManager
 {
     [Header("配置")]
     private NetworkConfig config = NetworkConfig.Instance;
+
+    private CoroutineManager coroutineManager = ManagerRefer.CoroutineManager;
 
     private Queue<Action> _mainThreadActions = new Queue<Action>();
     private readonly object _queueLock = new object();
@@ -33,13 +35,10 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     #endregion
 
     #region 初始化
-    private void Awake()
+
+    public override void OnRegister()
     {
-        gameObject.AddComponent<PersistentSingleton>();
-        
-        base.Awake();
-        
-        DontDestroyOnLoad(gameObject);
+        base.OnRegister();
 
         Debug.Log($"[NetworkService] 初始化完成，基础URL: {config.baseUrl}");
     }
@@ -74,7 +73,7 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
         string requestId = Guid.NewGuid().ToString();
         
         // 启动协程处理请求
-        StartCoroutine(ProcessRequest(requestParams, lockable, callback));
+        coroutineManager.StartManagedCoroutine(ProcessRequest(requestParams, lockable, callback), this);
         
         return requestId;
     }
@@ -209,7 +208,7 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// </summary>
     public void ClearAllRequests()
     {
-        StopAllCoroutines();
+        coroutineManager.StopManagedCoroutines(this);
         _activeRequests = 0;
         NotifyActiveRequestsChanged();
     }
@@ -217,25 +216,23 @@ public class NetworkServiceSystem : Singleton<NetworkServiceSystem>
     /// <summary>
     /// 添加请求事件监听
     /// </summary>
-    public static void AddResponseListener(string networkConstant, ResponseEvent listener)
+    public void AddResponseListener(string networkConstant, ResponseEvent listener)
     {
-        if (Instance == null) return;
-        if (!Instance._responseEvents.ContainsKey(networkConstant))
+        if (!_responseEvents.ContainsKey(networkConstant))
         {
-            Instance._responseEvents[networkConstant] = null;
+            _responseEvents[networkConstant] = null;
         }
-        Instance._responseEvents[networkConstant] += listener;
+        _responseEvents[networkConstant] += listener;
     }
 
     /// <summary>
     /// 移除请求事件监听
     /// </summary>
-    public static void RemoveResponseListener(string requestId, ResponseEvent listener)
+    public void RemoveResponseListener(string requestId, ResponseEvent listener)
     {
-        if (Instance == null) return;
-        if (Instance._responseEvents.ContainsKey(requestId))
+        if (_responseEvents.ContainsKey(requestId))
         {
-            Instance._responseEvents[requestId] -= listener;
+            _responseEvents[requestId] -= listener;
         }
     }
     

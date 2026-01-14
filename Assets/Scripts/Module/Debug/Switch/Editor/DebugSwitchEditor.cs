@@ -10,6 +10,7 @@ public class DebugSwitchEditor : Editor
         DrawDefaultInspector();
 
         GUILayout.Space(6);
+        GUILayout.BeginHorizontal();
         if (GUILayout.Button("切换图片显示"))
         {
             var ds = (DebugSwitch)target;
@@ -17,5 +18,14 @@ public class DebugSwitchEditor : Editor
             // 可选：让编辑器知道对象已改变
             EditorUtility.SetDirty(ds);
         }
+        
+        if (GUILayout.Button("切换图片层级"))
+        {
+            var ds = (DebugSwitch)target;
+            ds.ToggleImgLayer();
+            // 可选：让编辑器知道对象已改变
+            EditorUtility.SetDirty(ds);
+        }
+        GUILayout.EndHorizontal();
     }
 }

@@ -6,17 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-public class ControllerReferUserGenerator : EditorWindow
+public class ManagerReferUserGenerator : EditorWindow
 {
-    private string outputPath = "Assets/Scripts/MVC/Controller/ControllerRefer.cs";
+    private string outputPath = "Assets/Scripts/MVC/Manager/ManagerRefer.cs";
     
     // 父类名称
-    private string baseControllerName = "BaseController";
+    private string baseManagerName = "BaseManager";
     
     // 有效的后缀
-    private List<string> controllerSuffixes = new List<string> 
+    private List<string> managerSuffixes = new List<string> 
     { 
-        "Controller"
+        "Manager"
     };
     
     // 要包含的目录（用户脚本）
@@ -30,14 +30,14 @@ public class ControllerReferUserGenerator : EditorWindow
     {
         "Google",
         "Facebook",
-        "ControllerRegister",
+        "ManagerRegister",
     };
     
     private Vector2 scrollPosition;
-    private List<ControllerClassInfo> detectedControllers = new List<ControllerClassInfo>();
+    private List<ManagerClassInfo> detectedManagers = new List<ManagerClassInfo>();
     
     [System.Serializable]
-    public class ControllerClassInfo
+    public class ManagerClassInfo
     {
         public string FullTypeName;
         public string TypeName;
@@ -45,7 +45,7 @@ public class ControllerReferUserGenerator : EditorWindow
         public string ScriptPath; // 脚本完整路径
         public bool Include = true;
         
-        public ControllerClassInfo(string typeName, string scriptPath)
+        public ManagerClassInfo(string typeName, string scriptPath)
         {
             TypeName = typeName;
             ScriptPath = scriptPath;
@@ -60,70 +60,70 @@ public class ControllerReferUserGenerator : EditorWindow
         }
     }
     
-    [MenuItem("Tools/Generate/ControllerRefer生成")]
+    [MenuItem("Tools/Generate/ManagerRefer生成")]
     public static void ShowWindow()
     {
-        GetWindow<ControllerReferUserGenerator>("Controller Refer Generator - 继承BaseController");
+        GetWindow<ManagerReferUserGenerator>("Manager Refer Generator - 继承BaseManager");
     }
     
     private void OnEnable()
     {
         // 自动扫描用户脚本
-        ScanUserScriptsForControllers();
+        ScanUserScriptsForManagers();
     }
     
     void OnGUI()
     {
-        GUILayout.Label("Controller Refer 代码生成器 - 继承BaseController", EditorStyles.boldLabel);
+        GUILayout.Label("Manager Refer 代码生成器 - 继承BaseManager", EditorStyles.boldLabel);
         EditorGUILayout.Space(10);
         
         // 配置选项
         outputPath = EditorGUILayout.TextField("输出路径:", outputPath);
         
         EditorGUILayout.Space(10);
-        GUILayout.Label($"检测到的继承 BaseController 的类: {detectedControllers.Count}", EditorStyles.boldLabel);
+        GUILayout.Label($"检测到的继承 BaseManager 的类: {detectedManagers.Count}", EditorStyles.boldLabel);
         
         // 操作按钮
         EditorGUILayout.BeginHorizontal();
         {
             if (GUILayout.Button("重新扫描", GUILayout.Width(100)))
             {
-                ScanUserScriptsForControllers();
+                ScanUserScriptsForManagers();
             }
             
             if (GUILayout.Button("全选", GUILayout.Width(60)))
             {
-                foreach (var c in detectedControllers) c.Include = true;
+                foreach (var c in detectedManagers) c.Include = true;
             }
             
             if (GUILayout.Button("全不选", GUILayout.Width(60)))
             {
-                foreach (var c in detectedControllers) c.Include = false;
+                foreach (var c in detectedManagers) c.Include = false;
             }
         }
         EditorGUILayout.EndHorizontal();
         
         EditorGUILayout.Space(5);
         
-        // 显示检测到的 Controller 列表
+        // 显示检测到的 Manager 列表
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
         {
             EditorGUILayout.BeginVertical(GUI.skin.box);
             {
-                foreach (var controller in detectedControllers)
+                foreach (var manager in detectedManagers)
                 {
                     EditorGUILayout.BeginHorizontal();
                     {
-                        controller.Include = EditorGUILayout.Toggle(controller.Include, GUILayout.Width(20));
+                        manager.Include = EditorGUILayout.Toggle(manager.Include, GUILayout.Width(20));
                         
                         // 类型名
-                        EditorGUILayout.LabelField(controller.TypeName, GUILayout.Width(180));
+                        EditorGUILayout.LabelField(manager.TypeName, GUILayout.Width(180));
                         
                         // 变量名
-                        EditorGUILayout.LabelField(controller.VariableName, GUILayout.Width(120));
+                        EditorGUILayout.LabelField(manager.VariableName, GUILayout.Width(120));
                         
                         // 路径（简化的）
-                        string displayPath = controller.ScriptPath;
+                        string displayPath = manager.ScriptPath;
                         if (displayPath.StartsWith(Application.dataPath))
                         {
                             displayPath = "Assets" + displayPath.Substring(Application.dataPath.Length);
@@ -150,15 +150,15 @@ public class ControllerReferUserGenerator : EditorWindow
             
             if (GUILayout.Button("导出列表", GUILayout.Width(100)))
             {
-                ExportControllerList();
+                ExportManagerList();
             }
         }
         EditorGUILayout.EndHorizontal();
     }
     
-    private void ScanUserScriptsForControllers()
+    private void ScanUserScriptsForManagers()
     {
-        detectedControllers.Clear();
+        detectedManagers.Clear();
         
         // 获取项目中所有的 C# 脚本
         string[] allScripts = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
@@ -173,19 +173,19 @@ public class ControllerReferUserGenerator : EditorWindow
             
             string fileName = Path.GetFileNameWithoutExtension(scriptPath);
             
-            // 检查是否继承了 BaseController
-            if (IsInheritsBaseController(fileName, scriptPath))
+            // 检查是否继承了 BaseManager
+            if (IsInheritsBaseManager(fileName, scriptPath))
             {
-                detectedControllers.Add(new ControllerClassInfo(fileName, scriptPath));
+                detectedManagers.Add(new ManagerClassInfo(fileName, scriptPath));
             }
         }
         
         // 按类型名排序
-        detectedControllers = detectedControllers
+        detectedManagers = detectedManagers
             .OrderBy(c => c.TypeName)
             .ToList();
         
-        Debug.Log($"检测到 {detectedControllers.Count} 个继承 BaseController 的类");
+        Debug.Log($"检测到 {detectedManagers.Count} 个继承 BaseManager 的类");
     }
     
     private bool ShouldExcludeScript(string scriptPath)
@@ -232,8 +232,8 @@ public class ControllerReferUserGenerator : EditorWindow
         string relativePath = scriptPath.Substring(Application.dataPath.Length + 1);
         string[] pathParts = relativePath.Split(Path.DirectorySeparatorChar);
         
-        // 6. 排除BaseController本身
-        if (fileName == baseControllerName)
+        // 6. 排除BaseManager本身
+        if (fileName == baseManagerName)
         {
             return true;
         }
@@ -251,14 +251,14 @@ public class ControllerReferUserGenerator : EditorWindow
         return false;
     }
     
-    private bool IsInheritsBaseController(string fileName, string scriptPath)
+    private bool IsInheritsBaseManager(string fileName, string scriptPath)
     {
         try
         {
             string[] lines = File.ReadAllLines(scriptPath, Encoding.UTF8);
             
             bool hasClassDefinition = false;
-            bool inheritsBaseController = false;
+            bool inheritsBaseManager = false;
             string currentClassName = "";
             
             // 正则表达式匹配类定义
@@ -282,10 +282,10 @@ public class ControllerReferUserGenerator : EditorWindow
                         if (inheritanceMatch.Success)
                         {
                             string inheritanceChain = inheritanceMatch.Groups[2].Value;
-                            // 检查是否直接或间接继承 BaseController
-                            if (inheritanceChain.Contains(baseControllerName))
+                            // 检查是否直接或间接继承 BaseManager
+                            if (inheritanceChain.Contains(baseManagerName))
                             {
-                                inheritsBaseController = true;
+                                inheritsBaseManager = true;
                                 break;
                             }
                         }
@@ -295,15 +295,15 @@ public class ControllerReferUserGenerator : EditorWindow
                 // 如果已经找到类定义，检查后续行中的继承关系
                 if (hasClassDefinition && currentClassName == fileName)
                 {
-                    // 检查是否在后续行中继承 BaseController（处理跨行继承）
+                    // 检查是否在后续行中继承 BaseManager（处理跨行继承）
                     if (line.Contains(":"))
                     {
                         string[] parts = line.Split(':');
                         if (parts.Length > 1)
                         {
-                            if (parts[1].Contains(baseControllerName))
+                            if (parts[1].Contains(baseManagerName))
                             {
-                                inheritsBaseController = true;
+                                inheritsBaseManager = true;
                                 break;
                             }
                         }
@@ -311,7 +311,7 @@ public class ControllerReferUserGenerator : EditorWindow
                 }
             }
             
-            return hasClassDefinition && inheritsBaseController;
+            return hasClassDefinition && inheritsBaseManager;
         }
         catch (System.Exception e)
         {
@@ -322,11 +322,11 @@ public class ControllerReferUserGenerator : EditorWindow
     
     private void GenerateCode()
     {
-        var selectedControllers = detectedControllers.Where(c => c.Include).ToList();
+        var selectedManagers = detectedManagers.Where(c => c.Include).ToList();
         
-        if (selectedControllers.Count == 0)
+        if (selectedManagers.Count == 0)
         {
-            EditorUtility.DisplayDialog("警告", "请至少选择一个 Controller", "确定");
+            EditorUtility.DisplayDialog("警告", "请至少选择一个 Manager", "确定");
             return;
         }
         
@@ -334,53 +334,53 @@ public class ControllerReferUserGenerator : EditorWindow
         
         // 添加文件头
         sb.AppendLine("// =====================================================");
-        sb.AppendLine("// 自动生成的 Controller 引用类");
+        sb.AppendLine("// 自动生成的 Manager 引用类");
         sb.AppendLine("// 生成时间: " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-        sb.AppendLine("// 包含 " + selectedControllers.Count + " 个继承 BaseController 的类");
+        sb.AppendLine("// 包含 " + selectedManagers.Count + " 个继承 BaseManager 的类");
         sb.AppendLine("// =====================================================");
         sb.AppendLine();
         sb.AppendLine("using UnityEngine;");
         sb.AppendLine();
         
-        // 添加 BaseController 的 using（如果需要）
-        bool needsBaseControllerUsing = false;
-        foreach (var controller in selectedControllers)
-        {
-            if (controller.TypeName != "BaseController")
-            {
-                needsBaseControllerUsing = true;
-                break;
-            }
-        }
-        
-        if (needsBaseControllerUsing)
-        {
-            sb.AppendLine("// 请确保以下命名空间存在，或添加相应的 using 语句");
-            sb.AppendLine("// using YourNamespace; // 根据实际情况修改");
-            sb.AppendLine();
-        }
+        // 添加 BaseManager 的 using（如果需要）
+        // bool needsBaseManagerUsing = false;
+        // foreach (var manager in selectedManagers)
+        // {
+        //     if (manager.TypeName != "BaseManager")
+        //     {
+        //         needsBaseManagerUsing = true;
+        //         break;
+        //     }
+        // }
+        //
+        // if (needsBaseManagerUsing)
+        // {
+        //     sb.AppendLine("// 请确保以下命名空间存在，或添加相应的 using 语句");
+        //     sb.AppendLine("// using YourNamespace; // 根据实际情况修改");
+        //     sb.AppendLine();
+        // }
         
         // 类注释
         sb.AppendLine("/// <summary>");
-        sb.AppendLine("/// Controller 快速引用器 - 仅继承 BaseController 的类");
+        sb.AppendLine("/// Manager 快速引用器 - 仅继承 BaseManager 的类");
         sb.AppendLine("/// 自动生成，请勿手动修改");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine("public static class ControllerRefer");
+        sb.AppendLine("public static class ManagerRefer");
         sb.AppendLine("{");
         
         // 生成字段和属性
-        foreach (var controller in selectedControllers)
+        foreach (var manager in selectedManagers)
         {
             // 字段
-            string fieldName = "_" + char.ToLower(controller.VariableName[0]) + controller.VariableName.Substring(1);
-            sb.AppendLine($"    private static {controller.TypeName} {fieldName};");
+            string fieldName = "_" + char.ToLower(manager.VariableName[0]) + manager.VariableName.Substring(1);
+            sb.AppendLine($"    private static {manager.TypeName} {fieldName};");
             
             // 属性
-            sb.AppendLine($"    public static {controller.TypeName} {controller.VariableName}");
+            sb.AppendLine($"    public static {manager.TypeName} {manager.VariableName}");
             sb.AppendLine( "    {");
             sb.AppendLine( "        get");
             sb.AppendLine( "        {");
-            sb.AppendLine($"            return {fieldName} ??= ControllerRegister.Instance?.GetController<{controller.TypeName}>();");
+            sb.AppendLine($"            return {fieldName} ??= ManagerRegister.Instance?.GetManager<{manager.TypeName}>();");
             sb.AppendLine( "        }");
             sb.AppendLine( "    }");
             sb.AppendLine();
@@ -388,42 +388,42 @@ public class ControllerReferUserGenerator : EditorWindow
         
         // 添加通用获取方法
         sb.AppendLine("    /// <summary>");
-        sb.AppendLine("    /// 通用获取 Controller 方法");
+        sb.AppendLine("    /// 通用获取 Manager 方法");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine("    public static T Get<T>() where T : BaseController");
+        sb.AppendLine("    public static T Get<T>() where T : BaseManager");
         sb.AppendLine("    {");
-        sb.AppendLine("        return ControllerRegister.Instance?.GetController<T>();");
+        sb.AppendLine("        return ManagerRegister.Instance?.GetManager<T>();");
         sb.AppendLine("    }");
         sb.AppendLine();
         
             
-        // 根据字符串名称获取 Controller
+        // 根据字符串名称获取 Manager
         sb.AppendLine("    /// <summary>");
-        sb.AppendLine("    /// 根据类型名称字符串获取 Controller");
+        sb.AppendLine("    /// 根据类型名称字符串获取 Manager");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine("    /// <param name=\"controllerName\">Controller 类型名称</param>");
-        sb.AppendLine("    /// <returns>BaseController 实例，如果未找到则返回 null</returns>");
-        sb.AppendLine("    public static BaseController GetByName(string controllerName)");
+        sb.AppendLine("    /// <param name=\"managerName\">Manager 类型名称</param>");
+        sb.AppendLine("    /// <returns>BaseManager 实例，如果未找到则返回 null</returns>");
+        sb.AppendLine("    public static BaseManager GetByName(string managerName)");
         sb.AppendLine("    {");
-        sb.AppendLine("        if (string.IsNullOrEmpty(controllerName))");
+        sb.AppendLine("        if (string.IsNullOrEmpty(managerName))");
         sb.AppendLine("        {");
-        sb.AppendLine("            Debug.LogWarning(\"Controller 名称不能为空\");");
+        sb.AppendLine("            Debug.LogWarning(\"Manager 名称不能为空\");");
         sb.AppendLine("            return null;");
         sb.AppendLine("        }");
         sb.AppendLine();
-        sb.AppendLine("        // 使用 switch 语句根据名称返回对应的 Controller");
-        sb.AppendLine("        switch (controllerName)");
+        sb.AppendLine("        // 使用 switch 语句根据名称返回对应的 Manager");
+        sb.AppendLine("        switch (managerName)");
         sb.AppendLine("        {");
     
-        // 为每个选中的 Controller 生成 case 语句
-        foreach (var controller in selectedControllers)
+        // 为每个选中的 Manager 生成 case 语句
+        foreach (var manager in selectedManagers)
         {
-            sb.AppendLine($"            case \"{controller.TypeName}\":");
-            sb.AppendLine($"                return {controller.VariableName};");
+            sb.AppendLine($"            case \"{manager.TypeName}\":");
+            sb.AppendLine($"                return {manager.VariableName};");
         }
     
         sb.AppendLine("            default:");
-        sb.AppendLine("                Debug.LogWarning($\"未找到名为 {controllerName} 的 Controller\");");
+        sb.AppendLine("                Debug.LogWarning($\"未找到名为 {managerName} 的 Manager\");");
         sb.AppendLine("                return null;");
         sb.AppendLine("        }");
         sb.AppendLine("    }");
@@ -431,14 +431,14 @@ public class ControllerReferUserGenerator : EditorWindow
         
         // 添加重置方法
         sb.AppendLine("    /// <summary>");
-        sb.AppendLine("    /// 重置所有 Controller 引用（场景切换时调用）");
+        sb.AppendLine("    /// 重置所有 Manager 引用（场景切换时调用）");
         sb.AppendLine("    /// </summary>");
         sb.AppendLine("    public static void ResetAll()");
         sb.AppendLine("    {");
         
-        foreach (var controller in selectedControllers)
+        foreach (var manager in selectedManagers)
         {
-            string fieldName = "_" + char.ToLower(controller.VariableName[0]) + controller.VariableName.Substring(1);
+            string fieldName = "_" + char.ToLower(manager.VariableName[0]) + manager.VariableName.Substring(1);
             sb.AppendLine($"        {fieldName} = null;");
         }
         
@@ -457,32 +457,32 @@ public class ControllerReferUserGenerator : EditorWindow
         // 写入文件
         File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
         
-        Debug.Log($"✅ ControllerRefer.cs 已生成到: {outputPath}");
-        Debug.Log($"✅ 包含 {selectedControllers.Count} 个继承 BaseController 的类");
+        Debug.Log($"✅ ManagerRefer.cs 已生成到: {outputPath}");
+        Debug.Log($"✅ 包含 {selectedManagers.Count} 个继承 BaseManager 的类");
         
-        string result = $"已生成 ControllerRefer.cs\n" +
+        string result = $"已生成 ManagerRefer.cs\n" +
                        $"路径: {outputPath}\n" +
-                       $"包含 {selectedControllers.Count} 个继承 BaseController 的类:\n" +
-                       string.Join(", ", selectedControllers.Select(c => c.TypeName));
+                       $"包含 {selectedManagers.Count} 个继承 BaseManager 的类:\n" +
+                       string.Join(", ", selectedManagers.Select(c => c.TypeName));
         
         EditorUtility.DisplayDialog("生成成功", result, "确定");
     }
     
-    private void ExportControllerList()
+    private void ExportManagerList()
     {
-        var selected = detectedControllers.Where(c => c.Include).ToList();
+        var selected = detectedManagers.Where(c => c.Include).ToList();
         
         string exportPath = EditorUtility.SaveFilePanel(
-            "导出 Controller 列表",
+            "导出 Manager 列表",
             Application.dataPath,
-            "ControllerList_" + System.DateTime.Now.ToString("yyyyMMdd"),
+            "ManagerList_" + System.DateTime.Now.ToString("yyyyMMdd"),
             "txt");
         
         if (string.IsNullOrEmpty(exportPath))
             return;
         
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("继承 BaseController 的类列表");
+        sb.AppendLine("继承 BaseManager 的类列表");
         sb.AppendLine("生成时间: " + System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
         sb.AppendLine("总数: " + selected.Count);
         sb.AppendLine();
@@ -491,18 +491,18 @@ public class ControllerReferUserGenerator : EditorWindow
         
         for (int i = 0; i < selected.Count; i++)
         {
-            var controller = selected[i];
-            string relativePath = controller.ScriptPath;
+            var manager = selected[i];
+            string relativePath = manager.ScriptPath;
             if (relativePath.StartsWith(Application.dataPath))
             {
                 relativePath = "Assets" + relativePath.Substring(Application.dataPath.Length);
             }
             
-            sb.AppendLine($"{i + 1:D3} | {controller.TypeName} | {controller.VariableName} | {relativePath}");
+            sb.AppendLine($"{i + 1:D3} | {manager.TypeName} | {manager.VariableName} | {relativePath}");
         }
         
         File.WriteAllText(exportPath, sb.ToString(), Encoding.UTF8);
-        Debug.Log($"Controller 列表已导出到: {exportPath}");
+        Debug.Log($"Manager 列表已导出到: {exportPath}");
         
         EditorUtility.RevealInFinder(exportPath);
     }
