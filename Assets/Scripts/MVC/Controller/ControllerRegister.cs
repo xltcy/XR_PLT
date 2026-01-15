@@ -286,4 +286,12 @@ public class ControllerRegister : Singleton<ControllerRegister>
             }
         }
     }
+
+    
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void InitializeOnLoad()
+    {
+        // 在场景建立前调用
+    }
+
 }

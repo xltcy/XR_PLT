@@ -147,6 +147,15 @@ public static class ControllerRefer
         }
     }
 
+    private static TickController _tickController;
+    public static TickController TickController
+    {
+        get
+        {
+            return _tickController ??= ControllerRegister.Instance?.GetController<TickController>();
+        }
+    }
+
     private static TrackingImageManager _trackingImageManager;
     public static TrackingImageManager TrackingImageManager
     {
@@ -237,6 +246,8 @@ public static class ControllerRefer
                 return SpeechManager;
             case "SwipeManager":
                 return SwipeManager;
+            case "TickController":
+                return TickController;
             case "TrackingImageManager":
                 return TrackingImageManager;
             case "UIManager":
@@ -271,6 +282,7 @@ public static class ControllerRefer
         _sMPLController = null;
         _speechManager = null;
         _swipeManager = null;
+        _tickController = null;
         _trackingImageManager = null;
         _uIManager = null;
         _videoPlayController = null;

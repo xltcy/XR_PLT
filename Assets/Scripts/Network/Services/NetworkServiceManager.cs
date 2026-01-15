@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 /// <summary>
 /// 网络服务管理器 - 单例模式
 /// </summary>
-public partial class NetworkServiceManager : BaseManager
+public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpdate
 {
     [Header("配置")]
     private NetworkConfig config = NetworkConfig.Instance;
@@ -40,10 +40,12 @@ public partial class NetworkServiceManager : BaseManager
     {
         base.OnRegister();
 
+        TickController.Register(this);
+        
         Debug.Log($"[NetworkService] 初始化完成，基础URL: {config.baseUrl}");
     }
 
-    private void Update()
+    public void Tick()
     {
         // 处理主线程回调
         lock (_queueLock)
@@ -66,6 +68,9 @@ public partial class NetworkServiceManager : BaseManager
     public override void OnUnregister()
     {
         base.OnUnregister();
+        
+        TickController.Unregister(this);
+        
         ClearAllRequests();
     }
 
