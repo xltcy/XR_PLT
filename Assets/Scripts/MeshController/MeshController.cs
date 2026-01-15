@@ -20,7 +20,7 @@ public class MeshController : BaseController
 
     public Dropdown sceneSelectDropdown;
 
-    private Pose relocatedPose;
+    public Pose relocatedPose;
     private Pose relocatedSonarPose;
 
     public Button buttonGetPose;
@@ -58,7 +58,7 @@ public class MeshController : BaseController
         base.OnRegister();
         
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.GET_SONAR_POSE,GetSonarPoseCallBack);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
 
         Init();
     }
@@ -66,7 +66,7 @@ public class MeshController : BaseController
     public override void OnUnregister()
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.GET_SONAR_POSE, GetSonarPoseCallBack);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
         
         base.OnUnregister();
     }
@@ -201,7 +201,7 @@ public class MeshController : BaseController
                 SendImageAndReadJson(rawData);
                 break;
             case RelocateType.Sonar:
-                SendImage(rawData);
+                SendSonarImage(rawData);
                 break;
         }
     }
@@ -222,18 +222,8 @@ public class MeshController : BaseController
             }
             UIManager.SetLoadingStatus(false);
         }));
-        StartCoroutine(NetworkUtil.Instance.RelocateByCaptureRequest(summary[selectedSceneIndex], datasetLoc?.text ?? "", rawData,
-            onSuccess: (res) => {
-                // TODO Console res;
-                relocatedPose = TransArrayToWorldPose(camPoseT0, res);
-                countdownEvent.Signal();
 
-            },
-            onFail: (errorText) => {
-                // TODO Console Error
-                hasError = true;
-                countdownEvent.Signal();
-            }));
+        ControllerRefer.RelocateController.RelocateSceneRequest(rawData, countdownEvent);
         
         ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
             onComplete: (result, response) =>
@@ -244,66 +234,20 @@ public class MeshController : BaseController
             });
     }
 
-    private void SendImage(byte[] rawData)
+    private void SendSonarImage(byte[] rawData)
     {
         // Record Camera Pose
         var camPose = Matrix4x4.TRS(arCamera.transform.position, arCamera.transform.rotation, Vector3.one);
-        var req = new GetSonarPoseParams("sonar", rawData);
+        var req = new Network.RequestParam.RelocateSonar.RequestParam("sonar", rawData);
         req.localData = camPose; 
         req.Send();
     }
 
-    public class GetSonarPoseResponseData
-    {
-        public string message;
-        public float[,] poseMatrix; // 存 3x4 矩阵
-
-        /// <summary>
-        /// 手动解析 pose JSON 字符串，填充 poseMatrix
-        /// </summary>
-        public void ParsePoseFromJson(string json)
-        {
-            // 用正则匹配所有数字
-            string pattern = @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?";
-            var matches = Regex.Matches(json, pattern);
-
-            if (matches.Count != 12)
-            {
-                Debug.LogError("Pose json format incorrect! Need 12 numbers (3x4).");
-                poseMatrix = new float[3, 4];
-                return;
-            }
-
-            poseMatrix = new float[3, 4];
-
-            for (int i = 0; i < 12; i++)
-            {
-                poseMatrix[i / 4, i % 4] = float.Parse(matches[i].Value);
-            }
-        }
-
-        /// <summary>
-        /// 转成 Unity Matrix4x4
-        /// </summary>
-        public Matrix4x4 ToMatrix()
-        {
-            return MatrixUtil.FloatArrayToMatrix(poseMatrix);
-        }
-
-        /// <summary>
-        /// 转成 Unity Pose
-        /// </summary>
-        public Pose ToPose()
-        {
-            return MatrixUtil.FloatArrayToPose(poseMatrix);
-        }
-    }
-
-    private void GetSonarPoseCallBack(bool result, NetworkResponse response)
+    private void OnRelocateSonarResponse(bool result, NetworkResponse response)
     {
         if (result)
         {
-            var data = response.GetData<GetSonarPoseResponseData>();
+            var data = response.GetData<Network.RequestParam.RelocateSonar.ResponseData>();
             Debug.Log(data.message);
             
             // 获取相机位姿

@@ -134,7 +134,7 @@ public class SceneController : BaseController
         }
         else
         {
-            var requestParam = new GetSummaryJsonRequestParams();
+            var requestParam = new Network.RequestParam.GetSummaryJson.RequestParam();
             requestParam.Send();
         }
     }
@@ -248,7 +248,7 @@ public class SceneController : BaseController
         }
         else
         {
-            var requestParam = new GetSceneDataRequestParams(sceneItemData);
+            var requestParam = new Network.RequestParam.GetSceneData.RequestParam(sceneItemData);
             requestParam.Send(null, onComplete);
         }
     }
@@ -326,7 +326,7 @@ public class SceneController : BaseController
         }
 
         var jsonText = Resources.Load<TextAsset>("Configs/" + localSceneDataJsonDict[curSceneItemData.sceneKey]).text;
-        var reqParams = new UploadSceneDataRequestParams(curSceneItemData.sceneKey, jsonText);
+        var reqParams = new Network.RequestParam.UploadSceneData.RequestParam(curSceneItemData.sceneKey, jsonText);
         reqParams.Send(null, (result, response) =>
         {
             if (result)

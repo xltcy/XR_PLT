@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2026-01-14 15:11:10
-// 包含 18 个继承 BaseController 的类
+// 生成时间: 2026-01-15 17:48:37
+// 包含 20 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -81,6 +81,15 @@ public static class ControllerRefer
         get
         {
             return _moveController ??= ControllerRegister.Instance?.GetController<MoveController>();
+        }
+    }
+
+    private static RelocateController _relocateController;
+    public static RelocateController RelocateController
+    {
+        get
+        {
+            return _relocateController ??= ControllerRegister.Instance?.GetController<RelocateController>();
         }
     }
 
@@ -214,6 +223,8 @@ public static class ControllerRefer
                 return MeshController;
             case "MoveController":
                 return MoveController;
+            case "RelocateController":
+                return RelocateController;
             case "RotateController":
                 return RotateController;
             case "SceneController":
@@ -253,6 +264,7 @@ public static class ControllerRefer
         _materialController = null;
         _meshController = null;
         _moveController = null;
+        _relocateController = null;
         _rotateController = null;
         _sceneController = null;
         _selectDesController = null;

@@ -21,7 +21,7 @@ namespace Network.Editor
             if (!Application.isPlaying)
             {
                 EditorGUILayout.Space(10);
-                EditorGUILayout.HelpBox("运行时信息仅在游戏运行时可用", MessageType.Info);
+                EditorGUILayout.HelpBox("运行时信息仅在程序运行时可用", MessageType.Info);
                 return;
             }
             
@@ -45,21 +45,6 @@ namespace Network.Editor
             EditorGUILayout.EndVertical();
             
             EditorGUILayout.Space(10);
-            
-            if (GUILayout.Button("测试连接"))
-            {
-                manager.Get("api/health", null, callback: (result, response) =>
-                {
-                    if (response.success)
-                    {
-                        Debug.Log("✅ 服务器连接正常");
-                    }
-                    else
-                    {
-                        Debug.LogError("❌ 服务器连接失败");
-                    }
-                });
-            }
         }
     }
 }

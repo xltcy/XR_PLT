@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 /// <summary>
 /// 网络服务管理器 - 单例模式
 /// </summary>
-public class NetworkServiceManager : BaseManager
+public partial class NetworkServiceManager : BaseManager
 {
     [Header("配置")]
     private NetworkConfig config = NetworkConfig.Instance;
@@ -62,151 +62,33 @@ public class NetworkServiceManager : BaseManager
             }
         }
     }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        ClearAllRequests();
+    }
+
     #endregion
 
     #region 公共方法
     /// <summary>
     /// 发送HTTP请求
     /// </summary>
-    public string SendRequest(RequestParams requestParams, Transform lockable = null, ResponseEvent callback = null)
+    public string SendRequest(BaseRequestParam baseRequestParam, Transform lockable = null, ResponseEvent callback = null)
     {
         string requestId = Guid.NewGuid().ToString();
         
         // 启动协程处理请求
-        coroutineManager.StartManagedCoroutine(ProcessRequest(requestParams, lockable, callback), this);
+        coroutineManager.StartManagedCoroutine(ProcessRequest(baseRequestParam, lockable, callback), this);
         
         return requestId;
-    }
-
-    /// <summary>
-    /// 发送GET请求
-    /// </summary>
-    public string Get(string endpoint, Transform lockable, ResponseEvent callback = null, Dictionary<string, string> queryParams = null)
-    {
-        var requestParams = new RequestParams
-        {
-            url = BuildUrl(endpoint),
-            method = "GET",
-            queryParams = queryParams ?? new Dictionary<string, string>()
-        };
-
-        return SendRequest(requestParams, lockable, callback);
-    }
-
-    /// <summary>
-    /// 发送POST请求
-    /// </summary>
-    public string Post(string endpoint, object requestData, Transform lockable = null, ResponseEvent callback = null)
-    {
-        var requestParams = new RequestParams
-        {
-            url = BuildUrl(endpoint),
-            method = "POST",
-            requestData = requestData
-        };
-
-        return SendRequest(requestParams, lockable, callback);
-    }
-
-    /// <summary>
-    /// 发送 FormData 请求（支持多种数据类型）
-    /// </summary>
-    public string SendFormData(string url, List<FormField> formFields, 
-                              string method = "POST", Transform lockable = null,
-                              ResponseEvent callback = null)
-    {
-        var requestParams = new RequestParams
-        {
-            url = url,
-            method = method,
-            FormDataFields = formFields
-        };
-        
-        return SendRequest(requestParams, lockable, callback);
-    }
-    
-    /// <summary>
-    /// 发送文件上传请求
-    /// </summary>
-    public string UploadFile(string url, string fieldName, byte[] fileData, 
-                            string fileName, Dictionary<string, string> additionalFields = null,
-                            Transform lockable = null, ResponseEvent callback = null)
-    {
-        var formFields = new List<FormField>();
-        
-        // 添加文件
-        formFields.Add(FormField.CreateFile(fieldName, fileData, fileName));
-        
-        // 添加额外字段
-        if (additionalFields != null)
-        {
-            foreach (var kvp in additionalFields)
-            {
-                formFields.Add(FormField.CreateText(kvp.Key, kvp.Value));
-            }
-        }
-        
-        return SendFormData(url, formFields, "POST", lockable, callback);
-    }
-    
-    /// <summary>
-    /// 发送图片上传请求
-    /// </summary>
-    public string UploadImage(string url, string fieldName, byte[] imageData,
-                             string fileName = "image.jpg", 
-                             Dictionary<string, string> additionalFields = null,
-                             Transform lockable = null, ResponseEvent callback = null)
-    {
-        var formFields = new List<FormField>();
-        
-        // 添加图片文件
-        formFields.Add(FormField.CreateFile(fieldName, imageData, fileName, "image/jpeg"));
-        
-        // 添加额外字段
-        if (additionalFields != null)
-        {
-            foreach (var kvp in additionalFields)
-            {
-                formFields.Add(FormField.CreateText(kvp.Key, kvp.Value));
-            }
-        }
-        
-        return SendFormData(url, formFields, "POST", lockable, callback);
-    }
-    
-    /// <summary>
-    /// 发送PUT请求
-    /// </summary>
-    public string Put(string endpoint, object requestData, Transform lockable = null, ResponseEvent callback = null)
-    {
-        var requestParams = new RequestParams
-        {
-            url = BuildUrl(endpoint),
-            method = "PUT",
-            requestData = requestData
-        };
-
-        return SendRequest(requestParams, lockable, callback);
-    }
-
-    /// <summary>
-    /// 发送DELETE请求
-    /// </summary>
-    public string Delete(string endpoint, Transform lockable = null, ResponseEvent callback = null)
-    {
-        var requestParams = new RequestParams
-        {
-            url = BuildUrl(endpoint),
-            method = "DELETE"
-        };
-
-        return SendRequest(requestParams, lockable, callback);
     }
     
     /// <summary>
     /// 清除所有请求
     /// </summary>
-    public void ClearAllRequests()
+    private void ClearAllRequests()
     {
         coroutineManager.StopManagedCoroutines(this);
         _activeRequests = 0;
@@ -250,8 +132,8 @@ public class NetworkServiceManager : BaseManager
         if (queryParams == null || queryParams.Count == 0)
             return baseUrl;
 
-        var queryBuilder = new System.Text.StringBuilder(baseUrl);
-        queryBuilder.Append("?");
+        var queryBuilder = new System.Text.StringBuilder(baseUrl.TrimEnd('/'));
+        queryBuilder.Append("/?");
 
         bool isFirst = true;
         foreach (var param in queryParams)
@@ -266,15 +148,15 @@ public class NetworkServiceManager : BaseManager
     #endregion
 
     #region 私有方法
-    private IEnumerator ProcessRequest(RequestParams requestParams, Transform lockable = null, ResponseEvent callback = null)
+    private IEnumerator ProcessRequest(BaseRequestParam baseRequestParam, Transform lockable = null, ResponseEvent callback = null)
     {
-        yield return ExecuteRequestWithRetry(requestParams, callback);
+        yield return ExecuteRequestWithRetry(baseRequestParam, callback);
     }
 
     /// <summary>
     /// 网络请求处理器（包含重试逻辑）
     /// </summary>
-    private IEnumerator ExecuteRequestWithRetry(RequestParams requestParams, ResponseEvent callback = null)
+    private IEnumerator ExecuteRequestWithRetry(BaseRequestParam baseRequestParam, ResponseEvent callback = null)
     {
         _activeRequests++;
         NotifyActiveRequestsChanged();
@@ -289,25 +171,25 @@ public class NetworkServiceManager : BaseManager
             // 触发开始事件
             OnRequestStarted?.Invoke(new NetworkResponse
             {
-                localData = requestParams.localData, 
+                localData = baseRequestParam.localData, 
             });
             
             int attempt = 0;
             bool shouldRetry = true;
             
-            while (shouldRetry && attempt <= (requestParams.retryOnFailure ? config.maxRetries : 0))
+            while (shouldRetry && attempt <= (baseRequestParam.retryOnFailure ? config.maxRetries : 0))
             {
                 attempt++;
                 
                 if (attempt > 1)
                 {
-                    Debug.LogWarning($"[NetworkService] 请求重试 ({attempt - 1}/{config.maxRetries}): {requestParams.url}");
+                    Debug.LogWarning($"[NetworkService] 请求重试 ({attempt - 1}/{config.maxRetries}): {baseRequestParam.url}");
                     yield return new WaitForSeconds(config.retryDelay);
                 }
                 
                 // 执行单次请求
                 var attempt1 = attempt;
-                yield return ExecuteSingleRequest(requestParams, response =>
+                yield return ExecuteSingleRequest(baseRequestParam, response =>
                 {
                     finalResponse = response;
                 
@@ -321,7 +203,7 @@ public class NetworkServiceManager : BaseManager
                     {
                         // 判断是否应该继续重试
                         shouldRetry = attempt1 <= config.maxRetries && 
-                                      requestParams.retryOnFailure &&
+                                      baseRequestParam.retryOnFailure &&
                                       IsRetryableError(response.statusCode);
                     
                         if (!shouldRetry)
@@ -349,7 +231,7 @@ public class NetworkServiceManager : BaseManager
             // 执行最终回调
             if (finalResponse != null)
             {
-                InvokeCallback(requestParams.networkConstant, finalResponse, callback);
+                InvokeCallback(baseRequestParam.networkConstant, finalResponse, callback);
             }
             else
             {
@@ -358,10 +240,10 @@ public class NetworkServiceManager : BaseManager
                 {
                     success = false,
                     error = "请求执行异常",
-                    localData = requestParams.localData,
+                    localData = baseRequestParam.localData,
                     responseTime = (DateTime.Now.Ticks - totalStartTime) / TimeSpan.TicksPerMillisecond,
                 };
-                InvokeCallback(requestParams.networkConstant, errorResponse, callback);
+                InvokeCallback(baseRequestParam.networkConstant, errorResponse, callback);
             }
         }
     }
@@ -369,24 +251,24 @@ public class NetworkServiceManager : BaseManager
     /// <summary>
     /// 执行单次请求（不包含重试）
     /// </summary>
-    private IEnumerator ExecuteSingleRequest(RequestParams requestParams, Action<NetworkResponse> onComplete)
+    private IEnumerator ExecuteSingleRequest(BaseRequestParam baseRequestParam, Action<NetworkResponse> onComplete)
     {
         long startTime = DateTime.Now.Ticks;
         var response = new NetworkResponse
         {
-            localData = requestParams.localData,
+            localData = baseRequestParam.localData,
         };
-        string fullUrl = BuildFullUrl(requestParams.url, requestParams.queryParams);
-        UnityWebRequest request = CreateUnityWebRequest(fullUrl, requestParams);
-        AddHeadersToRequest(request, requestParams.headers);
+        string fullUrl = BuildFullUrl(baseRequestParam.url, baseRequestParam.queryParams);
+        UnityWebRequest request = CreateUnityWebRequest(fullUrl, baseRequestParam);
+        AddHeadersToRequest(request, baseRequestParam.headers);
 
         if (config.enableLogging)
         {
-            LogRequest(request, requestParams);
+            LogRequest(request, baseRequestParam);
         }
 
         // 同步发送请求（简化版本）
-        request.timeout = requestParams.timeout;
+        request.timeout = baseRequestParam.timeout;
         var asyncOperation = request.SendWebRequest();
 
         // 等待请求完成
@@ -395,7 +277,7 @@ public class NetworkServiceManager : BaseManager
             yield return null; // 每帧检查一次，不阻塞主线程
 
             // 可以在这里添加超时检查
-            if ((DateTime.Now.Ticks - startTime) / TimeSpan.TicksPerMillisecond > requestParams.timeout * 1000)
+            if ((DateTime.Now.Ticks - startTime) / TimeSpan.TicksPerMillisecond > baseRequestParam.timeout * 1000)
             {
                 request.Abort();
                 response.success = false;
@@ -428,24 +310,24 @@ public class NetworkServiceManager : BaseManager
                statusCode >= 500; // 服务器错误
     }
         
-    private UnityWebRequest CreateUnityWebRequest(string url, RequestParams requestParams)
+    private UnityWebRequest CreateUnityWebRequest(string url, BaseRequestParam baseRequestParam)
     {
-        switch (requestParams.method.ToUpper())
+        switch (baseRequestParam.method.ToUpper())
         {
             case "POST":
             case "PUT":
-                if (requestParams.FormDataFields != null && requestParams.FormDataFields.Count > 0)
+                if (baseRequestParam.FormDataFields != null && baseRequestParam.FormDataFields.Count > 0)
                 {
                     // 新的 FormData 请求（支持多种数据类型）
-                    return CreateFormDataRequest(url, requestParams.method, requestParams.FormDataFields);
+                    return CreateFormDataRequest(url, baseRequestParam.method, baseRequestParam.FormDataFields, baseRequestParam.customBoundary);
                 }
                 else
                 {
                     // JSON请求
-                    var request = new UnityWebRequest(url, requestParams.method);
-                    if (requestParams.requestData != null)
+                    var request = new UnityWebRequest(url, baseRequestParam.method);
+                    if (baseRequestParam.requestData != null)
                     {
-                        string json = JsonConvert.SerializeObject(requestParams.requestData);
+                        string json = JsonConvert.SerializeObject(baseRequestParam.requestData);
                         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
                         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                         request.downloadHandler = new DownloadHandlerBuffer();
@@ -464,9 +346,53 @@ public class NetworkServiceManager : BaseManager
     /// <summary>
     /// 创建FormData请求
     /// </summary>
-    private UnityWebRequest CreateFormDataRequest(string url, string method, List<FormField> formFields)
+    private UnityWebRequest CreateFormDataRequest(string url, string method, List<FormField> formFields, string customBoundary = null)
     {
-        // 创建 WWWForm
+        // 如果指定了自定义 boundary，使用 IMultipartFormSection 方式
+        if (!string.IsNullOrEmpty(customBoundary))
+        {
+            List<IMultipartFormSection> multipartSections = new List<IMultipartFormSection>();
+            
+            foreach (var field in formFields)
+            {
+                switch (field.Type)
+                {
+                    case FormFieldType.Text:
+                        multipartSections.Add(new MultipartFormDataSection(field.FieldName, field.StringValue));
+                        break;
+                    
+                    case FormFieldType.Binary:
+                    case FormFieldType.File:
+                        if (field.BinaryValue != null)
+                        {
+                            multipartSections.Add(new MultipartFormFileSection(
+                                field.FieldName,
+                                field.BinaryValue,
+                                field.FileName ?? "data.bin",
+                                field.MimeType ?? FormField.GetMimeType(field.FileName)
+                            ));
+                        }
+                        break;
+                }
+            }
+            
+            // 使用自定义 boundary
+            byte[] boundaryBytes = System.Text.Encoding.UTF8.GetBytes(customBoundary);
+            UnityWebRequest imfRequest = UnityWebRequest.Post(url, multipartSections, boundaryBytes);
+            
+            // 设置 Content-Type 头
+            imfRequest.SetRequestHeader("Content-Type", "multipart/form-data; boundary=" + customBoundary);
+            
+            // 如果不是 POST，修改方法
+            if (method.ToUpper() != "POST")
+            {
+                imfRequest.method = method.ToUpper();
+            }
+            
+            return imfRequest;
+        }
+        
+        // 默认使用 WWWForm
         WWWForm form = new WWWForm();
     
         foreach (var field in formFields)
@@ -507,15 +433,15 @@ public class NetworkServiceManager : BaseManager
         }
     
         // 创建 UnityWebRequest
-        UnityWebRequest request = UnityWebRequest.Post(url, form);
+        UnityWebRequest wwwRequest = UnityWebRequest.Post(url, form);
     
         // 如果不是 POST，修改方法（PUT 等也支持 FormData）
         if (method.ToUpper() != "POST")
         {
-            request.method = method.ToUpper();
+            wwwRequest.method = method.ToUpper();
         }
     
-        return request;
+        return wwwRequest;
     }
     
     private void AddHeadersToRequest(UnityWebRequest request, Dictionary<string, string> customHeaders)
@@ -600,16 +526,16 @@ public class NetworkServiceManager : BaseManager
         }
     }
 
-    private void LogRequest(UnityWebRequest request, RequestParams requestParams)
+    private void LogRequest(UnityWebRequest request, BaseRequestParam baseRequestParam)
     {
         string log = $"[NetworkService] 发送请求:\n" +
                     $"URL: {request.url}\n" +
                     $"Method: {request.method}\n" +
                     $"Headers: {(request.GetRequestHeader("Authorization") != null ? "有认证" : "无认证")}";
 
-        if (requestParams.requestData != null)
+        if (baseRequestParam.requestData != null)
         {
-            log += $"\nBody: {JsonUtility.ToJson(requestParams.requestData)}";
+            log += $"\nBody: {JsonUtility.ToJson(baseRequestParam.requestData)}";
         }
 
         Debug.Log(log);
