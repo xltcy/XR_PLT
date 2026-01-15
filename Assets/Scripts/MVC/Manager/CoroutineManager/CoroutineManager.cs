@@ -31,8 +31,8 @@ public class CoroutineManager : BaseManager
 
         // 创建协程运行器GameObject
         GameObject runnerObj = new GameObject("CoroutineRunner");
+        runnerObj.transform.parent = GameObject.Find("DontDestroyOnLoad").transform;
         runner = runnerObj.AddComponent<CoroutineRunner>();
-        GameObject.DontDestroyOnLoad(runnerObj);
     }
 
     public override void OnUnregister()
