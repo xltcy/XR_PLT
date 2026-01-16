@@ -3,7 +3,7 @@ using UniGLTF;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DebugUIMediator : BaseUIMediator
+public class DebugUIComp : ComponentBinder
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
@@ -54,13 +54,6 @@ public class DebugUIMediator : BaseUIMediator
         Toggle_json.AddValueChangeListener(value => {
             jsonComp.SetVisible(value);
         });
-    }
-
-    public override void OnOpen(UIParams uiParams = null)
-    {
-        base.OnOpen(uiParams);
-        
-        Debug.Log("DebugUIMediator OnOpen");
     }
 
 

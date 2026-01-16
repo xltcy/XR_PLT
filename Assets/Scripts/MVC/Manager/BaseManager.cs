@@ -8,7 +8,7 @@ public class BaseManager
     /// <summary>
     /// Controller的初始化优先级，数值越小优先级越高
     /// </summary>
-    public virtual int InitPriority => 999;
+    public virtual int InitPriority => 500;
 
     /// <summary>
     /// Controller的初始化时机

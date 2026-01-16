@@ -29,7 +29,7 @@ public class ManagerRegister : Singleton<ManagerRegister>
     
     public enum InitTiming
     {
-        OnAwake,        // 程序启动时初始化
+        OnSceneLoaded,        // 程序启动时初始化
         OnFirstUsed,    // 第一次使用时初始化
     }
 
@@ -79,7 +79,7 @@ public class ManagerRegister : Singleton<ManagerRegister>
                 // 创建临时实例来检查 InitTiming
                 BaseManager tempInstance = Activator.CreateInstance(managerType) as BaseManager;
                 
-                if (tempInstance is { InitTiming: InitTiming.OnAwake })
+                if (tempInstance is { InitTiming: InitTiming.OnSceneLoaded })
                 {
                     // 如果已经注册过，跳过
                     if (managers.ContainsKey(managerType))

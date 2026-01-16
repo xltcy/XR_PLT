@@ -167,7 +167,7 @@ public class MeshController : BaseController
         }
 
         SetStartState(StartState.GettingPos);
-        UIManager.SetLoadingStatus(true);
+        UIStateManager.SetLoadingStatus(true);
 
         // Record Camera Pose
         Vector3 camPosition = arCamera.transform.position;
@@ -220,7 +220,7 @@ public class MeshController : BaseController
             {
                 SetStartState(StartState.WaitSummon);
             }
-            UIManager.SetLoadingStatus(false);
+            UIStateManager.SetLoadingStatus(false);
         }));
 
         ControllerRefer.RelocateController.RelocateSceneRequest(rawData, countdownEvent);
@@ -388,7 +388,7 @@ public class MeshController : BaseController
 
     public void tempGetPose()
     {
-        UIManager.SetLoadingStatus(true);
+        UIStateManager.SetLoadingStatus(true);
         // Record Camera Pose
         Vector3 camPosition = arCamera.transform.position;
         Quaternion camRotation = arCamera.transform.rotation;
@@ -405,7 +405,7 @@ public class MeshController : BaseController
             {
                 SetStartState(StartState.WaitSummon);
             }
-            UIManager.SetLoadingStatus(false);
+            UIStateManager.SetLoadingStatus(false);
         }));
         ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
             onComplete: (result, response) =>

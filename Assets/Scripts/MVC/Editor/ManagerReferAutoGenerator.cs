@@ -160,6 +160,86 @@ public class ManagerReferUserGenerator : EditorWindow
     {
         detectedManagers.Clear();
         
+        // 尝试使用 TypeCache（需要项目无编译错误）
+        bool useTypeCache = TryScanWithTypeCache();
+        
+        // 如果 TypeCache 失败或没有结果，回退到字符串解析
+        if (!useTypeCache || detectedManagers.Count == 0)
+        {
+            Debug.LogWarning("TypeCache 检测失败或无结果，使用字符串解析方法（可能存在编译错误）");
+            ScanWithStringParsing();
+        }
+        
+        // 按类型名排序
+        detectedManagers = detectedManagers
+            .OrderBy(c => c.TypeName)
+            .ToList();
+        
+        Debug.Log($"检测到 {detectedManagers.Count} 个继承 BaseManager 的类");
+    }
+    
+    /// <summary>
+    /// 使用 TypeCache 扫描（推荐，但需要项目无编译错误）
+    /// </summary>
+    private bool TryScanWithTypeCache()
+    {
+        try
+        {
+            // 使用 TypeCache 获取所有继承 BaseManager 的类型（Unity 2019.2+）
+            var baseManagerType = typeof(BaseManager);
+            var allTypes = TypeCache.GetTypesDerivedFrom(baseManagerType);
+            
+            // 创建脚本路径映射
+            Dictionary<string, string> typeToScriptPath = new Dictionary<string, string>();
+            string[] allScripts = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
+            
+            foreach (string scriptPath in allScripts)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(scriptPath);
+                if (!typeToScriptPath.ContainsKey(fileName))
+                {
+                    typeToScriptPath[fileName] = scriptPath;
+                }
+            }
+            
+            foreach (var type in allTypes)
+            {
+                // 跳过抽象类和 BaseManager 本身
+                if (type.IsAbstract || type == baseManagerType)
+                {
+                    continue;
+                }
+                
+                // 获取脚本路径
+                string scriptPath = "";
+                if (typeToScriptPath.TryGetValue(type.Name, out scriptPath))
+                {
+                    // 检查是否需要排除
+                    if (ShouldExcludeScript(scriptPath))
+                    {
+                        continue;
+                    }
+                    
+                    detectedManagers.Add(new ManagerClassInfo(type.Name, scriptPath));
+                }
+            }
+            
+            return true;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"TypeCache 扫描失败: {e.Message}");
+            return false;
+        }
+    }
+    
+    /// <summary>
+    /// 使用字符串解析扫描（备用方法，可在编译错误时使用）
+    /// </summary>
+    private void ScanWithStringParsing()
+    {
+        detectedManagers.Clear();
+        
         // 获取项目中所有的 C# 脚本
         string[] allScripts = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
         
@@ -251,6 +331,9 @@ public class ManagerReferUserGenerator : EditorWindow
         return false;
     }
     
+    /// <summary>
+    /// 检查脚本是否继承 BaseManager（字符串解析方法）
+    /// </summary>
     private bool IsInheritsBaseManager(string fileName, string scriptPath)
     {
         try
@@ -261,9 +344,9 @@ public class ManagerReferUserGenerator : EditorWindow
             bool inheritsBaseManager = false;
             string currentClassName = "";
             
-            // 正则表达式匹配类定义
-            Regex classRegex = new Regex(@"^\s*(public\s+)?class\s+(\w+)");
-            Regex inheritanceRegex = new Regex(@"^\s*(public\s+)?class\s+\w+\s*:\s*(.*)");
+            // 正则表达式匹配类定义（支持 partial 关键字）
+            Regex classRegex = new Regex(@"^\s*(public\s+)?(partial\s+)?class\s+(\w+)");
+            Regex inheritanceRegex = new Regex(@"^\s*(public\s+)?(partial\s+)?class\s+\w+\s*:\s*(.*)");
             
             foreach (string line in lines)
             {
@@ -271,7 +354,7 @@ public class ManagerReferUserGenerator : EditorWindow
                 Match classMatch = classRegex.Match(line);
                 if (classMatch.Success)
                 {
-                    string className = classMatch.Groups[2].Value;
+                    string className = classMatch.Groups[3].Value;
                     if (className == fileName)
                     {
                         hasClassDefinition = true;
@@ -281,7 +364,7 @@ public class ManagerReferUserGenerator : EditorWindow
                         Match inheritanceMatch = inheritanceRegex.Match(line);
                         if (inheritanceMatch.Success)
                         {
-                            string inheritanceChain = inheritanceMatch.Groups[2].Value;
+                            string inheritanceChain = inheritanceMatch.Groups[3].Value;
                             // 检查是否直接或间接继承 BaseManager
                             if (inheritanceChain.Contains(baseManagerName))
                             {

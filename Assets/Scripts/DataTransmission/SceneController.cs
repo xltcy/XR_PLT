@@ -124,11 +124,11 @@ public class SceneController : BaseController
                 onSuccess: (res) => {
                     SummaryData = res;
                     ControllerRefer.MeshController.InitSceneSummary(res.items);
-                    UIManager.SetLoadingStatus(false);
+                    UIStateManager.SetLoadingStatus(false);
                 },
                 onFail: (errorText) => {
                     //TODO
-                    UIManager.SetLoadingStatus(false);
+                    UIStateManager.SetLoadingStatus(false);
                 }
             );
         }

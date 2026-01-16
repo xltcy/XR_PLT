@@ -20,7 +20,7 @@ public class CoroutineManager : BaseManager
     public override int InitPriority => 0;
     
     // 启动时初始化
-    public override ManagerRegister.InitTiming InitTiming => ManagerRegister.InitTiming.OnAwake;
+    public override ManagerRegister.InitTiming InitTiming => ManagerRegister.InitTiming.OnSceneLoaded;
 
     #endregion
 

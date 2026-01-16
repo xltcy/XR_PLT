@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Manager 引用类
-// 生成时间: 2026-01-14 15:23:55
-// 包含 3 个继承 BaseManager 的类
+// 生成时间: 2026-01-16 18:14:14
+// 包含 4 个继承 BaseManager 的类
 // =====================================================
 
 using UnityEngine;
@@ -39,6 +39,15 @@ public static class ManagerRefer
         }
     }
 
+    private static UIManager _uIManager;
+    public static UIManager UIManager
+    {
+        get
+        {
+            return _uIManager ??= ManagerRegister.Instance?.GetManager<UIManager>();
+        }
+    }
+
     /// <summary>
     /// 通用获取 Manager 方法
     /// </summary>
@@ -69,6 +78,8 @@ public static class ManagerRefer
                 return EventManager;
             case "NetworkServiceManager":
                 return NetworkServiceManager;
+            case "UIManager":
+                return UIManager;
             default:
                 Debug.LogWarning($"未找到名为 {managerName} 的 Manager");
                 return null;
@@ -83,5 +94,6 @@ public static class ManagerRefer
         _coroutineManager = null;
         _eventManager = null;
         _networkServiceManager = null;
+        _uIManager = null;
     }
 }

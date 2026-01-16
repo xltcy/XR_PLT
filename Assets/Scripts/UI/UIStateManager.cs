@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class UIManager : BaseController, SelectDesController.SelectDesActionInterface
+public class UIStateManager : BaseController, SelectDesController.SelectDesActionInterface
 {
     public GameObject StartView;
     public GameObject SelectDesView;
@@ -125,7 +125,7 @@ public class UIManager : BaseController, SelectDesController.SelectDesActionInte
 
     public static void SetLoadingStatus(bool setStart)
     {
-        ControllerRefer.UIManager.RequestLoadingStatus(setStart);
+        ControllerRefer.UIStateManager.RequestLoadingStatus(setStart);
     }
 
     public enum RunState

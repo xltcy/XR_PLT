@@ -166,7 +166,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
         _activeRequests++;
         NotifyActiveRequestsChanged();
         
-        UIManager.SetLoadingStatus(true);
+        UIStateManager.SetLoadingStatus(true);
 
         long totalStartTime = DateTime.Now.Ticks;
         NetworkResponse finalResponse = null;
@@ -225,7 +225,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
             _activeRequests--;
             NotifyActiveRequestsChanged();
             
-            UIManager.SetLoadingStatus(false);
+            UIStateManager.SetLoadingStatus(false);
             
             // 计算总时间
             if (finalResponse != null)
