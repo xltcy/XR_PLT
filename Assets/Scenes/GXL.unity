@@ -3766,7 +3766,7 @@ MonoBehaviour:
   DEBUG_FAKE_RELOCATE: 0
   DEBUG_USING_NETWORK_JSON: 0
   DebugSonarImg: {fileID: 2800000, guid: 20de243d985a1fa4396b2cae14e77241, type: 3}
-  DebugSceneImg: {fileID: 2800000, guid: 65d9fda406d8c344db55b3875e9508b0, type: 3}
+  DebugSceneImg: {fileID: 2800000, guid: 2db48e7ec04c56d4bad971c2f4f70f49, type: 3}
 --- !u!222 &506754613
 CanvasRenderer:
   m_ObjectHideFlags: 0

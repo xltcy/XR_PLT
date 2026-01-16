@@ -343,9 +343,9 @@ public class MeshController : BaseController
         
         
         //todo 删除临时代码
-        Vector3 tempPos = new Vector3(7.007f, 0.179f, 3.184f); //相对场景的坐标
+        Vector3 tempPos = new Vector3(-7.065f, -0.135f, 2.737f); //相对场景的坐标
         sonarGO.transform.position = ControllerRefer.SceneController.scene.transform.TransformPoint(tempPos);
-        Quaternion rotationOffset = new Quaternion(0, 0.958146751f, 0, 0.286277622f); //相对场景的旋转
+        Quaternion rotationOffset = new Quaternion(0.0f, 0.156820267f, 0.0f, 0.987627208f); //相对场景的旋转
         sonarGO.transform.rotation = ControllerRefer.SceneController.scene.transform.rotation * rotationOffset;
         
         sonarGO.SetVisible(true);
