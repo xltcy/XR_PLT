@@ -5,4 +5,8 @@
 public class UINameConstant
 {
     public const string DebugUIMediator = "DebugUIMediator";
+    public const string LoadingUIMediator = "LoadingUIMediator";
+    public const string SelectDesUIMediator = "SelectDesUIMediator";
+    public const string StartHudUIMediator = "StartHudUIMediator";
+    public const string VirtualManIntroUIMediator = "VirtualManIntroUIMediator";
 }

@@ -7,12 +7,8 @@ public class DebugUIMediator : BaseUIMediator
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
-    [BindChild("p_RelocateSonar"), ButtonCallback(nameof(OnRelocateSonarClick))]
-    private Button RelocateSonar;
     [BindChild("p_SummonSonar"), ButtonCallback(nameof(OnSummonSonarClick))]
     private Button SummonSonar;
-    [BindChild("p_Relocate"), ButtonCallback(nameof(OnRelocateClick))]
-    private Button Relocate;
     [BindChild("p_HideSonar"), ButtonCallback(nameof(OnHideSonarClick))]
     private Button HideSonar;
     [BindChild("p_ShowSonar"), ButtonCallback(nameof(OnShowSonarClick))]
@@ -29,6 +25,8 @@ public class DebugUIMediator : BaseUIMediator
     private GameObject UI_调试_相机;
     [BindChild("p_json")]
     private Transform jsonComp;
+    [BindChild("p_voicetext")]
+    private Transform voiceTextComp;
 
     [BindChild("p_Mesh控制台")]
     private Toggle Toggle_Mesh;
@@ -38,8 +36,10 @@ public class DebugUIMediator : BaseUIMediator
     private Toggle Toggle_相机;
     [BindChild("p_json_toggle")]
     private Toggle Toggle_json;
-    
-    public void Start()
+    [BindChild("p_toggle_voicetext")]
+    private Toggle toggeleVoiceText;
+
+    public override void OnOpen(UIParams uiParams = null)
     {
         // 添加事件监听
         Toggle_Mesh.AddValueChangeListener(value => {
@@ -54,41 +54,31 @@ public class DebugUIMediator : BaseUIMediator
         Toggle_json.AddValueChangeListener(value => {
             jsonComp.SetVisible(value);
         });
-    }
-
-    public override void OnOpen(UIParams uiParams = null)
-    {
-        base.OnOpen(uiParams);
+        toggeleVoiceText.AddValueChangeListener(value => {
+            voiceTextComp.SetVisible(value);
+        });
         
         Debug.Log("DebugUIMediator OnOpen");
     }
 
 
-    protected override void OnDestroy()
+    public override void OnClose()
     {
         // 清理事件监听
         Toggle_Mesh?.RemoveAllValueChangeListeners();
         Toggle_屏幕?.RemoveAllValueChangeListeners();
         Toggle_相机?.RemoveAllValueChangeListeners();
         Toggle_json?.RemoveAllValueChangeListeners();
-        base.OnDestroy();
+        toggeleVoiceText?.RemoveAllValueChangeListeners();
     }
 
     private void OnDebugSwitchButtonClick()
     {
         UIUtils.ToggleVisible(debugView);
     }
-    private void OnRelocateSonarClick()
-    {
-        ControllerRefer.MeshController.ClickToGetPoseByCapture(MeshController.RelocateType.Sonar);
-    }
     private void OnSummonSonarClick()
     {
         ControllerRefer.MeshController.ClickToSummonSonarAtCamera();
-    }
-    private void OnRelocateClick()
-    {
-        ControllerRefer.MeshController.ClickToGetPoseByCapture(MeshController.RelocateType.Scene);
     }
     private void OnHideSonarClick()
     {

@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class UIElementExtensions
 {
@@ -174,6 +176,38 @@ public static class UIElementExtensions
     }
     
     #endregion Canvas Extensions
+    
+    #region Text Extensions
+
+    /// <summary>
+    /// 快速设置文本
+    /// </summary>
+    /// <param name="textObj"></param>
+    /// <param name="text"></param>
+    public static void SetText(this Text textObj, string text)
+    {
+        if (textObj)
+        {
+            textObj.text = text;
+        }
+    }
+    #endregion Text Extensions
+    
+    #region TMP_Extensions
+        
+    /// <summary>
+    /// 快速设置文本
+    /// </summary>
+    /// <param name="textObj"></param>
+    /// <param name="text"></param>
+    public static void SetText(this TMP_InputField textObj, string text)
+    {
+        if (textObj)
+        {
+            textObj.text = text;
+        }
+    }
+    #endregion TMP_Extensions
     
     #region 回调绑定
     // Slider 扩展

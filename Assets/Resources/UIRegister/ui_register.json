@@ -1,3 +1,7 @@
 {
-  "DebugUIMediator": "UIPrefabs/prefab_ui_debug"
+  "DebugUIMediator": "UIPrefabs/ui_debug",
+  "LoadingUIMediator": "UIPrefabs/ui_loading",
+  "SelectDesUIMediator": "UIPrefabs/ui_select_des",
+  "StartHudUIMediator": "UIPrefabs/ui_start_hud",
+  "VirtualManIntroUIMediator": "UIPrefabs/ui_virtual_man_intro"
 }

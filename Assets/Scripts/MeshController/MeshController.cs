@@ -11,11 +11,14 @@ using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using System.Threading;
 using UniGLTF;
+using UnityEngine.EventSystems;
 
 public class MeshController : BaseController
 {
     public Camera arCamera;
-    private GameObject modelInstance;
+
+    public GameObject ModelInstance { private set; get; }
+    
     private GameObject sonarGO;
 
     public Dropdown sceneSelectDropdown;
@@ -39,9 +42,9 @@ public class MeshController : BaseController
 
     private Matrix4x4 camPoseT0;
 
-    private List<SummaryItemData> summary = new List<SummaryItemData>();
-    private int selectedSceneIndex = 0;
-
+    public List<SummaryItemData> Summary { private set; get; }
+    private SummaryItemData curSceneSummaryItemData;
+    
     private Shader defaultShader;
     private Shader hideShader;
 
@@ -59,6 +62,7 @@ public class MeshController : BaseController
         
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
+        this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
 
         Init();
     }
@@ -67,7 +71,8 @@ public class MeshController : BaseController
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
         ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
-        
+        this.RemoveAllEventListener();
+
         base.OnUnregister();
     }
 
@@ -94,14 +99,17 @@ public class MeshController : BaseController
     
     public void InitSceneSummary(List<SummaryItemData> items)
     {
-        summary = items;
-        List<String> options = new List<string>();
-        items.ForEach(item => options.Add(item.sceneName));
-        sceneSelectDropdown.ClearOptions();
-        sceneSelectDropdown.AddOptions(options);
+        if (items == null)
+        {
+            Summary = new List<SummaryItemData>();
+        }
+        else
+        {
+            Summary = items;
+        }
         
-        //手动初始化一次场景选择DropDown
-        OnSceneSelectChanged(sceneSelectDropdown.value);
+        // 通知场景总览数据初始化完成
+        this.TriggerEvent(EventConstant.COMPLETE_INIT_SUMMARY);
     }
 
     
@@ -225,7 +233,7 @@ public class MeshController : BaseController
 
         ControllerRefer.RelocateController.RelocateSceneRequest(rawData, countdownEvent);
         
-        ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
+        ControllerRefer.SceneController.RequestSceneDataByKey(GetCurrentSummaryItemData(),
             onComplete: (result, response) =>
             {
                 hasError |= !result;
@@ -302,13 +310,13 @@ public class MeshController : BaseController
         SetStartState(StartState.Summoning);
 
         // init modelInstance
-        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
+        ModelInstance = ControllerRefer.SceneController.AnalysisSceneData();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
         
-        modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
-        modelInstance.transform.rotation = relocatedPose.rotation;
+        ModelInstance.transform.position = relocatedPose.position * GetModelScale(ModelInstance);
+        ModelInstance.transform.rotation = relocatedPose.rotation;
 
         SetStartState(StartState.Normal);
     }
@@ -407,7 +415,7 @@ public class MeshController : BaseController
             }
             UIStateManager.SetLoadingStatus(false);
         }));
-        ControllerRefer.SceneController.RequestSceneDataByKey(summary[selectedSceneIndex],
+        ControllerRefer.SceneController.RequestSceneDataByKey(GetCurrentSummaryItemData(),
             onComplete: (result, response) =>
             {
                 hasError |= !result;
@@ -420,14 +428,14 @@ public class MeshController : BaseController
     {
         SetStartState(StartState.Summoning);
         // init modelInstance
-        modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
+        ModelInstance = ControllerRefer.SceneController.AnalysisSceneData();
         relocatedPose = testPose();
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
 
-        modelInstance.transform.position = relocatedPose.position;
-        modelInstance.transform.rotation = relocatedPose.rotation;
+        ModelInstance.transform.position = relocatedPose.position;
+        ModelInstance.transform.rotation = relocatedPose.rotation;
 
         SetStartState(StartState.Normal);
     }
@@ -516,17 +524,17 @@ public class MeshController : BaseController
 
     public void ClickRotateR()
     {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.right, 90f);
+        ModelInstance.transform.RotateAround(ModelInstance.transform.position, ModelInstance.transform.right, 90f);
     }
 
     public void ClickRotateF()
     {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.forward, 90f);
+        ModelInstance.transform.RotateAround(ModelInstance.transform.position, ModelInstance.transform.forward, 90f);
     }
 
     public void ClickRotateU()
     {
-        modelInstance.transform.RotateAround(modelInstance.transform.position, modelInstance.transform.up, 90f);
+        ModelInstance.transform.RotateAround(ModelInstance.transform.position, ModelInstance.transform.up, 90f);
     }
 
     private void SetStartState(StartState newState)
@@ -562,15 +570,43 @@ public class MeshController : BaseController
     /// <returns></returns>
     public SummaryItemData GetCurrentSummaryItemData()
     {
-        return summary[selectedSceneIndex];
+        return curSceneSummaryItemData;
     }
-    
+
+    /// <summary>
+    /// 设置当前选择的场景摘要数据
+    /// </summary>
+    /// <param name="data"></param>
+    public void SetCurrentSummaryItemData(SummaryItemData data)
+    {
+        curSceneSummaryItemData = data;
+    }
+
+    /// <summary>
+    /// 设置场景
+    /// </summary>
+    /// <param name="model"></param>
+    public void SetModelInstance(GameObject model)
+    {
+        ModelInstance = model;
+    }
     
     #region callback
     private void OnSceneSelectChanged(int index)
     {
-        selectedSceneIndex = index;
+        SetCurrentSummaryItemData(Summary[index]);
         SetDataSetLoc();
+    }
+
+    private void OnCompleteInitSummary(EventData eventData)
+    {
+        List<String> options = new List<string>();
+        Summary.ForEach(item => options.Add(item.sceneName));
+        sceneSelectDropdown.ClearOptions();
+        sceneSelectDropdown.AddOptions(options);
+        
+        //手动初始化一次场景选择DropDown
+        OnSceneSelectChanged(sceneSelectDropdown.value);
     }
     
     #endregion callback

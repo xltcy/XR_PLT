@@ -114,6 +114,9 @@ public class UIPrefabExporterEditor : Editor
         GameObject tempClone = Object.Instantiate(prefabObj);
         tempClone.name = prefabObj.name; // 保持名称一致
         
+        // 确保克隆对象为启用状态
+        tempClone.SetActive(true);
+        
         try
         {
             // 从克隆对象中移除UIPrefabExporter组件
