@@ -6,28 +6,24 @@ using UnityEngine;
 /// </summary>
 public class UIPrefabExporter : MonoBehaviour
 {
-    [Header("导出配置")]
+    [Header("导出配置(需要填)")]
     [Tooltip("导出的Prefab名称（留空则使用GameObject名称）")]
     public string exportName;
     
     [Tooltip("导出路径（相对于Assets/Resources/）")]
     private const string exportPath = "UIPrefabs";
     
-    [Header("只读信息")]
+    [Header("只读信息(不需要填)")]
     [SerializeField, Tooltip("场景名称")]
     private string sceneName;
     
     [SerializeField, Tooltip("检测到的BaseUIMediator组件")]
     private BaseUIMediator detectedMediator;
     
-    [SerializeField, Tooltip("检测到的CanvasGroup组件")]
-    private CanvasGroup detectedCanvasGroup;
-    
     private void OnValidate()
     {
         // 检测必要组件
         detectedMediator = GetComponent<BaseUIMediator>();
-        detectedCanvasGroup = GetComponent<CanvasGroup>();
 
         sceneName = GetSceneName();
     }
@@ -97,11 +93,11 @@ public class UIPrefabExporter : MonoBehaviour
     /// </summary>
     public void EnsureComponents()
     {
-        // 确保有CanvasGroup组件
-        if (GetComponent<CanvasGroup>() == null)
-        {
-            gameObject.AddComponent<CanvasGroup>();
-            Debug.Log($"已为 '{gameObject.name}' 添加CanvasGroup组件");
-        }
+        // // 确保有CanvasGroup组件
+        // if (GetComponent<CanvasGroup>() == null)
+        // {
+        //     gameObject.AddComponent<CanvasGroup>();
+        //     Debug.Log($"已为 '{gameObject.name}' 添加CanvasGroup组件");
+        // }
     }
 }

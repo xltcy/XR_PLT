@@ -118,7 +118,7 @@ public class UIExportWindow : EditorWindow
         selectedExporters.Clear();
         
         // 查找场景中所有的UIPrefabExporter
-        UIPrefabExporter[] foundExporters = FindObjectsOfType<UIPrefabExporter>();
+        UIPrefabExporter[] foundExporters = FindObjectsOfType<UIPrefabExporter>(true);
         
         foreach (var exporter in foundExporters)
         {

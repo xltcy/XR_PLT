@@ -6,29 +6,45 @@ using UnityEditor;
 /// </summary>
 public class UICreationMenu
 {
-    [MenuItem("GameObject/UI/Create UI with Exporter", false, 0)]
     public static void CreateUIWithExporter()
     {
+        // 查找或创建TempUIRoot
+        GameObject tempUIRoot = GameObject.Find("TempUIRoot");
+        if (tempUIRoot == null)
+        {
+            tempUIRoot = new GameObject("TempUIRoot");
+            
+            // 添加Canvas组件 - 屏幕空间-覆盖
+            Canvas canvas = tempUIRoot.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            
+            // 添加Canvas Scaler组件
+            UnityEngine.UI.CanvasScaler canvasScaler = tempUIRoot.AddComponent<UnityEngine.UI.CanvasScaler>();
+            canvasScaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            canvasScaler.referenceResolution = new Vector2(1920, 1080);
+            canvasScaler.matchWidthOrHeight = 0.5f;
+            
+            // 添加GraphicRaycaster
+            tempUIRoot.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+        }
+        
         // 创建UI GameObject
         GameObject uiObject = new GameObject("NewUI");
         
-        // 添加RectTransform
+        // 设置父节点为TempUIRoot
+        uiObject.transform.SetParent(tempUIRoot.transform, false);
+        
+        // 添加RectTransform并设置为全屏拉伸
         RectTransform rectTransform = uiObject.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(1920, 1080);
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.one;
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        
-        // 添加CanvasGroup
-        uiObject.AddComponent<CanvasGroup>();
-        
-        // 添加BaseUIMediator
-        BaseUIMediator mediator = uiObject.AddComponent<BaseUIMediator>();
-        mediator.uiType = UIType.Popup;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
         
         // 添加UIPrefabExporter
         UIPrefabExporter exporter = uiObject.AddComponent<UIPrefabExporter>();
-        exporter.exportName = "ui_new_uimediator";
+        exporter.exportName = "ui_prefab_new";
         
         // 选中新创建的对象
         Selection.activeGameObject = uiObject;

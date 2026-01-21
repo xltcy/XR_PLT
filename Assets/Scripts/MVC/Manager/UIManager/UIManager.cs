@@ -15,6 +15,7 @@ public class UIManager : BaseManager
     private Transform fullScreenLayer;
     private Transform popupLayer;
     private Transform tipLayer;
+    private Transform hudLayer;
     private Transform aboveAllLayer;
     
     // UI管理数据结构
@@ -41,25 +42,28 @@ public class UIManager : BaseManager
         InitUILayers();
         
         // 加载UI注册配置
-        LoadUIRegisterData();
+        uiRegisterData = LoadUIRegisterData();
+        
+        // 加载初始UI
+        InitUIMediator();
     }
     
     public override void OnUnregister()
     {
-        base.OnUnregister();
-        
         // 清理所有UI
         CloseAll();
         
         // 清理缓存
         foreach (var ui in cachedUIs.Values)
         {
-            if (ui != null)
+            if (ui != null && ui.gameObject != null)
             {
                 GameObject.Destroy(ui.gameObject);
             }
         }
         cachedUIs.Clear();
+        
+        base.OnUnregister();
     }
     #endregion 生命周期
 
@@ -69,10 +73,11 @@ public class UIManager : BaseManager
     /// </summary>
     private void InitUILayers()
     {
-        fullScreenLayer = CreateLayer("FullScreenLayer", 0);
-        popupLayer = CreateLayer("PopupLayer", 100);
-        tipLayer = CreateLayer("TipLayer", 200);
-        aboveAllLayer = CreateLayer("AboveAllLayer", 300);
+        hudLayer = CreateLayer("HudLayer", 0);
+        fullScreenLayer = CreateLayer("FullScreenLayer", 100);
+        popupLayer = CreateLayer("PopupLayer", 200);
+        tipLayer = CreateLayer("TipLayer", 300);
+        aboveAllLayer = CreateLayer("AboveAllLayer", 400);
     }
     
     /// <summary>
@@ -85,13 +90,24 @@ public class UIManager : BaseManager
         {
             GameObject layerObj = new GameObject(layerName);
             layerObj.transform.SetParent(rootTrans.transform);
-            layerObj.transform.localPosition = Vector3.zero;
-            layerObj.transform.localRotation = Quaternion.identity;
-            layerObj.transform.localScale = Vector3.one;
             
+            // 添加RectTransform并设置为全屏拉伸
+            RectTransform rectTransform = layerObj.AddComponent<RectTransform>();
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
+            rectTransform.localScale = Vector3.one;
+            //rectTransform.pivot = Vector2.zero;
+
+            
+            // 添加Canvas组件并设置sortingOrder
             Canvas canvas = layerObj.AddComponent<Canvas>();
             canvas.overrideSorting = true;
             canvas.sortingOrder = sortingOrder;
+            
+            // 添加GraphicRaycaster用于UI事件检测
+            layerObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
             
             layer = layerObj.transform;
         }
@@ -101,28 +117,42 @@ public class UIManager : BaseManager
     /// <summary>
     /// 加载UI注册配置
     /// </summary>
-    private void LoadUIRegisterData()
+    public static Dictionary<string, string> LoadUIRegisterData()
     {
         // 从ui_register.json加载配置
         TextAsset jsonFile = Resources.Load<TextAsset>("UIRegister/ui_register");
+
+        Dictionary<string, string> registerData = new Dictionary<string, string>();
+
         if (jsonFile != null)
         {
             try
             {
-                var data = JsonUtility.FromJson<UIRegisterDataList>(jsonFile.text);
-                if (data != null && data.uiList != null)
+                // 使用正则表达式解析JSON键值对
+                string jsonText = jsonFile.text;
+                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(
+                    @"""([^""]+)""\s*:\s*""([^""]+)""");
+                System.Text.RegularExpressions.MatchCollection matches = regex.Matches(jsonText);
+                
+                foreach (System.Text.RegularExpressions.Match match in matches)
                 {
-                    foreach (var item in data.uiList)
-                    {
-                        uiRegisterData[item.name] = item.prefabPath;
-                    }
+                    string key = match.Groups[1].Value;
+                    string value = match.Groups[2].Value;
+                    registerData[key] = value;
                 }
+                
+                Debug.Log($"成功加载 {registerData.Count} 个UI注册信息");
             }
             catch (Exception e)
             {
                 Debug.LogError($"Failed to load ui_register.json: {e.Message}");
             }
         }
+        else
+        {
+            Debug.LogError("ui_register.json not found in Resources/UIRegister/");
+        }
+        return registerData;
     }
     #endregion
 
@@ -130,7 +160,7 @@ public class UIManager : BaseManager
     /// <summary>
     /// 打开UI（通过BaseUIMediator实例）
     /// </summary>
-    public void Open(BaseUIMediator uiMediator, UIParams @params = null)
+    public void Open(BaseUIMediator uiMediator, UIParams uiParams = null)
     {
         if (uiMediator == null)
         {
@@ -138,44 +168,44 @@ public class UIManager : BaseManager
             return;
         }
         
-        OpenUIInternal(uiMediator, @params);
+        OpenUIInternal(uiMediator, uiParams);
     }
 
     /// <summary>
     /// 打开UI（通过UI名称）
     /// </summary>
-    /// <param name="uiPrefabName">UI名称</param>
+    /// <param name="uiMediatorName">UI名称</param>
     /// <param name="params">打开参数</param>
-    public void Open(string uiPrefabName, UIParams @params = null)
+    public void Open(string uiMediatorName, UIParams uiParams = null)
     {
-        if (string.IsNullOrEmpty(uiPrefabName))
+        if (string.IsNullOrEmpty(uiMediatorName))
         {
-            Debug.LogError("UI name is null or empty!");
+            Debug.LogError("UIMediator name is null or empty!");
             return;
         }
         
         // 检查UI是否已经打开
-        if (openedUIs.ContainsKey(uiPrefabName))
+        if (openedUIs.ContainsKey(uiMediatorName))
         {
-            Debug.LogWarning($"UI {uiPrefabName} is already opened!");
+            Debug.LogWarning($"UI {uiMediatorName} is already opened!");
             return;
         }
         
         // 检查缓存
-        if (cachedUIs.ContainsKey(uiPrefabName))
+        if (cachedUIs.ContainsKey(uiMediatorName))
         {
-            BaseUIMediator ui = cachedUIs[uiPrefabName];
-            cachedUIs.Remove(uiPrefabName);
-            OpenUIInternal(ui, @params);
+            BaseUIMediator ui = cachedUIs[uiMediatorName];
+            cachedUIs.Remove(uiMediatorName);
+            OpenUIInternal(ui, uiParams);
             return;
         }
         
         // 加载UI Prefab
-        LoadUIMediatorPrefab(uiPrefabName, (ui) =>
+        LoadUIMediatorPrefab(uiMediatorName, (ui) =>
         {
             if (ui != null)
             {
-                OpenUIInternal(ui, @params);
+                OpenUIInternal(ui, uiParams);
             }
         });
     }
@@ -183,28 +213,38 @@ public class UIManager : BaseManager
     /// <summary>
     /// 打开UI（通过UI名称，带泛型参数）
     /// </summary>
-    public void Open<T>(string uiPrefabName, T openParams) where T : UIParams
+    public void Open<T>(string uiMediatorName, T openParams) where T : UIParams
     {
-        Open(uiPrefabName, openParams as UIParams);
+        Open(uiMediatorName, openParams as UIParams);
     }
     
     /// <summary>
     /// 内部打开UI逻辑
     /// </summary>
-    private void OpenUIInternal(BaseUIMediator uiMediator, UIParams @params = null)
+    private void OpenUIInternal(BaseUIMediator uiMediator, UIParams uiParams = null)
     {
         if (uiMediator == null) return;
         
-        string uiPrefabName = uiMediator.uiPrefabName;
+        string uiMediatorName = uiMediator.GetMediatorName();
         
         // 根据UI类型处理其他UI
         HandleUITypeLogic(uiMediator);
         
         // 设置父节点
         SetUIParent(uiMediator);
+       
+        // 设置UI的RectTransform为全屏拉伸
+        RectTransform uiRectTransform = uiMediator.GetComponent<RectTransform>();
+        if (uiRectTransform != null)
+        {
+            uiRectTransform.anchorMin = Vector2.zero;
+            uiRectTransform.anchorMax = Vector2.one;
+            uiRectTransform.offsetMin = Vector2.zero;
+            uiRectTransform.offsetMax = Vector2.zero;
+        }
         
         // 添加到打开列表
-        openedUIs[uiPrefabName] = uiMediator;
+        openedUIs[uiMediatorName] = uiMediator;
         
         // 添加到UI栈
         if (uiMediator.uiType != UIType.Tip && uiMediator.uiType != UIType.AboveAll)
@@ -212,13 +252,14 @@ public class UIManager : BaseManager
             uiStack.Push(uiMediator);
         }
         
-        // 设置UI状态和显示（由UIManager统一控制）
+        // 设置UI状态和显示
         uiMediator.currentState = UIState.Opening;
         uiMediator.gameObject.SetActive(true);
         uiMediator.currentState = UIState.Opened;
         
-        // 调用OnOpen（业务逻辑由子类实现）
-        uiMediator.OnOpen(@params);
+        // 调用OnOpen
+        uiMediator.SetParam(uiParams);
+        uiMediator.OnOpen(uiParams);
     }
     
     /// <summary>
@@ -317,6 +358,9 @@ public class UIManager : BaseManager
             case UIType.Tip:
                 parent = tipLayer;
                 break;
+            case UIType.Hud:
+                parent = hudLayer;
+                break;
             case UIType.AboveAll:
                 parent = aboveAllLayer;
                 break;
@@ -362,12 +406,12 @@ public class UIManager : BaseManager
     /// </summary>
     private void CloseUIInternal(BaseUIMediator uiMediator, bool destroy)
     {
-        string uiPrefabName = uiMediator.uiPrefabName;
+        string uiMediatorName = uiMediator.GetMediatorName();
         
         // 从打开列表移除
-        if (openedUIs.ContainsKey(uiPrefabName))
+        if (openedUIs.ContainsKey(uiMediatorName))
         {
-            openedUIs.Remove(uiPrefabName);
+            openedUIs.Remove(uiMediatorName);
         }
         
         // 从UI栈移除（无论是否在栈顶都要移除）
@@ -402,7 +446,7 @@ public class UIManager : BaseManager
         }
         else
         {
-            cachedUIs[uiPrefabName] = uiMediator;
+            cachedUIs[uiMediatorName] = uiMediator;
         }
     }
     
@@ -466,19 +510,23 @@ public class UIManager : BaseManager
     /// <summary>
     /// 加载UI Prefab
     /// </summary>
-    private void LoadUIMediatorPrefab(string uiPrefabName, Action<BaseUIMediator> onLoaded)
+    private void LoadUIMediatorPrefab(string uiMediatorName, Action<BaseUIMediator> onLoaded)
     {
-        if (!uiRegisterData.ContainsKey(uiPrefabName))
+        if (uiRegisterData == null || !uiRegisterData.TryGetValue(uiMediatorName, out var prefabPath))
         {
-            Debug.LogError($"UI {uiPrefabName} is not registered in ui_register.json!");
+            Debug.LogError($"UI {uiMediatorName} is not registered in ui_register.json!");
             onLoaded?.Invoke(null);
             return;
         }
-        
-        string prefabPath = uiRegisterData[uiPrefabName];
-        
-        // 使用Addressable或Resources加载
-        // 这里使用Resources作为示例
+
+        // 规范化路径：移除扩展名，统一使用/作为分隔符
+        prefabPath = prefabPath.Replace("\\", "/");
+        if (prefabPath.EndsWith(".prefab"))
+        {
+            prefabPath = prefabPath.Substring(0, prefabPath.Length - 7);
+        }
+
+        // 这里使用Resources加载
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
         if (prefab != null)
         {
@@ -487,7 +535,7 @@ public class UIManager : BaseManager
             
             if (mediator == null)
             {
-                Debug.LogError($"UI {uiPrefabName} does not have BaseUIMediator component!");
+                Debug.LogError($"UI {uiMediatorName} does not have BaseUIMediator component!");
                 GameObject.Destroy(uiObj);
                 onLoaded?.Invoke(null);
                 return;
@@ -497,7 +545,7 @@ public class UIManager : BaseManager
         }
         else
         {
-            Debug.LogError($"Failed to load UI prefab: {prefabPath}");
+            Debug.LogError($"Failed to load UI prefab at path: {prefabPath}\nMake sure the prefab is in a Resources folder and the path is correct (case-sensitive on mobile platforms)");
             onLoaded?.Invoke(null);
         }
     }
@@ -509,31 +557,25 @@ public class UIManager : BaseManager
     /// </summary>
     public BaseUIMediator GetOpenedUI(string uiPrefabName)
     {
-        return openedUIs.ContainsKey(uiPrefabName) ? openedUIs[uiPrefabName] : null;
+        return openedUIs.TryGetValue(uiPrefabName, out var uiMediator) ? uiMediator : null;
     }
     
     /// <summary>
     /// 检查UI是否已打开
     /// </summary>
-    public bool IsUIOpened(string uiPrefabName)
+    public bool IsUIOpened(string uiMediatorName)
     {
-        return openedUIs.ContainsKey(uiPrefabName);
+        return openedUIs.ContainsKey(uiMediatorName);
     }
     #endregion
-}
-
-/// <summary>
-/// UI注册数据列表（用于JSON反序列化）
-/// </summary>
-[Serializable]
-public class UIRegisterDataList
-{
-    public List<UIRegisterItem> uiList;
-}
-
-[Serializable]
-public class UIRegisterItem
-{
-    public string name;
-    public string prefabPath;
+    
+    #region 程序启动时UI初始化
+    /// <summary>
+    /// 加载初始UI
+    /// </summary>
+    private void InitUIMediator()
+    {
+    }
+    
+    #endregion
 }

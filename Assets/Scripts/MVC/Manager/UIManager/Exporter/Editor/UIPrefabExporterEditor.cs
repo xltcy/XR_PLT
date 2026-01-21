@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +26,10 @@ public class UIPrefabExporterEditor : Editor
         
         // 检测组件并显示提示
         BaseUIMediator mediator = exporter.GetComponent<BaseUIMediator>();
-        CanvasGroup canvasGroup = exporter.GetComponent<CanvasGroup>();
         
         if (mediator == null)
         {
             EditorGUILayout.HelpBox("节点上没有挂载BaseUIMediator或其继承类！导出将失败。", MessageType.Warning);
-        }
-        
-        if (canvasGroup == null)
-        {
-            EditorGUILayout.HelpBox("节点上没有CanvasGroup组件！导出时会自动添加。", MessageType.Info);
         }
         
         EditorGUILayout.Space(5);
@@ -42,7 +37,7 @@ public class UIPrefabExporterEditor : Editor
         
         // 显示导出信息
         EditorGUILayout.HelpBox($"导出路径: {exporter.GetFullExportPath()}", MessageType.Info);
-        EditorGUILayout.HelpBox($"Resources路径: {exporter.GetResourcesPath()}", MessageType.Info);
+        // EditorGUILayout.HelpBox($"Resources路径: {exporter.GetResourcesPath()}", MessageType.Info);
         
         // 验证是否可以导出
         string errorMessage;
@@ -95,12 +90,11 @@ public class UIPrefabExporterEditor : Editor
         BaseUIMediator mediator = exporter.GetComponent<BaseUIMediator>();
         if (mediator != null)
         {
-            mediator.uiPrefabName = prefabName;
             mediator.sceneName = sceneName;
             EditorUtility.SetDirty(mediator);
         }
 
-        string mediatorName = mediator.name;
+        string mediatorName = mediator.GetMediatorName();
         
         // 确保目录存在
         string directory = Path.GetDirectoryName(fullPath);
@@ -116,21 +110,21 @@ public class UIPrefabExporterEditor : Editor
         GameObject prefabObj = exporter.gameObject;
         bool isSuccess = false;
         
+        // 创建临时克隆对象用于保存，避免影响场景中的原始对象
+        GameObject tempClone = Object.Instantiate(prefabObj);
+        tempClone.name = prefabObj.name; // 保持名称一致
+        
         try
         {
-            // 检查是否已存在
-            GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(fullPath);
+            // 从克隆对象中移除UIPrefabExporter组件
+            UIPrefabExporter exporterInClone = tempClone.GetComponent<UIPrefabExporter>();
+            if (exporterInClone != null)
+            {
+                Object.DestroyImmediate(exporterInClone);
+            }
             
-            if (existingPrefab != null)
-            {
-                // 更新现有Prefab
-                PrefabUtility.SaveAsPrefabAssetAndConnect(prefabObj, fullPath, InteractionMode.UserAction);
-            }
-            else
-            {
-                // 创建新Prefab
-                PrefabUtility.SaveAsPrefabAsset(prefabObj, fullPath);
-            }
+            // 保存克隆对象为Prefab（不建立连接）
+            PrefabUtility.SaveAsPrefabAsset(tempClone, fullPath);
             
             isSuccess = true;
         }
@@ -139,6 +133,11 @@ public class UIPrefabExporterEditor : Editor
             Debug.LogError($"导出Prefab失败: {e.Message}");
             EditorUtility.DisplayDialog("导出失败", $"保存Prefab时出错: {e.Message}", "确定");
             return;
+        }
+        finally
+        {
+            // 删除临时克隆对象
+            Object.DestroyImmediate(tempClone);
         }
         
         if (isSuccess)
@@ -150,14 +149,30 @@ public class UIPrefabExporterEditor : Editor
             
             AssetDatabase.Refresh();
             
+            // 只保存UI所在的场景
+            UnityEngine.SceneManagement.Scene uiScene = exporter.gameObject.scene;
+            bool sceneSaved = false;
+            string sceneStatus = "";
+            
+            if (uiScene.IsValid())
+            {
+                sceneSaved = EditorSceneManager.SaveScene(uiScene);
+                sceneStatus = sceneSaved ? $"场景 '{uiScene.name}' 已保存" : $"场景 '{uiScene.name}' 保存失败";
+            }
+            else
+            {
+                sceneStatus = "无法找到UI所在场景";
+            }
+            
             EditorUtility.DisplayDialog("导出成功", 
                 $"Prefab已导出到: {fullPath}\n" +
                 $"UI名称: {prefabName}\n" +
-                $"Resources路径: {resourcesPath}" +
-                $"UIMediator名称: {mediatorName}", 
+                $"Resources路径: {resourcesPath}\n" +
+                $"UIMediator名称: {mediatorName}\n" +
+                $"{sceneStatus}", 
                 "确定");
             
-            Debug.Log($"UI Prefab导出成功: {prefabName} -> {fullPath}");
+            Debug.Log($"UI Prefab导出成功: {prefabName} -> {fullPath}\n{sceneStatus}");
         }
     }
     
@@ -176,24 +191,58 @@ public class UIPrefabExporterEditor : Editor
         
         string content = File.ReadAllText(constantPath);
         
-        // 检查是否已经存在
-        string fieldDeclaration = $"public const string {uiName} = \"{uiName}\";";
+        // 提取所有现有的常量声明
+        Dictionary<string, string> constants = new Dictionary<string, string>();
+        System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(
+            @"public\s+const\s+string\s+(\w+)\s*=\s*""([^""]*)""\s*;");
+        System.Text.RegularExpressions.MatchCollection matches = regex.Matches(content);
         
-        if (content.Contains($"public const string {uiName}"))
+        foreach (System.Text.RegularExpressions.Match match in matches)
         {
-            Debug.Log($"UI名称 '{uiName}' 已存在于UINameConstant中，跳过注册。");
+            string key = match.Groups[1].Value;
+            string value = match.Groups[2].Value;
+            constants[key] = value;
+        }
+        
+        // 添加或更新新的常量
+        bool isNewEntry = !constants.ContainsKey(uiName);
+        constants[uiName] = uiName;
+        
+        // 提取类的头部和尾部
+        int classBodyStart = content.IndexOf('{');
+        int classBodyEnd = content.LastIndexOf('}');
+        
+        if (classBodyStart < 0 || classBodyEnd < 0)
+        {
+            Debug.LogError("无法解析UINameConstant.cs的类结构");
             return;
         }
         
-        // 找到类的最后一个字段位置
-        int lastBraceIndex = content.LastIndexOf('}');
-        if (lastBraceIndex > 0)
+        string header = content.Substring(0, classBodyStart + 1);
+        
+        // 按字母排序并生成新的常量声明
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.Append(header);
+        sb.AppendLine();
+        
+        var sortedConstants = constants.OrderBy(kv => kv.Key);
+        foreach (var kv in sortedConstants)
         {
-            // 在最后一个}之前插入新字段
-            string newContent = content.Insert(lastBraceIndex, $"    {fieldDeclaration}\n");
-            File.WriteAllText(constantPath, newContent);
-            
+            sb.AppendLine($"    public const string {kv.Key} = \"{kv.Value}\";");
+        }
+        
+        sb.AppendLine("}");
+        
+        // 写回文件
+        File.WriteAllText(constantPath, sb.ToString());
+        
+        if (isNewEntry)
+        {
             Debug.Log($"已将 '{uiName}' 注册到UINameConstant");
+        }
+        else
+        {
+            Debug.Log($"已更新 '{uiName}' 在UINameConstant中的注册");
         }
     }
     
@@ -204,40 +253,13 @@ public class UIPrefabExporterEditor : Editor
     {
         string jsonPath = "Assets/Resources/UIRegister/ui_register.json";
         
-        Dictionary<string, string> registerData = new Dictionary<string, string>();
-        
-        // 读取现有数据
-        if (File.Exists(jsonPath))
-        {
-            try
-            {
-                string jsonContent = File.ReadAllText(jsonPath);
-                var existingData = JsonUtility.FromJson<Dictionary<string, string>>(jsonContent);
-                if (existingData != null)
-                {
-                    registerData = existingData;
-                }
-            }
-            catch
-            {
-                // 如果解析失败，尝试手动解析
-                try
-                {
-                    string jsonContent = File.ReadAllText(jsonPath);
-                    registerData = ParseSimpleJson(jsonContent);
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogWarning($"解析ui_register.json失败: {e.Message}");
-                }
-            }
-        }
+        Dictionary<string, string> registerData = UIManager.LoadUIRegisterData();
         
         // 添加或更新数据
-        registerData[uiName] = resourcesPath;
+        bool isNewEntry = !registerData.ContainsKey(uiName);
         registerData[uiName] = resourcesPath;
         
-        // 保存JSON（手动格式化）
+        // 按字母排序并保存JSON
         try
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
@@ -264,7 +286,15 @@ public class UIPrefabExporterEditor : Editor
             sb.AppendLine("}");
             
             File.WriteAllText(jsonPath, sb.ToString());
-            Debug.Log($"已将 '{uiName}' 注册到ui_register.json");
+            
+            if (isNewEntry)
+            {
+                Debug.Log($"已将 '{uiName}' 注册到ui_register.json");
+            }
+            else
+            {
+                Debug.Log($"已更新 '{uiName}' 在ui_register.json中的注册");
+            }
         }
         catch (System.Exception e)
         {

@@ -7,6 +7,8 @@ using UnityEngine.UI;
 /// </summary>
 public enum UIType
 {
+    /// <summary>HUD UI</summary>
+    Hud,
     /// <summary>全屏UI，会隐藏其下所有UI</summary>
     FullScreen,
     /// <summary>弹窗UI，会Cover其下UI</summary>
@@ -41,14 +43,11 @@ public class UIParams
 public class BaseUIMediator : ComponentBinder
 {
     /// <summary>UI类型，决定UI的显示逻辑</summary>
-    [Header("UI配置")]
+    [Header("UI类型")]
     public UIType uiType = UIType.Popup;
-
-    /// <summary>UI名称，用于注册和查找</summary>
-    [HideInInspector]
-    public string uiPrefabName;
     
     /// <summary>所属场景名称</summary>
+    [Header("UI对应场景名(不需要手动输入)")]
     public string sceneName;
     
     /// <summary>当前UI状态（由UIManager控制）</summary>
@@ -72,14 +71,14 @@ public class BaseUIMediator : ComponentBinder
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
     }
+
     /// <summary>
     /// UI打开时调用，用于初始化UI
-    /// 由子类重写实现具体的初始化逻辑
+    /// 由子类重写实现具体初始化逻辑
     /// </summary>
-    /// <param name="params">打开参数</param>
+    /// <param name="uiParams">打开参数</param>
     public virtual void OnOpen(UIParams uiParams = null)
     {
-        this.OpenParams = uiParams;
     }
 
     /// <summary>
@@ -121,6 +120,15 @@ public class BaseUIMediator : ComponentBinder
     public virtual void OnUnCover()
     {
     }
+
+    /// <summary>
+    /// 保存传入参数
+    /// </summary>
+    /// <param name="uiParams"></param>
+    public void SetParam(UIParams uiParams)
+    {
+        this.OpenParams = uiParams;
+    }
     
     /// <summary>
     /// 获取当前打开参数
@@ -128,5 +136,13 @@ public class BaseUIMediator : ComponentBinder
     protected T GetOpenParams<T>() where T : UIParams
     {
         return OpenParams as T;
+    }
+
+    /// <summary>
+    /// 获取Mediator继承类的类名
+    /// </summary>
+    public string GetMediatorName()
+    {
+        return this.GetType().Name;
     }
 }
