@@ -245,7 +245,7 @@ public class ManagerRegister : Singleton<ManagerRegister>
             }
             catch (Exception e)
             {
-                Utils.LogMessage(LogType.Error, errorInitialization, $"[ManagerRegister] 清理Manager失败: {manager.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ManagerRegister] 清理Manager失败: {manager.GetType().Name}\n\n错误: {e.Message}\n\n调用栈：{e.StackTrace}");
             }
         }
         

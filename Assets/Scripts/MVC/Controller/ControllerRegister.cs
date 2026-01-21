@@ -209,7 +209,7 @@ public class ControllerRegister : Singleton<ControllerRegister>
             }
             catch (Exception e)
             {
-                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 清理Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 清理Controller失败: {controller.GetType().Name}\n\n错误: {e.Message}\n\n调用栈：{e.StackTrace}");
             }
         }
         
