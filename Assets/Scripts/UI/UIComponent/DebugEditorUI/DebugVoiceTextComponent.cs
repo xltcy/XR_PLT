@@ -12,6 +12,6 @@ public class DebugVoiceTextComponent : BaseStateComponent
 
     private void OnBtnVoiceTextClick()
     {
-        var text = inputField.text;
+        ControllerRefer.VoiceController.ProcessVoiceRecognizeResult(inputField.text);
     }
 }

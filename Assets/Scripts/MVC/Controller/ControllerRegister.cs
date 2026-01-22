@@ -11,11 +11,11 @@ using UnityEngine.Rendering;
 /// </summary>
 public class ControllerRegister : Singleton<ControllerRegister>
 {
-    [Header("Controller配置")]
+    //Register配置
     private bool autoInitializeOnStart = true;
-    [SerializeField] private bool logInitialization = true;
-    [SerializeField] private bool warnInitialization = true;
-    [SerializeField] private bool errorInitialization = true;
+    private bool logInitialization = false;
+    private bool warnInitialization = true;
+    private bool errorInitialization = true;
     
     // 所有已注册的Controller
     [SerializeField]
@@ -180,7 +180,7 @@ public class ControllerRegister : Singleton<ControllerRegister>
             }
             catch (Exception e)
             {
-                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 初始化Controller失败: {controller.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ControllerRegister] 初始化Controller失败: {controller.GetType().Name}\n\n错误: {e.Message}\n\n调用栈：{e.StackTrace}");
             }
         }
         

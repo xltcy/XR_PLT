@@ -50,10 +50,27 @@ public class UIManager : BaseManager
     
     public override void OnUnregister()
     {
-        // 清理所有UI
-        CloseAll();
+        // 清理所有打开的UI
+        foreach (var ui in openedUIs.Values)
+        {
+            if (ui != null)
+            {
+                // 只调用OnClose回调，不操作GameObject（场景销毁时会自动清理）
+                ui.currentState = UIState.Closing;
+                try
+                {
+                    ui.OnClose();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"UI OnClose error: {e.Message}");
+                }
+            }
+        }
+        openedUIs.Clear();
+        uiStack.Clear();
         
-        // 清理缓存
+        // 清理缓存的UI
         foreach (var ui in cachedUIs.Values)
         {
             if (ui != null && ui.gameObject != null)
@@ -375,15 +392,15 @@ public class UIManager : BaseManager
     /// <summary>
     /// 关闭UI（通过UI名称）
     /// </summary>
-    public void Close(string uiPrefabName, bool destroy = false)
+    public void Close(string uiMediatorName, bool destroy = false)
     {
-        if (!openedUIs.ContainsKey(uiPrefabName))
+        if (!openedUIs.ContainsKey(uiMediatorName))
         {
-            Debug.LogWarning($"UI {uiPrefabName} is not opened!");
+            Debug.LogWarning($"UI {uiMediatorName} is not opened!");
             return;
         }
         
-        BaseUIMediator ui = openedUIs[uiPrefabName];
+        BaseUIMediator ui = openedUIs[uiMediatorName];
         CloseUIInternal(ui, destroy);
     }
 
@@ -555,9 +572,9 @@ public class UIManager : BaseManager
     /// <summary>
     /// 获取已打开的UI
     /// </summary>
-    public BaseUIMediator GetOpenedUI(string uiPrefabName)
+    public BaseUIMediator GetOpenedUI(string uiMediatorName)
     {
-        return openedUIs.TryGetValue(uiPrefabName, out var uiMediator) ? uiMediator : null;
+        return openedUIs.TryGetValue(uiMediatorName, out var uiMediator) ? uiMediator : null;
     }
     
     /// <summary>

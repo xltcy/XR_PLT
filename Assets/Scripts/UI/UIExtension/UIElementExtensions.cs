@@ -111,6 +111,30 @@ public static class UIElementExtensions
         }
         return null;
     }
+
+    /// <summary>
+    /// 让 UI 元素充满父物体
+    /// </summary>
+    /// <param name="transform">要调整的 Transform</param>
+    public static void FitParent(this Transform transform)
+    {
+        if (transform == null)
+        {
+            Debug.LogWarning("[UIElementExtensions] FitParent: Transform 为 null");
+            return;
+        }
+
+        RectTransform rectTransform = transform.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            // UI 元素：设置锚点和偏移，让元素充满父物体
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
+            rectTransform.localScale = Vector3.one;
+        }
+    }
     #endregion Transform Extensions
     
     #region GameObject Extensions
@@ -120,7 +144,11 @@ public static class UIElementExtensions
     /// </summary>
     public static void SetVisible(this GameObject go, bool visible)
     {
-        go?.SetActive(visible);
+        if (go == null)
+        {
+            return;
+        }
+        go.SetActive(visible);
     }
     
     /// <summary>
@@ -128,7 +156,11 @@ public static class UIElementExtensions
     /// </summary>
     public static void ToggleVisible(this GameObject go)
     {
-        go?.SetActive(!go.activeSelf);
+        if (go == null)
+        {
+            return;
+        }
+        go.SetActive(!go.activeSelf);
     }
     
     /// <summary>
@@ -147,7 +179,11 @@ public static class UIElementExtensions
     /// </summary>
     public static void SetVisible(this Component go, bool visible)
     {
-        go?.gameObject.SetActive(visible);
+        if (go == null)
+        {
+            return;
+        }
+        go.gameObject.SetActive(visible);
     }
     
     /// <summary>
@@ -156,7 +192,11 @@ public static class UIElementExtensions
     /// <param name="component"></param>
     public static void ToggleVisible(this Component component)
     {
-        component?.gameObject.ToggleVisible();
+        if (component == null)
+        {
+            return;
+        }
+        component.gameObject.ToggleVisible();
     }
     #endregion Component Extensions
 

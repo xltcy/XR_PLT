@@ -11,11 +11,11 @@ using UnityEngine.Rendering;
 /// </summary>
 public class ManagerRegister : Singleton<ManagerRegister>
 {
-    [Header("Manager配置")]
+    //Register配置
     private bool autoInitializeOnStart = true;
-    [SerializeField] private bool logInitialization = true;
-    [SerializeField] private bool warnInitialization = true;
-    [SerializeField] private bool errorInitialization = true;
+    private bool logInitialization = false;
+    private bool warnInitialization = true;
+    private bool errorInitialization = true;
     
     // 所有已注册的Manager
     [SerializeField]
@@ -216,7 +216,7 @@ public class ManagerRegister : Singleton<ManagerRegister>
             }
             catch (Exception e)
             {
-                Utils.LogMessage(LogType.Error, errorInitialization, $"[ManagerRegister] 初始化Manager失败: {manager.GetType().Name}, 错误: {e.Message}");
+                Utils.LogMessage(LogType.Error, errorInitialization, $"[ManagerRegister] 初始化Manager失败: {manager.GetType().Name}\n\n错误: {e.Message}\n\n调用栈：{e.StackTrace}");
             }
         }
         

@@ -167,7 +167,7 @@ public class EventListener<T> : EventListener
 public class EventManager : BaseManager
 {
     [Header("配置")]
-    private bool enableLogging = true;
+    private bool enableLogging = false;
     private int maxEventHistory = 1000;
     private float asyncQueueInterval = 0.016f; // 约60Hz
     private bool autoCleanup = true;

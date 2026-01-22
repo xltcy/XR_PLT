@@ -27,7 +27,7 @@ public class RelocateController : BaseController
 
     }
 
-    public void RelocateSceneRequest(byte[] rawData, CountdownEvent countdown = null)
+    public void RelocateSceneRequest(byte[] rawData, Transform lockable = null, CountdownEvent countdown = null)
     {
         var summaryItemData = meshController.GetCurrentSummaryItemData();
         if (summaryItemData == null)
@@ -42,7 +42,7 @@ public class RelocateController : BaseController
         
         var req = new RelocateScene.RequestParam(summaryItemData, rawData);
         req.localData = new RelocateScene.LocalData {camPose = camPose, countdown = countdown}; 
-        req.Send();
+        req.Send(lockable);
     }
 
     public void OnRelocateSceneResponse(bool result, NetworkResponse response)
@@ -79,7 +79,7 @@ public class RelocateController : BaseController
     }
     
     
-    private void OnRelocateSonarResponse(bool result, NetworkResponse response)
+    public void OnRelocateSonarResponse(bool result, NetworkResponse response)
     {
         if (result)
         {

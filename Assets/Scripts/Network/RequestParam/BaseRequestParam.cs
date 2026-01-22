@@ -29,6 +29,11 @@ public abstract class BaseRequestParam
     
     public virtual void Send(Transform lockable = null, NetworkServiceManager.ResponseEvent callback = null)
     {
-        ManagerRefer.NetworkServiceManager.SendRequest(this, lockable, callback);
+        ManagerRefer.NetworkServiceManager.SendRequest(this, true, lockable, callback);
+    }
+
+    public virtual void SendWithoutLockable(NetworkServiceManager.ResponseEvent callback = null)
+    {
+        ManagerRefer.NetworkServiceManager.SendRequest(this, false, null, callback);
     }
 }

@@ -1,9 +1,10 @@
 using System;
+using TickSystem;
 using UniGLTF;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DebugUIMediator : BaseUIMediator
+public class DebugUIMediator : BaseUIMediator, ITickerUpdate
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
@@ -66,20 +67,40 @@ public class DebugUIMediator : BaseUIMediator
         });
 
         meshController = ControllerRefer.MeshController;
+        relocateController = ControllerRefer.RelocateController;
         
         
         RelocateSonar.SetVisible(true);
         SummonSonar.SetVisible(false);
         
+        debugSwitchButton.SetVisible(Application.isEditor);
+        
         Debug.Log("DebugUIMediator OnOpen");
 
         this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SONAR, OnRelocateSonarComplete);
+        
+        TickController.RegisterTick(this);
+    }
+
+    public void Tick()
+    {
+        // 检测 F1 键
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            OnDebugSwitchButtonClick();
+        }
+        
+        // 检测四指触摸
+        if (Input.touchCount >= 4)
+        {
+            OnDebugSwitchButtonClick();
+        }
     }
 
 
     public override void OnClose()
     {
-
+        TickController.UnRegisterTick(this);
         
         // 清理事件监听
         Toggle_Mesh?.RemoveAllValueChangeListeners();

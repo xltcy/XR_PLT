@@ -7,4 +7,5 @@ public class EventConstant
     public static string COMPLETE_GET_SCENE_DATA = "COMPLETE_GET_SCENE_DATA";
     public static string COMPLETE_RELOCATE_SCENE = "COMPLETE_RELOCATE_SCENE";
     public static string COMPLETE_RELOCATE_SONAR = "COMPLETE_RELOCATE_SONAR";
+    public static string VOICE_RECOGNITION_END = "VOICE_RECOGNITION_END";
 }

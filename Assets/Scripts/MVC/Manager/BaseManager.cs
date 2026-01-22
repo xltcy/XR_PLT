@@ -11,7 +11,7 @@ public class BaseManager
     public virtual int InitPriority => 500;
 
     /// <summary>
-    /// Controller的初始化时机
+    /// Controller的初始化时机，特别是有Tick功能的要特别注意
     /// </summary>
     public virtual ManagerRegister.InitTiming InitTiming => ManagerRegister.InitTiming.OnFirstUsed;
     

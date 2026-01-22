@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2026-01-16 18:14:24
-// 包含 20 个继承 BaseController 的类
+// 生成时间: 2026-01-22 19:38:47
+// 包含 19 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -45,15 +45,6 @@ public static class ControllerRefer
         get
         {
             return _externalModelController ??= ControllerRegister.Instance?.GetController<ExternalModelController>();
-        }
-    }
-
-    private static LoadingViewController _loadingViewController;
-    public static LoadingViewController LoadingViewController
-    {
-        get
-        {
-            return _loadingViewController ??= ControllerRegister.Instance?.GetController<LoadingViewController>();
         }
     }
 
@@ -224,8 +215,6 @@ public static class ControllerRefer
                 return EditModeManager;
             case "ExternalModelController":
                 return ExternalModelController;
-            case "LoadingViewController":
-                return LoadingViewController;
             case "MaterialController":
                 return MaterialController;
             case "MeshController":
@@ -271,7 +260,6 @@ public static class ControllerRefer
         _click3DObjectManager = null;
         _editModeManager = null;
         _externalModelController = null;
-        _loadingViewController = null;
         _materialController = null;
         _meshController = null;
         _moveController = null;

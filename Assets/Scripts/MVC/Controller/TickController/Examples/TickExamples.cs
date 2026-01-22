@@ -10,13 +10,13 @@ public class TickExampleMono : MonoBehaviour, ITickerUpdate
 
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("MonoBehaviour示例已注册到Tick系统");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void Tick()
@@ -37,13 +37,13 @@ public class TickExampleSecond : MonoBehaviour, ITickerSecond
 {
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("每秒Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickSecond()
@@ -59,13 +59,13 @@ public class TickExampleHalfSecond : MonoBehaviour, ITickerHalfSecond
 {
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("每0.5秒Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickHalfSecond()
@@ -83,13 +83,13 @@ public class TickExampleCustomInterval : MonoBehaviour, ITickerInterval
 
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log($"自定义间隔Tick示例已注册 (间隔: {intervalTime}秒)");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickInterval()
@@ -109,13 +109,13 @@ public class TickExampleFixed : MonoBehaviour, ITickerFixedUpdate
 
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("FixedUpdate Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickFixed()
@@ -135,13 +135,13 @@ public class TickExampleLate : MonoBehaviour, ITickerLateUpdate
 {
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("LateUpdate Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickLate()
@@ -157,13 +157,13 @@ public class TickExampleMulti : MonoBehaviour, ITickerUpdate, ITickerSecond
 {
     void Start()
     {
-        TickController.Register(this);  // 自动识别并注册所有接口
+        TickController.RegisterTick(this);  // 自动识别并注册所有接口
         Debug.Log("多接口Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);  // 自动取消所有接口
+        TickController.UnRegisterTick(this);  // 自动取消所有接口
     }
 
     public void Tick()
@@ -189,7 +189,7 @@ public class TickExamplePureCS : ITickerSecond, ITickerInterval
     {
         this.name = name;
         this.customInterval = customInterval;
-        TickController.Register(this);  // 自动注册所有实现的接口
+        TickController.RegisterTick(this);  // 自动注册所有实现的接口
         Debug.Log($"纯C#类 '{name}' 已注册 (间隔: {customInterval}秒)");
     }
 
@@ -207,7 +207,7 @@ public class TickExamplePureCS : ITickerSecond, ITickerInterval
 
     public void Dispose()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
         Debug.Log($"纯C#类 '{name}' 已注销");
     }
 }
@@ -227,13 +227,13 @@ public class TickExampleDerived : TickBaseController, ITickerSecond
 {
     void Start()
     {
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         Debug.Log("派生类每秒Tick示例已注册");
     }
 
     void OnDestroy()
     {
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
     }
 
     public void TickSecond()

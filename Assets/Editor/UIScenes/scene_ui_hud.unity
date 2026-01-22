@@ -684,7 +684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &106936271
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1216,19 +1216,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 448054241}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MeshController, Assembly-CSharp
-        m_MethodName: HideMeshRender
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &448054241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2689,7 +2677,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1176669406
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3617,7 +3605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dca404fa83296545bc67392001dae4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadingRotationSpeed: 200
+  rotationSpeed: 200
 --- !u!114 &1579681958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4277,19 +4265,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1950669022}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: TransToSelectDesUI
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1950669022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4718,19 +4694,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2095975896}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MeshController, Assembly-CSharp
-        m_MethodName: ShowMeshRender
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2095975896
 MonoBehaviour:
   m_ObjectHideFlags: 0

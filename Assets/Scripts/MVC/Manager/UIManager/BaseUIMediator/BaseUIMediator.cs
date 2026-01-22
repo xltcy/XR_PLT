@@ -1,6 +1,4 @@
-using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// UI类型枚举
@@ -144,5 +142,10 @@ public class BaseUIMediator : ComponentBinder
     public string GetMediatorName()
     {
         return this.GetType().Name;
+    }
+
+    public virtual void CloseSelf()
+    {
+        ManagerRefer.UIManager.Close(this);
     }
 }

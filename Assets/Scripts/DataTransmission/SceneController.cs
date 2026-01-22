@@ -90,8 +90,7 @@ public class SceneController : BaseController
         
     }
     #endregion 生命周期函数
-
-
+    
     #region 获取数据
     void InitiatePath()
     {

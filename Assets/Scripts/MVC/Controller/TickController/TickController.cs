@@ -89,10 +89,11 @@ public class TickController : BaseController
     
     #endregion
 
+    #region 注册/取消注册公共方法
     /// <summary>
     /// 注册对象（自动识别实现的接口类型）
     /// </summary>
-    public static void Register(object obj)
+    public static void RegisterTick(object obj)
     {
         if (obj == null)
         {
@@ -125,7 +126,7 @@ public class TickController : BaseController
     /// <summary>
     /// 取消注册对象（自动识别实现的接口类型）
     /// </summary>
-    public static void Unregister(object obj)
+    public static void UnRegisterTick(object obj)
     {
         if (obj == null)
             return;
@@ -151,6 +152,7 @@ public class TickController : BaseController
         if (obj is ITickerLateUpdate tickableLate)
             instance.UnregisterLate(tickableLate);
     }
+    #endregion 注册/取消注册公共方法
 
     #region Register/Unregister Internal Methods
     
@@ -657,7 +659,8 @@ public class TickController : BaseController
     }
 
     #endregion
-
+    
+    #region 信息展示
     /// <summary>
     /// 获取当前注册的Tickable对象总数
     /// </summary>
@@ -693,4 +696,5 @@ public class TickController : BaseController
                $"  LateUpdate: {instance.tickablesLate.Count}\n" +
                $"  总计: {GetTickableCount()}";
     }
+    #endregion 信息展示
 }

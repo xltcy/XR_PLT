@@ -59,8 +59,11 @@ public class MeshController : BaseController
     public override void OnRegister()
     {
         base.OnRegister();
-        
-        sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+
+        if (sceneSelectDropdown)
+        {
+            sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        }
         //todo delete remove listener
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
@@ -70,7 +73,10 @@ public class MeshController : BaseController
 
     public override void OnUnregister()
     {
-        sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        if (sceneSelectDropdown != null)
+        {
+            sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        }
         //todo delete remove listener
         ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
         this.RemoveAllEventListener();
@@ -85,15 +91,18 @@ public class MeshController : BaseController
         // 模型选择.value = 1;
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
-        buttonGetPose.gameObject.SetActive(true);
-        buttonSummonAtCamera.gameObject.SetActive(false);
-        
-        sceneSelectDropdown.ClearOptions();
+        buttonGetPose.SetVisible(true);
+        buttonSummonAtCamera.SetVisible(false);
+
+        if (sceneSelectDropdown)
+        {
+            sceneSelectDropdown.ClearOptions();
+        }
 
         SetStartState(StartState.Normal);
 
-        buttonHideMesh.gameObject.SetActive(true);
-        buttonShowMesh.gameObject.SetActive(false);
+        buttonHideMesh.SetVisible(true);
+        buttonShowMesh.SetVisible(false);
 
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
@@ -130,32 +139,32 @@ public class MeshController : BaseController
     {
         ChangeMeshShaderWithTag("Mesh", hideShader);
 
-        buttonShowMesh.gameObject.SetActive(true);
-        buttonHideMesh.gameObject.SetActive(false);
+        buttonShowMesh.SetVisible(true);
+        buttonHideMesh.SetVisible(false);
     }
 
     public void ShowMeshRender()
     {
         ChangeMeshShaderWithTag("Mesh", defaultShader);
 
-        buttonShowMesh.gameObject.SetActive(false);
-        buttonHideMesh.gameObject.SetActive(true);
+        buttonShowMesh.SetVisible(false);
+        buttonHideMesh.SetVisible(true);
     }
 
     public void HideSonarRender()
     {
         ChangeMeshShaderWithTag("Sonar", hideShader);
 
-        buttonShowSonar.gameObject.SetActive(true);
-        buttonHideSonar.gameObject.SetActive(false);
+        buttonShowSonar.SetVisible(true);
+        buttonHideSonar.SetVisible(false);
     }
 
     public void ShowSonarRender()
     {
         ChangeMeshShaderWithTag("Sonar", defaultShader);
 
-        buttonShowSonar.gameObject.SetActive(false);
-        buttonHideSonar.gameObject.SetActive(true);
+        buttonShowSonar.SetVisible(false);
+        buttonHideSonar.SetVisible(true);
     }
 
     #region 前后端通信
@@ -284,7 +293,7 @@ public class MeshController : BaseController
             UIStateManager.SetLoadingStatus(false);
         }));
 
-        ControllerRefer.RelocateController.RelocateSceneRequest(rawData, countdownEvent);
+        ControllerRefer.RelocateController.RelocateSceneRequest(rawData, null, countdownEvent);
         
         ControllerRefer.SceneController.RequestSceneDataByKey(GetCurrentSummaryItemData(),
             onComplete: (result, response) =>
@@ -491,7 +500,7 @@ public class MeshController : BaseController
     //public void ClickToGetPoseWithImage()
     //{
     //    buttonGetPose.GetComponent<Button>().interactable = false;
-    //    buttonSummonAtCamera.gameObject.SetActive(false);
+    //    buttonSummonAtCamera.SetVisible(false);
 
     //    string url = serverUrl;
 
@@ -586,14 +595,23 @@ public class MeshController : BaseController
 
     private void SetStartState(StartState newState)
     {
-        buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
-        buttonGetPose.gameObject.SetActive(newState != StartState.WaitSummon && newState != StartState.Summoning);
-        buttonSummonAtCamera.gameObject.SetActive(newState == StartState.WaitSummon);
+        if (buttonGetPose != null)
+        {
+            buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
+            buttonGetPose.SetVisible(newState != StartState.WaitSummon && newState != StartState.Summoning);
+        }
+        if (buttonSummonAtCamera)
+            buttonSummonAtCamera.SetVisible(newState == StartState.WaitSummon);
     }
     
     public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
     {
         GameObject obj = GameObject.FindGameObjectWithTag(tag);
+        if (obj == null)
+        {
+            return;
+        }
+        
         MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
         foreach(MeshRenderer meshRenderer in meshRenderers)
         {
@@ -649,11 +667,13 @@ public class MeshController : BaseController
     {
         List<String> options = new List<string>();
         Summary.ForEach(item => options.Add(item.sceneName));
-        sceneSelectDropdown.ClearOptions();
-        sceneSelectDropdown.AddOptions(options);
-        
-        //手动初始化一次场景选择DropDown
-        OnSceneSelectChanged(sceneSelectDropdown.value);
+        if (sceneSelectDropdown)
+        {
+            sceneSelectDropdown.ClearOptions();
+            sceneSelectDropdown.AddOptions(options);
+            //手动初始化一次场景选择DropDown
+            OnSceneSelectChanged(sceneSelectDropdown.value);
+        }
     }
     
     #endregion callback

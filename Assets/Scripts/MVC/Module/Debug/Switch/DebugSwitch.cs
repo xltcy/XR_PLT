@@ -17,7 +17,7 @@ public class DebugSwitch : Singleton<DebugSwitch>
     public bool DEBUG_USING_NETWORK_JSON = false;
 
     [SerializeField, Header("使用UIManager")]
-    public bool DEBUG_USING_UIMANAGER = false;
+    public bool DEBUG_USING_UIMANAGER = true;
     #endregion
     
     /*=========================================================================*/

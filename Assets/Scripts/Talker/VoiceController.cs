@@ -31,9 +31,12 @@ public class VoiceController : BaseController
 
     void Init()
     {
-        voiceActiveButton.ResetBtn();
-        voiceActiveButton.onPointerDown.AddListener(StartVoiceRecognize);
-        voiceActiveButton.onPointerUp.AddListener(StopVoiceRecognize);
+        if (voiceActiveButton)
+        {
+            voiceActiveButton.ResetBtn();
+            voiceActiveButton.onPointerDown.AddListener(StartVoiceRecognize);
+            voiceActiveButton.onPointerUp.AddListener(StopVoiceRecognize);
+        }
         xunfei = XunFeiYuYin.Init("5c81de59", "ea4d5e9b06f8cfb0deae4d5360e7f8a7", "94348d7a6d5f3807176cb1f4923efa5c", "c6ea43c9e7b14d163bdeb4e51d2e564d");
         xunfei.语音识别完成事件 += ProcessVoiceRecognizeResult;
 
@@ -137,7 +140,7 @@ public class VoiceController : BaseController
         }
         if (!matchFail)
         {
-            voiceActiveButton.ResetBtn();
+            ResetVoiceBtn();
         }
     }
 
@@ -296,13 +299,13 @@ public class VoiceController : BaseController
     private void ReconizeFail()
     {
         SpeechManager.SayFromStr("识别失败 请重新尝试");
-        voiceActiveButton.ResetBtn();
+        ResetVoiceBtn();
     }
 
     private void CommandFail()
     {
         SpeechManager.SayFromStr("出现错误 请重新尝试");
-        voiceActiveButton.ResetBtn();
+        ResetVoiceBtn();
     }
 
     private void RemoteChat(string userInput)
@@ -313,7 +316,7 @@ public class VoiceController : BaseController
             {
                 UnityEngine.Debug.Log("Msg in LLM:" + reply);
                 SpeechManager.SayFromStr(reply);
-                voiceActiveButton.ResetBtn();
+                ResetVoiceBtn();
             },
             onError: (string error) =>
             {
@@ -326,5 +329,11 @@ public class VoiceController : BaseController
     public void InitLLMMessageList()
     {
         llmGenerator?.InitMessagesList();
+    }
+
+    private void ResetVoiceBtn()
+    {
+        if (voiceActiveButton) voiceActiveButton.ResetBtn();
+        this.TriggerEvent(EventConstant.VOICE_RECOGNITION_END);
     }
 }

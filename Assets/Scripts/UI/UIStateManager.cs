@@ -19,6 +19,10 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
     // Start is called before the first frame update
     void Start()
     {
+        if (DebugSwitch.Instance.DEBUG_USING_UIMANAGER)
+        {
+            return;
+        }
         TransToStartUI();
     }
 
@@ -44,7 +48,7 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
         }
         if (!initPos)
         {
-            smplController.SetActive(true);
+            smplController.SetVisible(true);
             ControllerRefer.SMPLController.InitializeSmplPosition();
             initPos = true;
         }
@@ -80,7 +84,7 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
     {
         if (!initPos)
         {
-            smplController.SetActive(true);
+            smplController.SetVisible(true);
             ControllerRefer.SMPLController.InitializeSmplPosition();
             initPos = true;
         }
@@ -91,13 +95,13 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
     private void SwitchForStart(RunState newState)
     {
         bool setActive = newState == RunState.Start;
-        StartView.SetActive(setActive);
+        StartView.SetVisible(setActive);
     }
 
     private void SwitchForSelectDes(RunState newState)
     {
         bool setActive = newState == RunState.SelectDestination;
-        SelectDesView.SetActive(setActive);
+        SelectDesView.SetVisible(setActive);
         if (setActive)
         {
             ControllerRefer.SelectDesController.InitState();
@@ -108,7 +112,7 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
     private void SwitchForVirtualManIntro(RunState newState)
     {
         bool setActive = newState == RunState.VirtualManIntro;
-        VirtualManIntroView.SetActive(setActive);
+        VirtualManIntroView.SetVisible(setActive);
     }
 
     void SelectDesController.SelectDesActionInterface.OnSelectDesAt(SelectDesModel item)
@@ -120,7 +124,7 @@ public class UIStateManager : BaseController, SelectDesController.SelectDesActio
 
     private void RequestLoadingStatus(bool setStart)
     {
-        LoadingView.SetActive(setStart);
+        LoadingView.SetVisible(setStart);
     }
 
     public static void SetLoadingStatus(bool setStart)

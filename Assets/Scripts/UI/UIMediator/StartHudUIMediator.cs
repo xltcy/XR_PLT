@@ -30,11 +30,10 @@ public class StartHudUIMediator : BaseUIMediator
     private List<SummaryItemData> summaryItemDataList;
     
     private MeshController meshController;
+    private bool initSMPL = false;
 
     public override void OnOpen(UIParams uiParams = null)
     {
-        //todo 1.添加Relocate按钮，显示、lockable
-        //todo 2.添加Summon按钮显示
         dropdownSceneSelect.onValueChanged.AddListener(OnSceneSelectChanged);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
         this.AddEventListener(EventConstant.COMPLETE_GET_SCENE_DATA, OnCompleteGetSceneData);
@@ -42,6 +41,9 @@ public class StartHudUIMediator : BaseUIMediator
 
         meshController = ControllerRefer.MeshController;
 
+        initSMPL = false;
+        
+        btnStart.SetVisible(false);
         SetUI(0);
     }
 
@@ -62,7 +64,19 @@ public class StartHudUIMediator : BaseUIMediator
         btnSummonModel.SetVisible(index == 2);
         btnRelocate.SetVisible(index == 1);
     }
+
+    private void SetModelBtnGroup(bool modelVisible)
+    {
+        btnShowModel.SetVisible(!modelVisible);
+        btnHideModel.SetVisible(modelVisible);
+    }
     
+    private void LoadSceneData()
+    {
+        ControllerRefer.SceneController.RequestSceneDataByKey(meshController.GetCurrentSummaryItemData());
+    }
+    
+    #region callback
     private void OnBtnRelocateClick()
     {
         var relocateType = MeshController.RelocateType.Scene;
@@ -92,36 +106,55 @@ public class StartHudUIMediator : BaseUIMediator
         
         ControllerRefer.RelocateController.RelocateSceneRequest(rawData);
     }
-
-    private void LoadSceneData()
-    {
-        ControllerRefer.SceneController.RequestSceneDataByKey(meshController.GetCurrentSummaryItemData());
-    }
-
+    
     private void OnBtnSummonModelClick()
     {
         meshController.ClickToSummonAtCamera(meshController.relocatedPose);
         SetUI(1);
+        SetModelBtnGroup(true);
     }
 
     private void OnBtnStartClick()
     {
-        
-    }
+        var sceneData = ControllerRefer.SceneController.SceneData;
+        if (sceneData == null)
+        {
+            // Error
+            Debug.Log("No vailable explaination point!!!");
+            return;
+        }
+        if (!initSMPL)
+        {
+            ControllerRefer.SMPLController.SetVisible(true);
+            ControllerRefer.SMPLController.InitializeSmplPosition();
+            initSMPL = true;
+        }
+        if (sceneData.explanationPoints.Count == 1)
+        {
+            // skip selectDestination.
+            ControllerRefer.SceneController.SetSelectedExplainationPoint(sceneData.explanationPoints[0].id);
+            ManagerRefer.UIManager.Open(UINameConstant.VirtualManIntroUIMediator);
+        }
+        else
+        {
+            // 打开讲解点选择
+            // todo 迁移逻辑到UI SwitchRunState(RunState.SelectDestination);
+            ManagerRefer.UIManager.Open(UINameConstant.SelectDesUIMediator);
+        }
 
-    private void OnToggleSceneSelect()
-    {
-        
+        CloseSelf();
     }
 
     private void OnBtnShowModelClick()
     {
-        
+        meshController.ShowMeshRender();
+        SetModelBtnGroup(true);
     }
 
     private void OnBtnHideModelClick()
     {
-        
+        meshController.HideMeshRender();
+        SetModelBtnGroup(false);
     }
     
     private void OnSceneSelectChanged(int index)
@@ -154,11 +187,17 @@ public class StartHudUIMediator : BaseUIMediator
     {
         SetUI(1);
         ControllerRefer.VoiceController.InitLLMMessageList();
+        btnStart.SetVisible(false);
+        OnBtnHideModelClick();
+        btnShowModel.SetVisible(false);
+        btnHideModel.SetVisible(false);
     }
 
     private void OnCompleteRelocateScene(EventData eventData)
     {
         SetUI(2);
+        btnStart.SetVisible(true);
     }
+    #endregion callback
     
 }

@@ -44,6 +44,52 @@ namespace Network.Editor
             }
             EditorGUILayout.EndVertical();
             
+            // Lockable 信息
+            EditorGUILayout.Space(10);
+            EditorGUILayout.LabelField("锁定与加载圈信息", EditorStyles.boldLabel);
+            
+            var activeLockables = manager.ActiveLockables;
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            {
+                EditorGUILayout.LabelField($"活跃锁定数: {activeLockables.Count}");
+                EditorGUILayout.LabelField($"全屏锁定请求数: {manager.FullScreenLockCount}");
+                EditorGUILayout.LabelField($"局部锁定数: {manager.LocalLockCount}");
+                
+                if (activeLockables.Count > 0)
+                {
+                    EditorGUILayout.Space(5);
+                    EditorGUILayout.LabelField("详细信息:", EditorStyles.boldLabel);
+                    
+                    foreach (var kvp in activeLockables)
+                    {
+                        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                        {
+                            if (kvp.Key == null)
+                            {
+                                EditorGUILayout.LabelField($"全屏锁定", EditorStyles.boldLabel);
+                                EditorGUILayout.LabelField($"  请求数: {kvp.Value}");
+                                EditorGUILayout.HelpBox("使用全屏加载圈", MessageType.Info);
+                            }
+                            else
+                            {
+                                EditorGUILayout.LabelField($"局部锁定: {kvp.Key.name}", EditorStyles.boldLabel);
+                                EditorGUILayout.ObjectField("  对象", kvp.Key, typeof(Transform), true);
+                                EditorGUILayout.LabelField($"  请求数: {kvp.Value}");
+                                EditorGUILayout.HelpBox($"在 {kvp.Key.name} 上显示加载圈", MessageType.Info);
+                            }
+                        }
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.Space(3);
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("当前没有活跃的锁定", MessageType.Info);
+                }
+            }
+            EditorGUILayout.EndVertical();
+            
             EditorGUILayout.Space(10);
         }
     }
