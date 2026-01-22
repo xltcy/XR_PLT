@@ -93,7 +93,15 @@ public class DebugUIMediator : BaseUIMediator, ITickerUpdate
         // 检测四指触摸
         if (Input.touchCount >= 4)
         {
-            OnDebugSwitchButtonClick();
+            // 检查是否有任何手指刚刚开始触摸
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                if (Input.GetTouch(i).phase == TouchPhase.Began)
+                {
+                    OnDebugSwitchButtonClick();
+                    break;
+                }
+            }
         }
     }
 
