@@ -10,6 +10,9 @@ using UnityEngine.Networking;
 /// </summary>
 public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpdate
 {
+    // 有Tick的Manager都要特别注意初始化时机
+    public override ManagerRegister.InitTiming InitTiming => ManagerRegister.InitTiming.OnSceneLoaded;
+
     [Header("配置")]
     private NetworkConfig config = NetworkConfig.Instance;
 
@@ -19,6 +22,14 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     private readonly object _queueLock = new object();
     private int _activeRequests = 0;
     private string _authToken = "";
+    
+    // Lockable 相关 - 支持多个不同的 lockable 同时存在
+    // key: lockable Transform (null 表示全屏锁定)
+    // value: 该 lockable 的活动请求数
+    private Dictionary<Transform, int> _lockableRequests = new Dictionary<Transform, int>();
+    // 保存每个 lockable 的原始 interactable 状态
+    private Dictionary<Transform, bool> _lockableInteractableStates = new Dictionary<Transform, bool>();
+    private readonly object _lockableLock = new object();
 
     #region 事件系统
     public delegate void NetworkEvent(NetworkResponse response);
@@ -40,7 +51,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     {
         base.OnRegister();
 
-        TickController.Register(this);
+        TickController.RegisterTick(this);
         
         Debug.Log($"[NetworkService] 初始化完成，基础URL: {config.baseUrl}");
     }
@@ -48,20 +59,43 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     public void Tick()
     {
         // 处理主线程回调
-        lock (_queueLock)
+        const int maxActionsPerFrame = 100; // 每帧最多处理100个回调，避免卡顿
+        int processedCount = 0;
+        
+        while (processedCount < maxActionsPerFrame)
         {
-            while (_mainThreadActions.Count > 0)
+            Action action = null;
+            
+            // 只在出队时加锁，减少锁持有时间
+            lock (_queueLock)
             {
-                Action action = _mainThreadActions.Dequeue();
-                try
+                if (_mainThreadActions.Count > 0)
                 {
-                    action?.Invoke();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"主线程回调执行失败: {e}");
+                    action = _mainThreadActions.Dequeue();
                 }
             }
+            
+            // 如果队列为空，退出循环
+            if (action == null)
+                break;
+            
+            // 在锁外执行回调，避免阻塞其他线程
+            try
+            {
+                action.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"主线程回调执行失败: {e}");
+            }
+            
+            processedCount++;
+        }
+        
+        // 如果还有未处理的任务，下一帧继续处理
+        if (_mainThreadActions.Count > 0 && processedCount >= maxActionsPerFrame)
+        {
+            Debug.LogWarning($"[NetworkService] 主线程回调队列积压，剩余 {_mainThreadActions.Count} 个任务");
         }
     }
 
@@ -69,7 +103,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     {
         base.OnUnregister();
         
-        TickController.Unregister(this);
+        TickController.UnRegisterTick(this);
         
         ClearAllRequests();
     }
@@ -77,15 +111,21 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     #endregion
 
     #region 公共方法
+
     /// <summary>
     /// 发送HTTP请求
     /// </summary>
-    public string SendRequest(BaseRequestParam baseRequestParam, Transform lockable = null, ResponseEvent callback = null)
+    /// <param name="baseRequestParam">请求参数</param>
+    /// <param name="showLoading">是否显示加载圈，false 表示后台静默请求</param>
+    /// <param name="lockable">需要锁定的 Transform，null 表示全屏锁定</param>
+    /// <param name="callback">请求完成回调</param>
+    public string SendRequest(BaseRequestParam baseRequestParam, bool showLoading = true, Transform lockable = null,
+        ResponseEvent callback = null)
     {
         string requestId = Guid.NewGuid().ToString();
         
         // 启动协程处理请求
-        coroutineManager.StartManagedCoroutine(ProcessRequest(baseRequestParam, lockable, callback), this);
+        coroutineManager.StartManagedCoroutine(ProcessRequest(baseRequestParam, showLoading, lockable, callback), this);
         
         return requestId;
     }
@@ -153,20 +193,26 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
     #endregion
 
     #region 私有方法
-    private IEnumerator ProcessRequest(BaseRequestParam baseRequestParam, Transform lockable = null, ResponseEvent callback = null)
+    private IEnumerator ProcessRequest(BaseRequestParam baseRequestParam, bool showLoading = true,
+        Transform lockable = null, ResponseEvent callback = null)
     {
-        yield return ExecuteRequestWithRetry(baseRequestParam, callback);
+        yield return ExecuteRequestWithRetry(baseRequestParam, showLoading, lockable, callback);
     }
 
     /// <summary>
     /// 网络请求处理器（包含重试逻辑）
     /// </summary>
-    private IEnumerator ExecuteRequestWithRetry(BaseRequestParam baseRequestParam, ResponseEvent callback = null)
+    private IEnumerator ExecuteRequestWithRetry(BaseRequestParam baseRequestParam, bool showLoading = true,
+        Transform lockable = null, ResponseEvent callback = null)
     {
         _activeRequests++;
         NotifyActiveRequestsChanged();
         
-        UIStateManager.SetLoadingStatus(true);
+        // 处理 lockable 加载状态
+        if (showLoading)
+        {
+            SetLockableLoadingStatus(lockable, true);
+        }
 
         long totalStartTime = DateTime.Now.Ticks;
         NetworkResponse finalResponse = null;
@@ -225,7 +271,11 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
             _activeRequests--;
             NotifyActiveRequestsChanged();
             
-            UIStateManager.SetLoadingStatus(false);
+            // 处理 lockable 加载状态
+            if (showLoading)
+            {
+                SetLockableLoadingStatus(lockable, false);
+            }
             
             // 计算总时间
             if (finalResponse != null)
@@ -553,11 +603,279 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
             OnActiveRequestsChanged?.Invoke(_activeRequests);
         });
     }
+
+    /// <summary>
+    /// 设置 Lockable 加载状态
+    /// </summary>
+    /// <param name="lockable">需要锁定的 Transform，null 表示全屏锁定</param>
+    /// <param name="isLoading">是否开始加载</param>
+    private void SetLockableLoadingStatus(Transform lockable, bool isLoading)
+    {
+        // 使用特殊的静态占位符代替 null，因为 Dictionary 不允许 null 键
+        Transform key = lockable ?? GetFullScreenLockKey();
+        
+        lock (_lockableLock)
+        {
+            if (isLoading)
+            {
+                // 开始加载
+                if (!_lockableRequests.ContainsKey(key))
+                {
+                    _lockableRequests[key] = 0;
+                }
+                
+                int previousCount = _lockableRequests[key];
+                _lockableRequests[key]++;
+                
+                // 只在该 lockable 的第一个请求时显示加载圈
+                if (previousCount == 0)
+                {
+                    ShowLoadingForLockable(lockable);
+                }
+            }
+            else
+            {
+                // 结束加载
+                if (_lockableRequests.ContainsKey(key))
+                {
+                    _lockableRequests[key]--;
+                    
+                    // 当该 lockable 的所有请求都完成时，隐藏加载圈
+                    if (_lockableRequests[key] <= 0)
+                    {
+                        HideLoadingForLockable(lockable);
+                        _lockableRequests.Remove(key);
+                    }
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 获取全屏锁定的键（避免使用 null）
+    /// </summary>
+    private static Transform _fullScreenLockKey;
+    private static Transform GetFullScreenLockKey()
+    {
+        if (_fullScreenLockKey == null)
+        {
+            // 创建一个永久的空 GameObject 作为全屏锁定的键
+            var go = new GameObject("__FullScreenLockKey__");
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            go.hideFlags = HideFlags.HideAndDontSave;
+            _fullScreenLockKey = go.transform;
+        }
+        return _fullScreenLockKey;
+    }
+    
+    /// <summary>
+    /// 为指定 lockable 显示加载圈
+    /// </summary>
+    private void ShowLoadingForLockable(Transform lockable)
+    {
+        if (lockable == null)
+        {
+            // 全屏锁定
+            ManagerRefer.UIManager.Open(UINameConstant.LoadingUIMediator);
+        }
+        else
+        {
+            // 保存并禁用 interactable 状态
+            SaveAndDisableInteractable(lockable);
+            
+            // 局部锁定 - 使用 ResourceManager 加载加载圈
+            ManagerRefer.ResourceManager.InstantiateAsync(
+                "UIPrefabs/ui_comp_loading_circle",
+                lockable,
+                loadingCircle =>
+                {
+                    if (loadingCircle == null)
+                    {
+                        Debug.LogError("[NetworkService] 加载圈创建失败，降级为全屏加载");
+                        ManagerRefer.UIManager.Open(UINameConstant.LoadingUIMediator);
+                        return;
+                    }
+
+                    // 让加载圈充满父物体
+                    loadingCircle.transform.FitParent();
+                },
+                usePool: true
+            );
+        }
+    }
+    
+    /// <summary>
+    /// 为指定 lockable 隐藏加载圈
+    /// </summary>
+    private void HideLoadingForLockable(Transform lockable)
+    {
+        if (lockable == null)
+        {
+            // 关闭全屏加载
+            ManagerRefer.UIManager.Close(UINameConstant.LoadingUIMediator);
+        }
+        else
+        {
+            // 关闭局部加载 - 查找并回收加载圈
+            // 通过查找 lockable 的子对象来找到加载圈
+            if (lockable != null)
+            {
+                for (int i = lockable.childCount - 1; i >= 0; i--)
+                {
+                    Transform child = lockable.GetChild(i);
+                    // 检查是否是加载圈实例（通过名称匹配）
+                    if (child.name.Contains("ui_comp_loading_circle"))
+                    {
+                        ManagerRefer.ResourceManager.Recycle(child.gameObject, usePool: true);
+                        break;
+                    }
+                }
+                
+                // 恢复 interactable 状态
+                RestoreInteractable(lockable);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 保存并禁用 interactable 状态
+    /// </summary>
+    private void SaveAndDisableInteractable(Transform lockable)
+    {
+        if (lockable == null) return;
+        
+        // 检查 Selectable 组件（Button, Toggle, Slider, InputField 等的基类）
+        var selectable = lockable.GetComponent<UnityEngine.UI.Selectable>();
+        if (selectable != null)
+        {
+            lock (_lockableLock)
+            {
+                _lockableInteractableStates[lockable] = selectable.interactable;
+            }
+            selectable.interactable = false;
+            return;
+        }
+        
+        // 检查 CanvasGroup 组件
+        var canvasGroup = lockable.GetComponent<CanvasGroup>();
+        if (canvasGroup != null)
+        {
+            lock (_lockableLock)
+            {
+                _lockableInteractableStates[lockable] = canvasGroup.interactable;
+            }
+            canvasGroup.interactable = false;
+            return;
+        }
+    }
+    
+    /// <summary>
+    /// 恢复 interactable 状态
+    /// </summary>
+    private void RestoreInteractable(Transform lockable)
+    {
+        if (lockable == null) return;
+        
+        bool originalState;
+        lock (_lockableLock)
+        {
+            if (!_lockableInteractableStates.TryGetValue(lockable, out originalState))
+            {
+                return; // 没有保存的状态，无需恢复
+            }
+            _lockableInteractableStates.Remove(lockable);
+        }
+        
+        // 检查 Selectable 组件
+        var selectable = lockable.GetComponent<UnityEngine.UI.Selectable>();
+        if (selectable != null)
+        {
+            selectable.interactable = originalState;
+            return;
+        }
+        
+        // 检查 CanvasGroup 组件
+        var canvasGroup = lockable.GetComponent<CanvasGroup>();
+        if (canvasGroup != null)
+        {
+            canvasGroup.interactable = originalState;
+            return;
+        }
+    }
     #endregion
 
-    #region 属性
+    #region Editor用展示属性
     public int ActiveRequests => _activeRequests;
     public bool IsRequesting => _activeRequests > 0;
     public string BaseUrl => config.baseUrl;
+    
+    // Lockable 信息（用于编辑器显示）
+    /// <summary>
+    /// 获取所有活动的 lockable 及其请求计数
+    /// </summary>
+    public Dictionary<Transform, int> ActiveLockables
+    {
+        get
+        {
+            lock (_lockableLock)
+            {
+                var result = new Dictionary<Transform, int>();
+                Transform fullScreenKey = GetFullScreenLockKey();
+                
+                foreach (var kvp in _lockableRequests)
+                {
+                    // 将全屏锁定键转换回 null 以便编辑器显示
+                    Transform key = kvp.Key == fullScreenKey ? null : kvp.Key;
+                    result[key] = kvp.Value;
+                }
+                
+                return result;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 是否有全屏锁定的请求
+    /// </summary>
+    public bool HasFullScreenLock
+    {
+        get
+        {
+            lock (_lockableLock)
+            {
+                Transform key = GetFullScreenLockKey();
+                return _lockableRequests.ContainsKey(key) && _lockableRequests[key] > 0;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 全屏锁定请求数
+    /// </summary>
+    public int FullScreenLockCount
+    {
+        get
+        {
+            lock (_lockableLock)
+            {
+                Transform key = GetFullScreenLockKey();
+                return _lockableRequests.ContainsKey(key) ? _lockableRequests[key] : 0;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 局部锁定的数量（不包括全屏锁定）
+    /// </summary>
+    public int LocalLockCount
+    {
+        get
+        {
+            lock (_lockableLock)
+            {
+                return _lockableRequests.Count - (HasFullScreenLock ? 1 : 0);
+            }
+        }
+    }
     #endregion
 }
