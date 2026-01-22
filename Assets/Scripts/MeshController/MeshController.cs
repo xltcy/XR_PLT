@@ -24,7 +24,7 @@ public class MeshController : BaseController
     public Dropdown sceneSelectDropdown;
 
     public Pose relocatedPose;
-    private Pose relocatedSonarPose;
+    public Pose relocatedSonarPose;
 
     public Button buttonGetPose;
     public Button buttonSummonAtCamera;
@@ -40,7 +40,7 @@ public class MeshController : BaseController
     [Header("本地图片路径")]
     public string testImagePath;
 
-    private Matrix4x4 camPoseT0;
+    public Matrix4x4 camPoseT0;
 
     public List<SummaryItemData> Summary { private set; get; }
     private SummaryItemData curSceneSummaryItemData;
@@ -61,6 +61,7 @@ public class MeshController : BaseController
         base.OnRegister();
         
         sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
+        //todo delete remove listener
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
 
@@ -70,6 +71,7 @@ public class MeshController : BaseController
     public override void OnUnregister()
     {
         sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
+        //todo delete remove listener
         ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
         this.RemoveAllEventListener();
 
@@ -163,24 +165,27 @@ public class MeshController : BaseController
         Sonar = 1
     }
 
+    /// <summary>
+    /// 已废弃，仅作留档
+    /// </summary>
+    /// <param name="relocateType"></param>
+    [Obsolete]
     public void ClickToGetPoseByCapture(RelocateType relocateType)
     {
         //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
-
+        
         //DebugUIMediator节点上添加开关
         if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
         {
             tempGetPose();
             return;
         }
-
+        
         SetStartState(StartState.GettingPos);
         UIStateManager.SetLoadingStatus(true);
-
+        
         // Record Camera Pose
-        Vector3 camPosition = arCamera.transform.position;
-        Quaternion camRotation = arCamera.transform.rotation;
-        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+        camPoseT0 = GetARCameraPose();
         byte[] rawData;
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -214,7 +219,55 @@ public class MeshController : BaseController
         }
     }
 
-    private void SendImageAndReadJson(byte[] rawData)
+    /// <summary>
+    /// 获取相机位姿
+    /// </summary>
+    /// <returns></returns>
+    public Matrix4x4 GetARCameraPose()
+    {
+        if (arCamera == null)
+        {
+            Debug.LogError("找不到AR相机");
+            return default(Matrix4x4);
+        }
+        Vector3 camPosition = arCamera.transform.position;
+        Quaternion camRotation = arCamera.transform.rotation;
+        return Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+    }
+
+    /// <summary>
+    /// 获取相机图片RawData
+    /// </summary>
+    /// <returns>byte[]</returns>
+    public byte[] GetCameraImgRawData()
+    {
+        byte[] rawData = new byte[] { };
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // load from camera android aar
+            rawData = GetImageByARFoundation();
+        }
+
+        return rawData;
+    }
+
+    /// <summary>
+    /// 获取本地图片RawData
+    /// </summary>
+    /// <returns>byte[]</returns>
+    public byte[] GetLocalImgRawData(string imgPath)
+    {
+        byte[] rawData = new byte[] { };
+        if (!imgPath.IsNullOrEmpty())
+        {
+            Debug.Log($"读取图片rawdata：{imgPath}");
+            rawData = ReadImageBytes(imgPath);
+        }
+
+        return rawData;
+    }
+
+    public void SendImageAndReadJson(byte[] rawData)
     {
         CountdownEvent countdownEvent = new CountdownEvent(2);
         bool hasError = false;
@@ -242,6 +295,7 @@ public class MeshController : BaseController
             });
     }
 
+    [Obsolete]
     private void SendSonarImage(byte[] rawData)
     {
         // Record Camera Pose
@@ -251,6 +305,7 @@ public class MeshController : BaseController
         req.Send();
     }
 
+    [Obsolete]
     private void OnRelocateSonarResponse(bool result, NetworkResponse response)
     {
         if (result)
@@ -307,6 +362,11 @@ public class MeshController : BaseController
     #region 放置模型
     public void ClickToSummonAtCamera()
     {
+        ClickToSummonAtCamera(relocatedPose);
+    }
+    
+    public void ClickToSummonAtCamera(Pose pose)
+    {
         SetStartState(StartState.Summoning);
 
         // init modelInstance
@@ -315,13 +375,13 @@ public class MeshController : BaseController
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
         
-        ModelInstance.transform.position = relocatedPose.position * GetModelScale(ModelInstance);
-        ModelInstance.transform.rotation = relocatedPose.rotation;
+        ModelInstance.transform.position = pose.position * GetModelScale(ModelInstance);
+        ModelInstance.transform.rotation = pose.rotation;
 
         SetStartState(StartState.Normal);
     }
 
-    public void ClickToSummonSonarAtCamera()
+    public void ClickToSummonSonarAtCamera(Pose pose)
     {
         string prefabPathInResources = "Prefab/Prefab-Sonar";
 
@@ -341,13 +401,13 @@ public class MeshController : BaseController
 
         float scale = GetModelScale(sonarGO);
         //绕z轴旋转180
-        Quaternion rot180 = Quaternion.AngleAxis(180f, relocatedSonarPose.rotation * Vector3.forward);
+        Quaternion rot180 = Quaternion.AngleAxis(180f, pose.rotation * Vector3.forward);
 
         // 更新 Pose 的旋转
-        relocatedSonarPose.rotation = rot180 * relocatedSonarPose.rotation;
+        pose.rotation = rot180 * pose.rotation;
 
-        sonarGO.transform.position = relocatedSonarPose.position * scale;
-        sonarGO.transform.rotation = relocatedSonarPose.rotation;
+        sonarGO.transform.position = pose.position * scale;
+        sonarGO.transform.rotation = pose.rotation;
         
         
         //todo 删除临时代码
@@ -398,9 +458,7 @@ public class MeshController : BaseController
     {
         UIStateManager.SetLoadingStatus(true);
         // Record Camera Pose
-        Vector3 camPosition = arCamera.transform.position;
-        Quaternion camRotation = arCamera.transform.rotation;
-        camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
+        camPoseT0 = GetARCameraPose();
         CountdownEvent countdownEvent = new CountdownEvent(1);
         bool hasError = false;
         StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
@@ -426,18 +484,7 @@ public class MeshController : BaseController
     
     public void tempClickSummon()
     {
-        SetStartState(StartState.Summoning);
-        // init modelInstance
-        ModelInstance = ControllerRefer.SceneController.AnalysisSceneData();
-        relocatedPose = testPose();
-        // set AstarPath ConsPos;
-        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
-        SMPLController.SetConsPos(centerPos);
-
-        ModelInstance.transform.position = relocatedPose.position;
-        ModelInstance.transform.rotation = relocatedPose.rotation;
-
-        SetStartState(StartState.Normal);
+        ClickToSummonAtCamera(testPose());
     }
 
     //todo 好像是合并到ClickToGetPoseByCapture()里面？
@@ -480,7 +527,7 @@ public class MeshController : BaseController
         }
         catch (Exception e)
         {
-            Debug.LogError($"Failed to read image bytes: {e.Message}");
+            Debug.LogError($"Failed to read image bytes: {e.Message}\n\nstack: {e.StackTrace}");
             return null;
         }
     }

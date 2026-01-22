@@ -230,7 +230,7 @@ public class SceneController : BaseController
         {
             GetSceneDataTestRequest(sceneItemData, 
                 onSuccess: (res) => {
-                    if (SceneData == null || SceneData.timestampMs < res.timestampMs)
+                    if (SceneData == null || sceneItemData.sceneName != res.sceneName || SceneData.timestampMs < res.timestampMs)
                     {
                         // TODO save to local
                         SceneData = res;
@@ -238,6 +238,7 @@ public class SceneController : BaseController
                     {
                         // use sceneData directly.
                     }
+                    this.TriggerEvent(EventConstant.COMPLETE_GET_SCENE_DATA);
                     onComplete?.Invoke(true, null);
                 },
                 onFail: (errorText) => {
@@ -277,10 +278,12 @@ public class SceneController : BaseController
         File.WriteAllText(localPath, jsonText);
         Debug.Log("文件保存到: " + localPath);
         
-        if (SceneData == null || SceneData.timestampMs < data.timestampMs)
+        if (SceneData == null || SceneData.sceneName != data.sceneName || SceneData.timestampMs < data.timestampMs)
         {
             SceneData = data;
         }
+
+        this.TriggerEvent(EventConstant.COMPLETE_GET_SCENE_DATA);
     }
     
     /// <summary>

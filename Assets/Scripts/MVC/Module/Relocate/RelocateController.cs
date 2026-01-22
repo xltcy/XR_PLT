@@ -6,6 +6,8 @@ public class RelocateController : BaseController
 {
     private MeshController meshController;
     
+    public Pose sonarPose;
+    
     public override void OnRegister()
     {
         base.OnRegister();
@@ -13,6 +15,16 @@ public class RelocateController : BaseController
         meshController = ControllerRefer.MeshController;
         
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SCENE, OnRelocateSceneResponse);
+        ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
+    }
+
+    public override void OnUnregister()
+    {
+        base.OnUnregister();
+        
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SCENE, OnRelocateSceneResponse);
+        ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
+
     }
 
     public void RelocateSceneRequest(byte[] rawData, CountdownEvent countdown = null)
@@ -61,6 +73,35 @@ public class RelocateController : BaseController
             {
                 localData.countdown.Signal();
             }
+
+            this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SCENE);
+        }
+    }
+    
+    
+    private void OnRelocateSonarResponse(bool result, NetworkResponse response)
+    {
+        if (result)
+        {
+            var data = response.GetData<Network.RequestParam.RelocateSonar.ResponseData>();
+            Debug.Log(data.message);
+            
+            // 获取相机位姿
+            var camPose = response.localData is Matrix4x4 ? (Matrix4x4)response.localData : default;
+
+            // 2️⃣ 手动解析 pose 字段
+            data.ParsePoseFromJson(response.rawResponse);
+
+            // 3️⃣ 转 Matrix4x4
+            //Matrix4x4 matrix = data.ToMatrix();
+
+            // 4️⃣ 转 Pose
+            sonarPose = meshController.TransArrayToWorldPose(camPose, data.poseMatrix); 
+
+            // 5️⃣ 输出测试
+            Debug.Log($"Position: {sonarPose.position}, Rotation: {sonarPose.rotation}");
+
+            this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SONAR);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class StartHudUIMediator : BaseUIMediator
@@ -36,8 +37,12 @@ public class StartHudUIMediator : BaseUIMediator
         //todo 2.添加Summon按钮显示
         dropdownSceneSelect.onValueChanged.AddListener(OnSceneSelectChanged);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
+        this.AddEventListener(EventConstant.COMPLETE_GET_SCENE_DATA, OnCompleteGetSceneData);
+        this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SCENE, OnCompleteRelocateScene);
 
         meshController = ControllerRefer.MeshController;
+
+        SetUI(0);
     }
 
 
@@ -47,29 +52,56 @@ public class StartHudUIMediator : BaseUIMediator
         this.RemoveAllEventListener();
     }
 
+    /// <summary>
+    /// 设置UI状态，0-未获取场景数据；1-可重定位；2-可生成模型
+    /// </summary>
+    /// <param name="index"></param>
+    private void SetUI(int index)
+    {
+        btnRelocate.SetVisible(index == 1);
+        btnSummonModel.SetVisible(index == 2);
+        btnRelocate.SetVisible(index == 1);
+    }
+    
     private void OnBtnRelocateClick()
     {
-        ControllerRefer.MeshController.ClickToGetPoseByCapture(MeshController.RelocateType.Scene);
+        var relocateType = MeshController.RelocateType.Scene;
+        //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
+
+        //DebugUIMediator节点上添加开关
+        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
+        {
+            meshController.tempGetPose();
+            return;
+        }
+
+        // Record Camera Pose
+        meshController.camPoseT0 = meshController.GetARCameraPose();
+        byte[] rawData;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // load from camera android aar
+            rawData = meshController.GetCameraImgRawData();
+        }
+        else
+        {
+            //尝试读取DebugSwitch中的路径
+            string debugImagePath = DebugSwitch.Instance.GetRelocateDebugImgPath(relocateType);
+            rawData = meshController.GetLocalImgRawData(debugImagePath);
+        }
+        
+        ControllerRefer.RelocateController.RelocateSceneRequest(rawData);
+    }
+
+    private void LoadSceneData()
+    {
+        ControllerRefer.SceneController.RequestSceneDataByKey(meshController.GetCurrentSummaryItemData());
     }
 
     private void OnBtnSummonModelClick()
     {
-        
-        
-        /*SetStartState(StartState.Summoning);
-
-        // init modelInstance
-        var modelInstance = ControllerRefer.SceneController.AnalysisSceneData();
-        ControllerRefer.MeshController.SetModelInstance(modelInstance);
-        
-        // set AstarPath ConsPos;
-        Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
-        SMPLController.SetConsPos(centerPos);
-        
-        modelInstance.transform.position = relocatedPose.position * GetModelScale(modelInstance);
-        modelInstance.transform.rotation = relocatedPose.rotation;
-
-        SetStartState(StartState.Normal);*/
+        meshController.ClickToSummonAtCamera(meshController.relocatedPose);
+        SetUI(1);
     }
 
     private void OnBtnStartClick()
@@ -96,6 +128,7 @@ public class StartHudUIMediator : BaseUIMediator
     {
         meshController.SetCurrentSummaryItemData(summaryItemDataList[index]);
         SetDataSetLoc();
+        LoadSceneData();
     }
     
     //设置模型选择
@@ -115,6 +148,17 @@ public class StartHudUIMediator : BaseUIMediator
         
         //手动初始化一次场景选择DropDown
         OnSceneSelectChanged(dropdownSceneSelect.value);
+    }
+
+    private void OnCompleteGetSceneData(EventData eventData)
+    {
+        SetUI(1);
+        ControllerRefer.VoiceController.InitLLMMessageList();
+    }
+
+    private void OnCompleteRelocateScene(EventData eventData)
+    {
+        SetUI(2);
     }
     
 }

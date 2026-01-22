@@ -575,6 +575,13 @@ public class UIManager : BaseManager
     /// </summary>
     private void InitUIMediator()
     {
+        if (!DebugSwitch.Instance.DEBUG_USING_UIMANAGER)
+        {
+            return;
+        }
+        // 初始化Hud
+        Open(UINameConstant.DebugUIMediator);
+        Open(UINameConstant.StartHudUIMediator);
     }
     
     #endregion

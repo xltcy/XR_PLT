@@ -77,7 +77,7 @@ public class DebugUIComp : ComponentBinder
     }
     private void OnSummonSonarClick()
     {
-        ControllerRefer.MeshController.ClickToSummonSonarAtCamera();
+        ControllerRefer.MeshController.ClickToSummonSonarAtCamera(ControllerRefer.MeshController.relocatedSonarPose);
     }
     private void OnRelocateClick()
     {

@@ -7,6 +7,8 @@ public class DebugUIMediator : BaseUIMediator
 {
     [BindChild("p_DebugSwitch"), ButtonCallback(nameof(OnDebugSwitchButtonClick))]
     private Button debugSwitchButton;
+    [BindChild("p_RelocateSonar"), ButtonCallback(nameof(OnRelocateSonarClick))]
+    private Button RelocateSonar;
     [BindChild("p_SummonSonar"), ButtonCallback(nameof(OnSummonSonarClick))]
     private Button SummonSonar;
     [BindChild("p_HideSonar"), ButtonCallback(nameof(OnHideSonarClick))]
@@ -38,6 +40,11 @@ public class DebugUIMediator : BaseUIMediator
     private Toggle Toggle_json;
     [BindChild("p_toggle_voicetext")]
     private Toggle toggeleVoiceText;
+    
+    MeshController meshController;
+    RelocateController relocateController;
+
+    private Pose sonarPose;
 
     public override void OnOpen(UIParams uiParams = null)
     {
@@ -57,28 +64,79 @@ public class DebugUIMediator : BaseUIMediator
         toggeleVoiceText.AddValueChangeListener(value => {
             voiceTextComp.SetVisible(value);
         });
+
+        meshController = ControllerRefer.MeshController;
+        
+        
+        RelocateSonar.SetVisible(true);
+        SummonSonar.SetVisible(false);
         
         Debug.Log("DebugUIMediator OnOpen");
+
+        this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SONAR, OnRelocateSonarComplete);
     }
 
 
     public override void OnClose()
     {
+
+        
         // 清理事件监听
         Toggle_Mesh?.RemoveAllValueChangeListeners();
         Toggle_屏幕?.RemoveAllValueChangeListeners();
         Toggle_相机?.RemoveAllValueChangeListeners();
         Toggle_json?.RemoveAllValueChangeListeners();
         toggeleVoiceText?.RemoveAllValueChangeListeners();
+        
+        this.RemoveAllEventListener();
     }
 
     private void OnDebugSwitchButtonClick()
     {
         UIUtils.ToggleVisible(debugView);
     }
+    
+    private void OnRelocateSonarClick()
+    {
+        var relocateType = MeshController.RelocateType.Sonar;
+
+        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
+        {
+            meshController.tempGetPose();
+            return;
+        }
+
+        //SetStartState(MeshController.StartState.GettingPos);
+        //UIStateManager.SetLoadingStatus(true);
+        
+        byte[] rawData;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            // load from camera android aar
+            rawData = meshController.GetCameraImgRawData();
+        }
+        else
+        {
+            //尝试读取DebugSwitch中的路径
+            string debugImagePath = DebugSwitch.Instance.GetRelocateDebugImgPath(relocateType);
+            rawData = meshController.GetLocalImgRawData(debugImagePath);
+        }
+        
+        // Record Camera Pose
+        var camPose = meshController.GetARCameraPose();
+        var req = new Network.RequestParam.RelocateSonar.RequestParam("sonar", rawData)
+        {
+            localData = camPose
+        };
+        req.Send();
+    }
+    
     private void OnSummonSonarClick()
     {
-        ControllerRefer.MeshController.ClickToSummonSonarAtCamera();
+        ControllerRefer.MeshController.ClickToSummonSonarAtCamera(relocateController.sonarPose);
+        
+        RelocateSonar.SetVisible(true);
+        SummonSonar.SetVisible(false);
     }
     private void OnHideSonarClick()
     {
@@ -87,5 +145,11 @@ public class DebugUIMediator : BaseUIMediator
     private void OnShowSonarClick()
     {
         ControllerRefer.MeshController.ShowSonarRender();
+    }
+
+    private void OnRelocateSonarComplete(EventData eventData)
+    {
+        RelocateSonar.SetVisible(false);
+        SummonSonar.SetVisible(true);
     }
 }
