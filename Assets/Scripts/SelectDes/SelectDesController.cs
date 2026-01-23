@@ -149,7 +149,8 @@ public class SelectDesController : BaseController
     private void ListItemClickAction(SelectDesModel item)
     {
         Debug.Log($"Msg: 点击了选项 {item.title}");
-        selectDesInterface?.OnSelectDesAt(item);
+        //todo 处理点击事件
+        //selectDesInterface?.OnSelectDesAt(item);
     }
 
     public interface SelectDesActionInterface

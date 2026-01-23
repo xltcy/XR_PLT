@@ -20,6 +20,9 @@ public class SceneController : BaseController
     }
     public SummaryData SummaryData { get; private set; }
     public SceneData SceneData { get; private set; }
+    
+    public List<SummaryItemData> Summary { private set; get; }
+    private SummaryItemData curSceneSummaryItemData;
 
     public Text jsonLocationHint;
 
@@ -122,12 +125,10 @@ public class SceneController : BaseController
             GetSceneSummaryTestRequest(
                 onSuccess: (res) => {
                     SummaryData = res;
-                    ControllerRefer.MeshController.InitSceneSummary(res.items);
-                    UIStateManager.SetLoadingStatus(false);
+                    InitSceneSummary(res.items);
                 },
                 onFail: (errorText) => {
                     //TODO
-                    UIStateManager.SetLoadingStatus(false);
                 }
             );
         }
@@ -156,7 +157,7 @@ public class SceneController : BaseController
             File.WriteAllText(localPath, response.rawResponse);
             Debug.Log("文件保存到: " + localPath);
             
-            ControllerRefer.MeshController.InitSceneSummary(SummaryData.items);
+            InitSceneSummary(SummaryData.items);
         }
     }
     
@@ -320,7 +321,7 @@ public class SceneController : BaseController
             return;
         }
         
-        var curSceneItemData = ControllerRefer.MeshController.GetCurrentSummaryItemData();
+        var curSceneItemData = GetCurrentSummaryItemData();
         if (curSceneItemData == null)
         {
             Debug.LogWarning("当前场景数据为空，无法上传");
@@ -391,6 +392,43 @@ public class SceneController : BaseController
         InitAllTriggers();
         return scene;
     }
+    
+    #region 当前场景数据
+    public void InitSceneSummary(List<SummaryItemData> items)
+    {
+        if (items == null)
+        {
+            Summary = new List<SummaryItemData>();
+        }
+        else
+        {
+            Summary = items;
+        }
+        
+        // 通知场景总览数据初始化完成
+        this.TriggerEvent(EventConstant.COMPLETE_INIT_SUMMARY);
+    }
+    
+    
+    /// <summary>
+    /// 获取当前选择的场景摘要数据
+    /// </summary>
+    /// <returns></returns>
+    public SummaryItemData GetCurrentSummaryItemData()
+    {
+        return curSceneSummaryItemData;
+    }
+
+    /// <summary>
+    /// 设置当前选择的场景摘要数据
+    /// </summary>
+    /// <param name="data"></param>
+    public void SetCurrentSummaryItemData(SummaryItemData data)
+    {
+        curSceneSummaryItemData = data;
+    }
+    #endregion 当前场景数据
+    
     #endregion 获取数据
     
     /**
@@ -737,18 +775,8 @@ public class SceneController : BaseController
         }
         desAction.startTrigger.nextActionIds.Add(desAction.id, isActionStart);
     }
-
-    /// <summary>
-    /// 仅为ControllerFunctionAction测试用 todo 删除测试函数
-    /// </summary>
-    /// <param name="isStartAction"></param>
-    /// <param name="data"></param>
-    public void TestForFunctionCall(bool isStartAction, object data)
-    {
-        Debug.LogWarning("SceneController.TestForFunctionCall |" + isStartAction);
-    }
     
-        #region 处理函数调用
+    #region 处理函数调用
     /// <summary>
     /// 自定义函数调用，直接调用
     /// </summary>

@@ -33,16 +33,16 @@ public class DebugSwitch : Singleton<DebugSwitch>
     private bool isImgDisplay = false;
     private ScreenImgComp.ScreenImgLayer imgLayer = ScreenImgComp.ScreenImgLayer.UI;
 
-    public string GetRelocateDebugImgPath(MeshController.RelocateType type)
+    public string GetRelocateDebugImgPath(RelocateController.RelocateType type)
     {
 #if UNITY_EDITOR
         Texture2D img = null;
         switch (type)
         {
-            case MeshController.RelocateType.Sonar:
+            case RelocateController.RelocateType.Sonar:
                 img = DebugSonarImg;
                 break;
-            case MeshController.RelocateType.Scene:
+            case RelocateController.RelocateType.Scene:
                 img = DebugSceneImg;
                 break;  
         }

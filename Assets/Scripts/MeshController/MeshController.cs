@@ -15,213 +15,36 @@ using UnityEngine.EventSystems;
 
 public class MeshController : BaseController
 {
+    #region 属性
     public Camera arCamera;
-
     public GameObject ModelInstance { private set; get; }
     
     private GameObject sonarGO;
-
-    public Dropdown sceneSelectDropdown;
-    
-    public Button buttonGetPose;
-    public Button buttonSummonAtCamera;
-
-    public Button buttonHideMesh;
-    public Button buttonShowMesh;
-
-    public Button buttonHideSonar;
-    public Button buttonShowSonar;
-
-    public TMP_InputField datasetLoc;
-
-    [Header("本地图片路径")]
-    public string testImagePath;
-
-    public Matrix4x4 camPoseT0;
-
-    public List<SummaryItemData> Summary { private set; get; }
-    private SummaryItemData curSceneSummaryItemData;
     
     private Shader defaultShader;
     private Shader hideShader;
+    #endregion
 
-    enum StartState
-    {
-        Normal,
-        GettingPos,
-        WaitSummon,
-        Summoning
-    }
-
+    #region 生命周期
     public override void OnRegister()
     {
         base.OnRegister();
-
-        if (sceneSelectDropdown)
-        {
-            sceneSelectDropdown.onValueChanged.AddListener(OnSceneSelectChanged);
-        }
-        //todo delete remove listener
-        this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
-
-        Init();
+        InitShader();
     }
 
     public override void OnUnregister()
     {
-        if (sceneSelectDropdown != null)
-        {
-            sceneSelectDropdown.onValueChanged.RemoveListener(OnSceneSelectChanged);
-        }
-        //todo delete remove listener
-        this.RemoveAllEventListener();
-
         base.OnUnregister();
     }
-
-    void Init()
+    
+    void InitShader()
     {
-        //modelToSummon = (GameObject)Resources.Load("Prefab/Prefab-GXL"); // 在这里更换放置的模型
-        //SetDropDownAddListener(模型切换);
-        // 模型选择.value = 1;
-        defaultShader = Shader.Find("Universal Render Pipeline/Lit");
-        hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
-        buttonGetPose.SetVisible(true);
-        buttonSummonAtCamera.SetVisible(false);
-
-        if (sceneSelectDropdown)
-        {
-            sceneSelectDropdown.ClearOptions();
-        }
-
-        SetStartState(StartState.Normal);
-
-        buttonHideMesh.SetVisible(true);
-        buttonShowMesh.SetVisible(false);
-
         defaultShader = Shader.Find("Universal Render Pipeline/Lit");
         hideShader = Shader.Find("VR/SpatialMapping/Occlusion");
     }
-    
-    public void InitSceneSummary(List<SummaryItemData> items)
-    {
-        if (items == null)
-        {
-            Summary = new List<SummaryItemData>();
-        }
-        else
-        {
-            Summary = items;
-        }
-        
-        // 通知场景总览数据初始化完成
-        this.TriggerEvent(EventConstant.COMPLETE_INIT_SUMMARY);
-    }
+    #endregion
 
-    
-    //设置模型选择
-    private void SetDataSetLoc()
-    {
-        var curSummary = GetCurrentSummaryItemData();
-        if (datasetLoc)
-        {
-            datasetLoc.text = curSummary?.sceneDataSet;
-        }
-    }
-
-
-    public void HideMeshRender()
-    {
-        ChangeMeshShaderWithTag("Mesh", hideShader);
-
-        buttonShowMesh.SetVisible(true);
-        buttonHideMesh.SetVisible(false);
-    }
-
-    public void ShowMeshRender()
-    {
-        ChangeMeshShaderWithTag("Mesh", defaultShader);
-
-        buttonShowMesh.SetVisible(false);
-        buttonHideMesh.SetVisible(true);
-    }
-
-    public void HideSonarRender()
-    {
-        ChangeMeshShaderWithTag("Sonar", hideShader);
-
-        buttonShowSonar.SetVisible(true);
-        buttonHideSonar.SetVisible(false);
-    }
-
-    public void ShowSonarRender()
-    {
-        ChangeMeshShaderWithTag("Sonar", defaultShader);
-
-        buttonShowSonar.SetVisible(false);
-        buttonHideSonar.SetVisible(true);
-    }
-
-    #region 前后端通信
-    public enum RelocateType
-    {
-        Scene = 0,
-        Sonar = 1
-    }
-
-    /// <summary>
-    /// 已废弃，仅作留档
-    /// </summary>
-    /// <param name="relocateType"></param>
-    [Obsolete]
-    public void ClickToGetPoseByCapture(RelocateType relocateType)
-    {
-        //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
-        
-        //DebugUIMediator节点上添加开关
-        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
-        {
-            tempGetPose();
-            return;
-        }
-        
-        SetStartState(StartState.GettingPos);
-        UIStateManager.SetLoadingStatus(true);
-        
-        // Record Camera Pose
-        camPoseT0 = GetARCameraPose();
-        byte[] rawData;
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            // load from camera android aar
-            rawData = GetImageByARFoundation();
-        }
-        else
-        {
-            //尝试读取DebugSwitch中的路径
-            string debugImagePath = DebugSwitch.Instance.GetRelocateDebugImgPath(relocateType);
-            if (!debugImagePath.IsNullOrEmpty())
-            {
-                Debug.Log($"重定位图片：{debugImagePath.ToString()}");
-                rawData = ReadImageBytes(debugImagePath);
-            }
-            else
-            {
-                // load from file
-                Debug.Log($"重定位图片：{testImagePath.ToString()}");
-                rawData = ReadImageBytes(testImagePath);
-            }
-        }
-        switch (relocateType)
-        {
-            case RelocateType.Scene:
-                SendImageAndReadJson(rawData);
-                break;
-            case RelocateType.Sonar:
-                SendSonarImage(rawData);
-                break;
-        }
-    }
+    #region 相机和图片数据
 
     /// <summary>
     /// 获取相机位姿
@@ -270,39 +93,21 @@ public class MeshController : BaseController
 
         return rawData;
     }
-
-    public void SendImageAndReadJson(byte[] rawData)
+    
+    byte[] ReadImageBytes(string path)
     {
-        CountdownEvent countdownEvent = new CountdownEvent(2);
-        bool hasError = false;
-        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
+        try
         {
-            if (hasError)
-            {
-                SetStartState(StartState.Normal);
-            }
-            else
-            {
-                SetStartState(StartState.WaitSummon);
-            }
-            UIStateManager.SetLoadingStatus(false);
-        }));
-
-        ControllerRefer.RelocateController.RelocateSceneRequest(rawData, null, countdownEvent);
-        
-        ControllerRefer.SceneController.RequestSceneDataByKey(GetCurrentSummaryItemData(),
-            onComplete: (result, response) =>
-            {
-                hasError |= !result;
-                countdownEvent.Signal();
-                ControllerRefer.VoiceController.InitLLMMessageList();
-            });
-    }
-
-    [Obsolete]
-    private void SendSonarImage(byte[] rawData)
-    {
-        ControllerRefer.RelocateController.RelocateSonarRequest(rawData);
+            // 使用 File.ReadAllBytes 读取本地图片的字节数组
+            byte[] fileData = File.ReadAllBytes(path);
+            var texture = ExifUtil.FixOrientation(fileData);
+            return texture.EncodeToPNG();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to read image bytes: {e.Message}\n\nstack: {e.StackTrace}");
+            return null;
+        }
     }
 
     private byte[] GetImageByARFoundation()
@@ -342,8 +147,6 @@ public class MeshController : BaseController
     
     public void ClickToSummonAtCamera(Pose pose)
     {
-        SetStartState(StartState.Summoning);
-
         // init modelInstance
         ModelInstance = ControllerRefer.SceneController.AnalysisSceneData();
         // set AstarPath ConsPos;
@@ -352,16 +155,12 @@ public class MeshController : BaseController
         
         ModelInstance.transform.position = pose.position * GetModelScale(ModelInstance);
         ModelInstance.transform.rotation = pose.rotation;
-
-        SetStartState(StartState.Normal);
     }
 
     public void ClickToSummonSonarAtCamera(Pose pose)
     {
         string prefabPathInResources = "Prefab/Prefab-Sonar";
-
-        SetStartState(StartState.Summoning);
-
+        
         GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
         if (prefab == null)
         {
@@ -406,114 +205,8 @@ public class MeshController : BaseController
         return MatrixUtil.MatrixToPose(w2c * coord_xform);
     }
     #endregion
-
-    #region PC测试
-    private Pose testPose()
-    {
-        float[,] temp = new float[4, 4]
-        {
-            { -0.994569278666888f, 0.009617385193789074f, 0.10363134580839106f, 0.46216198801994324f },
-            { 0.9049069881439209f, -0.011102000251412392f, 0.425464004278183f, -1.8088890314102173f },
-            { 0.42285001277923584f, -0.09018000215291977f, -0.9017009735107422f, 16.555131912231445f },
-            { 0f, 0f, 0f, 1f }
-        };
-
-        return TransArrayToWorldPose(camPoseT0, temp);
-    }
-
-    public void tempGetPose()
-    {
-        UIStateManager.SetLoadingStatus(true);
-        // Record Camera Pose
-        camPoseT0 = GetARCameraPose();
-        CountdownEvent countdownEvent = new CountdownEvent(1);
-        bool hasError = false;
-        StartCoroutine(WaitUnitCountDownComplete(countdownEvent, () =>
-        {
-            if (hasError)
-            {
-                SetStartState(StartState.Normal);
-            }
-            else
-            {
-                SetStartState(StartState.WaitSummon);
-            }
-            UIStateManager.SetLoadingStatus(false);
-        }));
-        ControllerRefer.SceneController.RequestSceneDataByKey(GetCurrentSummaryItemData(),
-            onComplete: (result, response) =>
-            {
-                hasError |= !result;
-                countdownEvent.Signal();
-                ControllerRefer.VoiceController.InitLLMMessageList();
-            });
-    }
     
-    public void tempClickSummon()
-    {
-        ClickToSummonAtCamera(testPose());
-    }
-
-    //todo 好像是合并到ClickToGetPoseByCapture()里面？
-    //public void ClickToGetPoseWithImage()
-    //{
-    //    buttonGetPose.GetComponent<Button>().interactable = false;
-    //    buttonSummonAtCamera.SetVisible(false);
-
-    //    string url = serverUrl;
-
-    //    // Record Camera Pose
-    //    Vector3 camPosition = arCamera.transform.position;
-    //    Quaternion camRotation = arCamera.transform.rotation;
-    //    camPoseT0 = Matrix4x4.TRS(camPosition, camRotation, Vector3.one);
-
-    //    string imagePath = testImagePath;
-    //    byte[] fileData = File.ReadAllBytes(imagePath);
-    //    var texture = ExifUtil.FixOrientation(fileData);
-
-    //    Debug.Log(imagePath.ToString());
-
-
-    //    if (datasetLoc != null)
-    //    {
-    //        url = url + "request_NVLAD_redir/?source_location=" + datasetLoc.text;  //最后的url格式
-    //    }
-
-    //    StartCoroutine(UploadCapture(url, texture.EncodeToPNG()));
-
-    //}
-
-    byte[] ReadImageBytes(string path)
-    {
-        try
-        {
-            // 使用 File.ReadAllBytes 读取本地图片的字节数组
-            byte[] fileData = File.ReadAllBytes(path);
-            var texture = ExifUtil.FixOrientation(fileData);
-            return texture.EncodeToPNG();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to read image bytes: {e.Message}\n\nstack: {e.StackTrace}");
-            return null;
-        }
-    }
-    #endregion
-
-    //public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
-    //{
-    //    GameObject obj = GameObject.FindGameObjectWithTag(tag);
-    //    MeshRenderer[] meshRenderers = obj.GetComponentsInChildren<MeshRenderer>();
-    //    foreach (MeshRenderer meshRenderer in meshRenderers)
-    //    {
-    //        Material[] materials = meshRenderer.materials;
-    //        foreach (Material material in materials)
-    //        {
-    //            material.shader = targetShader;
-    //        }
-    //    }
-    //}
-
+    #region 模型信息
     public static float GetModelScale(GameObject modelInstance)
     {
         Transform mesh = modelInstance.transform.GetChildByName("mesh");
@@ -534,8 +227,9 @@ public class MeshController : BaseController
         
         return modelInstance.transform.localScale.x;
     }
+    #endregion
 
-
+    #region 模型旋转
     public void ClickRotateR()
     {
         ModelInstance.transform.RotateAround(ModelInstance.transform.position, ModelInstance.transform.right, 90f);
@@ -550,18 +244,30 @@ public class MeshController : BaseController
     {
         ModelInstance.transform.RotateAround(ModelInstance.transform.position, ModelInstance.transform.up, 90f);
     }
+    #endregion
 
-    private void SetStartState(StartState newState)
+    #region 模型透明控制
+    public void HideMeshRender()
     {
-        if (buttonGetPose != null)
-        {
-            buttonGetPose.GetComponent<Button>().interactable = newState != StartState.GettingPos;
-            buttonGetPose.SetVisible(newState != StartState.WaitSummon && newState != StartState.Summoning);
-        }
-        if (buttonSummonAtCamera)
-            buttonSummonAtCamera.SetVisible(newState == StartState.WaitSummon);
+        ChangeMeshShaderWithTag("Mesh", hideShader);
+    }
+
+    public void ShowMeshRender()
+    {
+        ChangeMeshShaderWithTag("Mesh", defaultShader);
+    }
+
+    public void HideSonarRender()
+    {
+        ChangeMeshShaderWithTag("Sonar", hideShader);
+    }
+
+    public void ShowSonarRender()
+    {
+        ChangeMeshShaderWithTag("Sonar", defaultShader);
     }
     
+    //todo 不使用Tag控制
     public void ChangeMeshShaderWithTag(string tag, Shader targetShader)
     {
         GameObject obj = GameObject.FindGameObjectWithTag(tag);
@@ -581,58 +287,6 @@ public class MeshController : BaseController
         }
     }
 
-    private IEnumerator WaitUnitCountDownComplete(CountdownEvent countdownEvent, Action onComplete)
-    {
-        yield return new WaitUntil(() => countdownEvent.CurrentCount == 0);
-        onComplete?.Invoke();
-    }
+    #endregion
 
-    /// <summary>
-    /// 获取当前选择的场景摘要数据
-    /// </summary>
-    /// <returns></returns>
-    public SummaryItemData GetCurrentSummaryItemData()
-    {
-        return curSceneSummaryItemData;
-    }
-
-    /// <summary>
-    /// 设置当前选择的场景摘要数据
-    /// </summary>
-    /// <param name="data"></param>
-    public void SetCurrentSummaryItemData(SummaryItemData data)
-    {
-        curSceneSummaryItemData = data;
-    }
-
-    /// <summary>
-    /// 设置场景
-    /// </summary>
-    /// <param name="model"></param>
-    public void SetModelInstance(GameObject model)
-    {
-        ModelInstance = model;
-    }
-    
-    #region callback
-    private void OnSceneSelectChanged(int index)
-    {
-        SetCurrentSummaryItemData(Summary[index]);
-        SetDataSetLoc();
-    }
-
-    private void OnCompleteInitSummary(EventData eventData)
-    {
-        List<String> options = new List<string>();
-        Summary.ForEach(item => options.Add(item.sceneName));
-        if (sceneSelectDropdown)
-        {
-            sceneSelectDropdown.ClearOptions();
-            sceneSelectDropdown.AddOptions(options);
-            //手动初始化一次场景选择DropDown
-            OnSceneSelectChanged(sceneSelectDropdown.value);
-        }
-    }
-    
-    #endregion callback
 }

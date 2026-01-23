@@ -12,10 +12,9 @@ public class RelocateController : BaseController
     }
     
     private MeshController meshController;
+    private SceneController sceneController;
     
     private Dictionary<string, Pose> relocatePoses = new Dictionary<string, Pose>();
-    
-    public Pose sonarPose;
     
     #region 生命周期
     public override void OnRegister()
@@ -23,6 +22,7 @@ public class RelocateController : BaseController
         base.OnRegister();
         
         meshController = ControllerRefer.MeshController;
+        sceneController = ControllerRefer.SceneController;
         
         relocatePoses.Clear();
     

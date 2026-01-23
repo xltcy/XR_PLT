@@ -31,6 +31,7 @@ public class StartHudUIMediator : BaseUIMediator
     
     private MeshController meshController;
     private RelocateController relocateController;
+    private SceneController sceneController;
     private bool initSMPL = false;
 
     public override void OnOpen(UIParams uiParams = null)
@@ -42,6 +43,7 @@ public class StartHudUIMediator : BaseUIMediator
 
         meshController = ControllerRefer.MeshController;
         relocateController = ControllerRefer.RelocateController;
+        sceneController = ControllerRefer.SceneController;
 
         initSMPL = false;
         
@@ -75,14 +77,13 @@ public class StartHudUIMediator : BaseUIMediator
     
     private void LoadSceneData()
     {
-        ControllerRefer.SceneController.RequestSceneDataByKey(meshController.GetCurrentSummaryItemData());
+        ControllerRefer.SceneController.RequestSceneDataByKey(sceneController.GetCurrentSummaryItemData());
     }
     
     #region callback
     private void OnBtnRelocateClick()
     {
-        var relocateType = MeshController.RelocateType.Scene;
-        //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
+        var relocateType = RelocateController.RelocateType.Scene;
 
         //DebugUIMediator节点上添加开关
         var fake = DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor;
@@ -155,7 +156,7 @@ public class StartHudUIMediator : BaseUIMediator
     
     private void OnSceneSelectChanged(int index)
     {
-        meshController.SetCurrentSummaryItemData(summaryItemDataList[index]);
+        sceneController.SetCurrentSummaryItemData(summaryItemDataList[index]);
         SetDataSetLoc();
         LoadSceneData();
     }
@@ -163,14 +164,14 @@ public class StartHudUIMediator : BaseUIMediator
     //设置模型选择
     private void SetDataSetLoc()
     {
-        var curSummaryItem = meshController.GetCurrentSummaryItemData();
+        var curSummaryItem = sceneController.GetCurrentSummaryItemData();
         textDataset.SetText(curSummaryItem?.sceneDataSet);
     }
     
     private void OnCompleteInitSummary(EventData eventData)
     {
         var options = new List<string>();
-        summaryItemDataList = meshController.Summary;
+        summaryItemDataList = sceneController.Summary;
         summaryItemDataList.ForEach(item => options.Add(item.sceneName));
         dropdownSceneSelect.ClearOptions();
         dropdownSceneSelect.AddOptions(options);

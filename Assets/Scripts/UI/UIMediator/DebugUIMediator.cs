@@ -127,7 +127,7 @@ public class DebugUIMediator : BaseUIMediator, ITickerUpdate
     
     private void OnRelocateSonarClick()
     {
-        var relocateType = MeshController.RelocateType.Sonar;
+        var relocateType = RelocateController.RelocateType.Sonar;
 
         var fake = DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor; 
         

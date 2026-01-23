@@ -156,15 +156,6 @@ public static class ControllerRefer
         }
     }
 
-    private static UIStateManager _uIStateManager;
-    public static UIStateManager UIStateManager
-    {
-        get
-        {
-            return _uIStateManager ??= ControllerRegister.Instance?.GetController<UIStateManager>();
-        }
-    }
-
     private static VideoPlayController _videoPlayController;
     public static VideoPlayController VideoPlayController
     {
@@ -239,8 +230,6 @@ public static class ControllerRefer
                 return TickController;
             case "TrackingImageManager":
                 return TrackingImageManager;
-            case "UIStateManager":
-                return UIStateManager;
             case "VideoPlayController":
                 return VideoPlayController;
             case "VoiceController":
@@ -272,7 +261,6 @@ public static class ControllerRefer
         _swipeManager = null;
         _tickController = null;
         _trackingImageManager = null;
-        _uIStateManager = null;
         _videoPlayController = null;
         _voiceController = null;
     }
