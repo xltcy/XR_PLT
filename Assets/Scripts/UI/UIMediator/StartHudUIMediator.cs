@@ -185,7 +185,6 @@ public class StartHudUIMediator : BaseUIMediator
         SetUI(1);
         ControllerRefer.VoiceController.InitLLMMessageList();
         btnStart.SetVisible(false);
-        OnBtnHideModelClick();
         btnShowModel.SetVisible(false);
         btnHideModel.SetVisible(false);
     }

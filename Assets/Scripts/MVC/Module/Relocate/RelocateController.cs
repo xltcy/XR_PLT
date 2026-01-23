@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using Network.RequestParam;
 
@@ -43,7 +42,7 @@ public class RelocateController : BaseController
     #region 公共方法
     public Pose GetPoseByStringType(string relocateType)
     {
-        if (relocatePoses.IsNullOrEmpty() || !relocatePoses.TryGetValue(relocateType.ToLower(), out var pose))
+        if (relocatePoses.IsNullOrEmpty() || !relocatePoses.TryGetValue(relocateType, out var pose))
         {
             return default(Pose);
         }
@@ -52,21 +51,27 @@ public class RelocateController : BaseController
     
     public void SetPoseByStringType(string relocateType, Pose pose)
     {
-        relocatePoses[relocateType.ToLower()] = pose;
+        relocatePoses[relocateType] = pose;
     }
     
     public Pose GetPoseByEnumType(RelocateType relocateType)
     {
-        return GetPoseByStringType(relocateType.ToString().ToLower());
+        return GetPoseByStringType(relocateType.ToString());
     }
     
     public void SetPoseByEnumType(RelocateType relocateType, Pose pose)
     {
-        SetPoseByStringType(relocateType.ToString().ToLower(), pose);
+        SetPoseByStringType(relocateType.ToString(), pose);
     }
     #endregion 公共方法
 
     #region 网络请求
+    /// <summary>
+    /// 重定位场景
+    /// </summary>
+    /// <param name="rawData"></param>
+    /// <param name="lockable"></param>
+    /// <param name="fake"></param>
     public void RelocateSceneRequest(byte[] rawData, Transform lockable = null, bool fake = false)
     {
         if (fake)
@@ -91,6 +96,11 @@ public class RelocateController : BaseController
         req.Send(lockable);
     }
 
+    /// <summary>
+    /// 场景重定位响应
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="response"></param>
     public void OnRelocateSceneResponse(bool result, NetworkResponse response)
     {
         if (result)
@@ -157,17 +167,14 @@ public class RelocateController : BaseController
             // 获取相机位姿
             var camPose = response.localData is Matrix4x4 ? (Matrix4x4)response.localData : default;
 
-            // 2️⃣ 手动解析 pose 字段
+            // 手动解析 pose 字段
             data.ParsePoseFromJson(response.rawResponse);
 
-            // 3️⃣ 转 Matrix4x4
-            //Matrix4x4 matrix = data.ToMatrix();
-
-            // 4️⃣ 转 Pose
+            // 转 Pose
             var pose = meshController.TransArrayToWorldPose(camPose, data.poseMatrix); 
             SetPoseByEnumType(RelocateType.Sonar, pose);
             
-            // 5️⃣ 输出测试
+            // 输出测试
             Debug.Log($"Position: {pose.position}, Rotation: {pose.rotation}");
 
             this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SONAR);

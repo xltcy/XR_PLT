@@ -684,7 +684,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
             SaveAndDisableInteractable(lockable);
             
             // 局部锁定 - 使用 ResourceManager 加载加载圈
-            ManagerRefer.ResourceManager.InstantiateAsync(
+            ManagerRefer.GameObjectPoolManager.InstantiateAsync(
                 "UIPrefabs/ui_comp_loading_circle",
                 lockable,
                 loadingCircle =>
@@ -726,7 +726,7 @@ public partial class NetworkServiceManager : BaseManager , TickSystem.ITickerUpd
                     // 检查是否是加载圈实例（通过名称匹配）
                     if (child.name.Contains("ui_comp_loading_circle"))
                     {
-                        ManagerRefer.ResourceManager.Recycle(child.gameObject, usePool: true);
+                        ManagerRefer.GameObjectPoolManager.Recycle(child.gameObject, usePool: true);
                         break;
                     }
                 }

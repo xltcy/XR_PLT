@@ -63,11 +63,13 @@ public class SceneController : BaseController
     }
 
     private GameObject _scene;
-    public GameObject scene
+    public GameObject Scene
     {
         private set => _scene = value;
         get => _scene;
     }
+    
+    private Dictionary<string, GameObject> ModelDic = new Dictionary<string, GameObject>();
 
     #region 生命周期函数
     public override void OnRegister()
@@ -368,21 +370,18 @@ public class SceneController : BaseController
         // init object for SMPLController
 
         // load scene
-        if (scene == null)
-        {
-            GameObject scenePrefab = (GameObject)Resources.Load("Prefab/" + SceneData.sceneModelPath);
-            scene = Instantiate(scenePrefab);
-            scene.tag = nameof(GameObjectTag.Mesh);
-        }
+        ManagerRefer.GameObjectPoolManager.Recycle(Scene);
+        Scene = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/{SceneData.sceneModelPath}");
+        Scene.tag = nameof(GameObjectTag.Mesh);
 
         // Generate ObjectDatas
         prefabs.Clear();
         foreach (var objectData in SceneData.objects)
         {
-            GameObject prefab = (GameObject)Resources.Load("Prefab/" + objectData.url);
+            GameObject prefab = ManagerRefer.GameObjectPoolManager.LoadPrefab($"Prefab/{objectData.url}");
             if (!prefab)
             {
-                prefab = (GameObject)Resources.Load(objectData.url);
+                prefab = ManagerRefer.GameObjectPoolManager.LoadPrefab(objectData.url);
             }
             prefabs[objectData.id] = prefab;
         }
@@ -390,7 +389,7 @@ public class SceneController : BaseController
 
         // Init voice commands
         InitAllTriggers();
-        return scene;
+        return Scene;
     }
     
     #region 当前场景数据
@@ -557,8 +556,8 @@ public class SceneController : BaseController
                 GameObject addObject = Instantiate(prefab);
                 var dynamicObject = addObject.AddComponent<DynamicObject>();
                 dynamicObject.generateActionId = addAction.id;
-                addObject.transform.position = scene.transform.TransformPoint(addAction.position);
-                addObject.transform.rotation = scene.transform.rotation * addAction.GetRotationQuaternion();
+                addObject.transform.position = Scene.transform.TransformPoint(addAction.position);
+                addObject.transform.rotation = Scene.transform.rotation * addAction.GetRotationQuaternion();
                 addObject.transform.localScale = addAction.scale;
                 addObject.SetActive(false);
                 addedObjects[addAction.id] = addObject;
@@ -590,7 +589,7 @@ public class SceneController : BaseController
                     interObject.transform.localRotation = Quaternion.Euler(90, 180, 0);
                 } else
                 {
-                    videoScreen.transform.SetParent(scene.transform, false);
+                    videoScreen.transform.SetParent(Scene.transform, false);
                     videoScreen.transform.localPosition = videoAction.position;
                     videoScreen.transform.localRotation = videoAction.GetRotationQuaternion();
                     videoScreen.transform.localScale = videoAction.scale;

@@ -63,7 +63,7 @@ public class SMPLController : BaseController
 
     public void InitilizeObjectWithTag()
     {
-        scene = ControllerRefer.SceneController.scene;
+        scene = ControllerRefer.SceneController.Scene;
     }
 
     private Vector3 initPos

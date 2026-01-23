@@ -17,9 +17,28 @@ public class MeshController : BaseController
 {
     #region 属性
     public Camera arCamera;
-    public GameObject ModelInstance { private set; get; }
+
+    public GameObject ModelInstance
+    {
+        private set => ModelDict[nameof(RelocateController.RelocateType.Scene)] = value;
+        get
+        {
+            ModelDict.TryGetValue(nameof(RelocateController.RelocateType.Scene), out var go);
+            return go;
+        }
+    }
+
+    private GameObject sonarGO
+    {
+        set => ModelDict[nameof(RelocateController.RelocateType.Sonar)] = value;
+        get
+        {
+            ModelDict.TryGetValue(nameof(RelocateController.RelocateType.Sonar), out var go);
+            return go;
+        }
+    }
     
-    private GameObject sonarGO;
+    private Dictionary<string, GameObject> ModelDict = new Dictionary<string, GameObject>();
     
     private Shader defaultShader;
     private Shader hideShader;
@@ -148,49 +167,43 @@ public class MeshController : BaseController
     public void ClickToSummonAtCamera(Pose pose)
     {
         // init modelInstance
-        ModelInstance = ControllerRefer.SceneController.AnalysisSceneData();
+        var go = ControllerRefer.SceneController.AnalysisSceneData();
+        ModelInstance = go;
         // set AstarPath ConsPos;
         Vector3 centerPos = AstarPath.active.data.recastGraph.forcedBoundsCenter;
         SMPLController.SetConsPos(centerPos);
         
-        ModelInstance.transform.position = pose.position * GetModelScale(ModelInstance);
-        ModelInstance.transform.rotation = pose.rotation;
+        go.transform.position = pose.position * GetModelScale(go);
+        go.transform.rotation = pose.rotation;
     }
 
     public void ClickToSummonSonarAtCamera(Pose pose)
     {
-        string prefabPathInResources = "Prefab/Prefab-Sonar";
-        
-        GameObject prefab = Resources.Load<GameObject>(prefabPathInResources);
-        if (prefab == null)
+        ManagerRefer.GameObjectPoolManager.Recycle(sonarGO);
+        ManagerRefer.GameObjectPoolManager.InstantiateAsync("Prefab/Prefab-Sonar", null, go =>
         {
-            Debug.LogError("找不到 prefab：" + prefabPathInResources);
-            return;
-        }
+            if (go == null) return;
+            sonarGO = go;
+            
+            float scale = GetModelScale(go);
+            //绕z轴旋转180
+            Quaternion rot180 = Quaternion.AngleAxis(180f, pose.rotation * Vector3.forward);
 
-        if (!sonarGO)
-        {
-            sonarGO = Instantiate(prefab);
-        }
+            // 更新 Pose 的旋转
+            pose.rotation = rot180 * pose.rotation;
 
-        float scale = GetModelScale(sonarGO);
-        //绕z轴旋转180
-        Quaternion rot180 = Quaternion.AngleAxis(180f, pose.rotation * Vector3.forward);
-
-        // 更新 Pose 的旋转
-        pose.rotation = rot180 * pose.rotation;
-
-        sonarGO.transform.position = pose.position * scale;
-        sonarGO.transform.rotation = pose.rotation;
+            go.transform.position = pose.position * scale;
+            go.transform.rotation = pose.rotation;
         
         
-        //todo 删除临时代码
-        Vector3 tempPos = new Vector3(-7.065f, -0.135f, 2.737f); //相对场景的坐标
-        sonarGO.transform.position = ControllerRefer.SceneController.scene.transform.TransformPoint(tempPos);
-        Quaternion rotationOffset = new Quaternion(0.0f, 0.156820267f, 0.0f, 0.987627208f); //相对场景的旋转
-        sonarGO.transform.rotation = ControllerRefer.SceneController.scene.transform.rotation * rotationOffset;
+            //todo 删除临时代码
+            Vector3 tempPos = new Vector3(-7.065f, -0.135f, 2.737f); //相对场景的坐标
+            go.transform.position = ControllerRefer.SceneController.Scene.transform.TransformPoint(tempPos);
+            Quaternion rotationOffset = new Quaternion(0.0f, 0.156820267f, 0.0f, 0.987627208f); //相对场景的旋转
+            go.transform.rotation = ControllerRefer.SceneController.Scene.transform.rotation * rotationOffset;
         
-        sonarGO.SetVisible(true);
+            go.SetVisible(true);
+        });
     }
 
     public Pose TransArrayToWorldPose(Matrix4x4 camPose, float[,] num)
@@ -207,17 +220,17 @@ public class MeshController : BaseController
     #endregion
     
     #region 模型信息
-    public static float GetModelScale(GameObject modelInstance)
+    public static float GetModelScale(GameObject go)
     {
-        Transform mesh = modelInstance.transform.GetChildByName("mesh");
+        Transform mesh = go.transform.GetChildByName("mesh");
         if (mesh != null)
         {
             return mesh.localScale.x;
         }
 
-        for (int i = 0; i < modelInstance.transform.childCount; i++)
+        for (int i = 0; i < go.transform.childCount; i++)
         {
-            var childTrans = modelInstance.transform.GetChild(i);
+            var childTrans = go.transform.GetChild(i);
             if (childTrans.name.ToLower().Contains("FindPath".ToLower()))
             {
                 continue;
@@ -225,7 +238,7 @@ public class MeshController : BaseController
             return childTrans.localScale.x;
         }
         
-        return modelInstance.transform.localScale.x;
+        return go.transform.localScale.x;
     }
     #endregion
 
