@@ -129,14 +129,7 @@ public class DebugUIMediator : BaseUIMediator, ITickerUpdate
     {
         var relocateType = MeshController.RelocateType.Sonar;
 
-        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
-        {
-            meshController.tempGetPose();
-            return;
-        }
-
-        //SetStartState(MeshController.StartState.GettingPos);
-        //UIStateManager.SetLoadingStatus(true);
+        var fake = DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor; 
         
         byte[] rawData;
         if (Application.platform == RuntimePlatform.Android)
@@ -151,7 +144,7 @@ public class DebugUIMediator : BaseUIMediator, ITickerUpdate
             rawData = meshController.GetLocalImgRawData(debugImagePath);
         }
         
-        relocateController.RelocateSonarRequest(rawData);
+        relocateController.RelocateSonarRequest(rawData, fake);
     }
     
     private void OnSummonSonarClick()

@@ -85,14 +85,8 @@ public class StartHudUIMediator : BaseUIMediator
         //relocateType == 0，重定位场景；relocateType == 1，重定位声呐。
 
         //DebugUIMediator节点上添加开关
-        if (DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor)
-        {
-            meshController.tempGetPose();
-            return;
-        }
-
-        // Record Camera Pose
-        meshController.camPoseT0 = meshController.GetARCameraPose();
+        var fake = DebugSwitch.Instance.DEBUG_FAKE_RELOCATE && Application.isEditor;
+        
         byte[] rawData;
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -106,7 +100,7 @@ public class StartHudUIMediator : BaseUIMediator
             rawData = meshController.GetLocalImgRawData(debugImagePath);
         }
         
-        relocateController.RelocateSceneRequest(rawData);
+        relocateController.RelocateSceneRequest(rawData, null, fake);
     }
     
     private void OnBtnSummonModelClick()

@@ -67,9 +67,15 @@ public class RelocateController : BaseController
     #endregion 公共方法
 
     #region 网络请求
-    public void RelocateSceneRequest(byte[] rawData, Transform lockable = null, CountdownEvent countdown = null)
+    public void RelocateSceneRequest(byte[] rawData, Transform lockable = null, bool fake = false)
     {
-        var summaryItemData = meshController.GetCurrentSummaryItemData();
+        if (fake)
+        {
+            this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SCENE);
+            return;
+        }
+        
+        var summaryItemData = sceneController.GetCurrentSummaryItemData();
         if (summaryItemData == null)
         {
             Utils.LogMessage(LogType.Error, true, $"RelocateSceneRequest失败，当前没有选中的场景数据");
@@ -81,7 +87,7 @@ public class RelocateController : BaseController
         var camPose = Matrix4x4.TRS(arCamera.transform.position, arCamera.transform.rotation, Vector3.one);
         
         var req = new RelocateScene.RequestParam(summaryItemData, rawData);
-        req.localData = new RelocateScene.LocalData {camPose = camPose, countdown = countdown}; 
+        req.localData = new RelocateScene.LocalData {camPose = camPose}; 
         req.Send(lockable);
     }
 
@@ -119,9 +125,19 @@ public class RelocateController : BaseController
         }
     }
     
-    
-    public void RelocateSonarRequest(byte[] rawData)
+    /// <summary>
+    /// 重定位声呐
+    /// </summary>
+    /// <param name="rawData"></param>
+    /// <param name="fake">假请求，直接跳转定位完成的逻辑</param>
+    public void RelocateSonarRequest(byte[] rawData, bool fake = false)
     {
+        if (fake)
+        {
+            this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SONAR);
+            return;
+        }
+        
         // Record Camera Pose
         var camPose = meshController.GetARCameraPose();
         var req = new Network.RequestParam.RelocateSonar.RequestParam("sonar", rawData)
