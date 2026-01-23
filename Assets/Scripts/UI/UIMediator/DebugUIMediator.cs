@@ -151,18 +151,12 @@ public class DebugUIMediator : BaseUIMediator, ITickerUpdate
             rawData = meshController.GetLocalImgRawData(debugImagePath);
         }
         
-        // Record Camera Pose
-        var camPose = meshController.GetARCameraPose();
-        var req = new Network.RequestParam.RelocateSonar.RequestParam("sonar", rawData)
-        {
-            localData = camPose
-        };
-        req.Send();
+        relocateController.RelocateSonarRequest(rawData);
     }
     
     private void OnSummonSonarClick()
     {
-        ControllerRefer.MeshController.ClickToSummonSonarAtCamera(relocateController.sonarPose);
+        ControllerRefer.MeshController.ClickToSummonSonarAtCamera(relocateController.GetPoseByEnumType(RelocateController.RelocateType.Sonar));
         
         RelocateSonar.SetVisible(true);
         SummonSonar.SetVisible(false);

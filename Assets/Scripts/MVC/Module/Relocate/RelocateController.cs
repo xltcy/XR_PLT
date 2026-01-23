@@ -1,19 +1,31 @@
+using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using Network.RequestParam;
 
 public class RelocateController : BaseController
 {
+    public enum RelocateType
+    {
+        Scene = 0,
+        Sonar = 1
+    }
+    
     private MeshController meshController;
+    
+    private Dictionary<string, Pose> relocatePoses = new Dictionary<string, Pose>();
     
     public Pose sonarPose;
     
+    #region 生命周期
     public override void OnRegister()
     {
         base.OnRegister();
         
         meshController = ControllerRefer.MeshController;
         
+        relocatePoses.Clear();
+    
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SCENE, OnRelocateSceneResponse);
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
     }
@@ -26,7 +38,35 @@ public class RelocateController : BaseController
         ManagerRefer.NetworkServiceManager.RemoveResponseListener(NetworkConstant.RELOCATE_SONAR, OnRelocateSonarResponse);
 
     }
+    #endregion 生命周期
+    
+    #region 公共方法
+    public Pose GetPoseByStringType(string relocateType)
+    {
+        if (relocatePoses.IsNullOrEmpty() || !relocatePoses.TryGetValue(relocateType.ToLower(), out var pose))
+        {
+            return default(Pose);
+        }
+        return pose;
+    }
+    
+    public void SetPoseByStringType(string relocateType, Pose pose)
+    {
+        relocatePoses[relocateType.ToLower()] = pose;
+    }
+    
+    public Pose GetPoseByEnumType(RelocateType relocateType)
+    {
+        return GetPoseByStringType(relocateType.ToString().ToLower());
+    }
+    
+    public void SetPoseByEnumType(RelocateType relocateType, Pose pose)
+    {
+        SetPoseByStringType(relocateType.ToString().ToLower(), pose);
+    }
+    #endregion 公共方法
 
+    #region 网络请求
     public void RelocateSceneRequest(byte[] rawData, Transform lockable = null, CountdownEvent countdown = null)
     {
         var summaryItemData = meshController.GetCurrentSummaryItemData();
@@ -63,10 +103,11 @@ public class RelocateController : BaseController
             //Matrix4x4 matrix = data.ToMatrix();
 
             // 转 Pose
-            meshController.relocatedPose =  meshController.TransArrayToWorldPose(camPose, data.poseMatrix);
-
+            var pose = meshController.TransArrayToWorldPose(camPose, data.poseMatrix);
+            SetPoseByEnumType(RelocateType.Scene, pose);
+            
             // 输出测试
-            Debug.Log($"Position: {meshController.relocatedPose.position}, Rotation: {meshController.relocatedPose.rotation}");
+            Debug.Log($"Position: {pose.position}, Rotation: {pose.rotation}");
             
             // 通知等待的线程
             if (localData != null && localData.countdown != null)
@@ -78,6 +119,17 @@ public class RelocateController : BaseController
         }
     }
     
+    
+    public void RelocateSonarRequest(byte[] rawData)
+    {
+        // Record Camera Pose
+        var camPose = meshController.GetARCameraPose();
+        var req = new Network.RequestParam.RelocateSonar.RequestParam("sonar", rawData)
+        {
+            localData = camPose
+        };
+        req.Send();
+    }
     
     public void OnRelocateSonarResponse(bool result, NetworkResponse response)
     {
@@ -96,12 +148,14 @@ public class RelocateController : BaseController
             //Matrix4x4 matrix = data.ToMatrix();
 
             // 4️⃣ 转 Pose
-            sonarPose = meshController.TransArrayToWorldPose(camPose, data.poseMatrix); 
-
+            var pose = meshController.TransArrayToWorldPose(camPose, data.poseMatrix); 
+            SetPoseByEnumType(RelocateType.Sonar, pose);
+            
             // 5️⃣ 输出测试
-            Debug.Log($"Position: {sonarPose.position}, Rotation: {sonarPose.rotation}");
+            Debug.Log($"Position: {pose.position}, Rotation: {pose.rotation}");
 
             this.TriggerEvent(EventConstant.COMPLETE_RELOCATE_SONAR);
         }
     }
+    #endregion 网络请求
 }

@@ -30,6 +30,7 @@ public class StartHudUIMediator : BaseUIMediator
     private List<SummaryItemData> summaryItemDataList;
     
     private MeshController meshController;
+    private RelocateController relocateController;
     private bool initSMPL = false;
 
     public override void OnOpen(UIParams uiParams = null)
@@ -40,6 +41,7 @@ public class StartHudUIMediator : BaseUIMediator
         this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SCENE, OnCompleteRelocateScene);
 
         meshController = ControllerRefer.MeshController;
+        relocateController = ControllerRefer.RelocateController;
 
         initSMPL = false;
         
@@ -104,12 +106,12 @@ public class StartHudUIMediator : BaseUIMediator
             rawData = meshController.GetLocalImgRawData(debugImagePath);
         }
         
-        ControllerRefer.RelocateController.RelocateSceneRequest(rawData);
+        relocateController.RelocateSceneRequest(rawData);
     }
     
     private void OnBtnSummonModelClick()
     {
-        meshController.ClickToSummonAtCamera(meshController.relocatedPose);
+        meshController.ClickToSummonAtCamera(relocateController.GetPoseByEnumType(RelocateController.RelocateType.Scene));
         SetUI(1);
         SetModelBtnGroup(true);
     }
