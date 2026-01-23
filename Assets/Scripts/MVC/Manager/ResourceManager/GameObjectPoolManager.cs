@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 资源管理器 - 负责资源的加载、实例化和回收
+/// GameObject池管理器 - 负责Prefab的加载、实例化和回收
 /// </summary>
-public class ResourceManager : BaseManager
+public class GameObjectPoolManager : BaseManager
 {
     // 预制体缓存
     private Dictionary<string, GameObject> _prefabCache = new Dictionary<string, GameObject>();
@@ -18,13 +18,23 @@ public class ResourceManager : BaseManager
     private Dictionary<GameObject, string> _activeInstances = new Dictionary<GameObject, string>();
     
     private readonly object _cacheLock = new object();
-
+    
+    // 日志开关
+    private bool enableLog = false;    
+    // 对象池根节点
+    private Transform _poolRoot;
     #region 初始化
 
     public override void OnRegister()
     {
         base.OnRegister();
-        Debug.Log("[ResourceManager] 初始化完成");
+        
+        // 创建对象池根节点
+        GameObject poolRootObj = new GameObject("[GameObjectPoolManager Pool]");
+        _poolRoot = poolRootObj.transform;
+        UnityEngine.Object.DontDestroyOnLoad(poolRootObj);
+        
+        if (enableLog) Debug.Log("[GameObjectPoolManager] 初始化完成");
     }
 
     public override void OnUnregister()
@@ -40,7 +50,14 @@ public class ResourceManager : BaseManager
         // 清理预制体缓存
         _prefabCache.Clear();
         
-        Debug.Log("[ResourceManager] 资源已清理");
+        // 销毁对象池根节点
+        if (_poolRoot != null)
+        {
+            UnityEngine.Object.Destroy(_poolRoot.gameObject);
+            _poolRoot = null;
+        }
+        
+        if (enableLog) Debug.Log("[GameObjectPoolManager] 资源已清理");
     }
 
     #endregion
@@ -48,15 +65,15 @@ public class ResourceManager : BaseManager
     #region 同步加载
 
     /// <summary>
-    /// 同步加载预制体
+    /// 同步加载预制体，只加载，不实例化
     /// </summary>
     /// <param name="path">Resources 路径</param>
     /// <returns>预制体，失败返回 null</returns>
-    private GameObject LoadPrefab(string path)
+    public GameObject LoadPrefab(string path)
     {
         if (string.IsNullOrEmpty(path))
         {
-            Debug.LogError("[ResourceManager] 加载路径为空");
+            Debug.LogError("[GameObjectPoolManager] 加载路径为空");
             return null;
         }
 
@@ -72,20 +89,20 @@ public class ResourceManager : BaseManager
             GameObject prefab = Resources.Load<GameObject>(path);
             if (prefab == null)
             {
-                Debug.LogError($"[ResourceManager] 无法加载预制体: {path}");
+                Debug.LogError($"[GameObjectPoolManager] 无法加载预制体: {path}");
                 return null;
             }
 
             // 缓存预制体
             _prefabCache[path] = prefab;
-            Debug.Log($"[ResourceManager] 预制体已加载并缓存: {path}");
+            if (enableLog) Debug.Log($"[GameObjectPoolManager] 预制体已加载并缓存: {path}");
             
             return prefab;
         }
     }
 
     /// <summary>
-    /// 同步实例化对象（使用对象池优化）
+    /// 同步加载并且实例化对象（使用对象池优化）
     /// </summary>
     /// <param name="path">Resources 路径</param>
     /// <param name="parent">父物体</param>
@@ -106,13 +123,13 @@ public class ResourceManager : BaseManager
         {
             instance.transform.SetParent(parent);
             instance.SetActive(true);
-            Debug.Log($"[ResourceManager] 从对象池获取实例: {path}");
+            if (enableLog) Debug.Log($"[GameObjectPoolManager] 从对象池获取实例: {path}");
         }
         else
         {
             // 创建新实例
             instance = UnityEngine.Object.Instantiate(prefab, parent);
-            Debug.Log($"[ResourceManager] 创建新实例: {path}");
+            if (enableLog) Debug.Log($"[GameObjectPoolManager] 创建新实例: {path}");
         }
 
         // 记录活跃实例
@@ -136,9 +153,9 @@ public class ResourceManager : BaseManager
         // 获取资源路径
         if (!_activeInstances.TryGetValue(instance, out string path))
         {
-            // 不是通过 ResourceManager 创建的对象，直接销毁
+            // 不是通过 GameObjectPoolManager 创建的对象，直接销毁
             UnityEngine.Object.Destroy(instance);
-            Debug.LogWarning($"[ResourceManager] 销毁未跟踪的对象: {instance.name}");
+            Debug.LogWarning($"[GameObjectPoolManager] 销毁未跟踪的对象: {instance.name}");
             return;
         }
 
@@ -149,13 +166,13 @@ public class ResourceManager : BaseManager
         {
             // 放入对象池
             ReturnToPool(path, instance);
-            Debug.Log($"[ResourceManager] 对象已回收到池: {path}");
+            if (enableLog) Debug.Log($"[GameObjectPoolManager] 对象已回收到池: {path}");
         }
         else
         {
             // 直接销毁
             UnityEngine.Object.Destroy(instance);
-            Debug.Log($"[ResourceManager] 对象已销毁: {path}");
+            if (enableLog) Debug.Log($"[GameObjectPoolManager] 对象已销毁: {path}");
         }
     }
 
@@ -164,15 +181,15 @@ public class ResourceManager : BaseManager
     #region 异步加载
 
     /// <summary>
-    /// 异步加载预制体
+    /// 异步加载预制体，只加载，不实例化
     /// </summary>
     /// <param name="path">Resources 路径</param>
     /// <param name="onLoaded">加载完成回调</param>
-    private void LoadPrefabAsync(string path, Action<GameObject> onLoaded)
+    public void LoadPrefabAsync(string path, Action<GameObject> onLoaded)
     {
         if (string.IsNullOrEmpty(path))
         {
-            Debug.LogError("[ResourceManager] 加载路径为空");
+            Debug.LogError("[GameObjectPoolManager] 加载路径为空");
             onLoaded?.Invoke(null);
             return;
         }
@@ -200,7 +217,7 @@ public class ResourceManager : BaseManager
         
         if (prefab == null)
         {
-            Debug.LogError($"[ResourceManager] 异步加载预制体失败: {path}");
+            Debug.LogError($"[GameObjectPoolManager] 异步加载预制体失败: {path}");
             onLoaded?.Invoke(null);
             yield break;
         }
@@ -211,7 +228,7 @@ public class ResourceManager : BaseManager
             if (!_prefabCache.ContainsKey(path))
             {
                 _prefabCache[path] = prefab;
-                Debug.Log($"[ResourceManager] 预制体异步加载并缓存: {path}");
+                if (enableLog) Debug.Log($"[GameObjectPoolManager] 预制体异步加载并缓存: {path}");
             }
         }
 
@@ -242,13 +259,13 @@ public class ResourceManager : BaseManager
             {
                 instance.transform.SetParent(parent);
                 instance.SetActive(true);
-                Debug.Log($"[ResourceManager] 从对象池获取实例: {path}");
+                if (enableLog) Debug.Log($"[GameObjectPoolManager] 从对象池获取实例: {path}");
             }
             else
             {
                 // 创建新实例
                 instance = UnityEngine.Object.Instantiate(prefab, parent);
-                Debug.Log($"[ResourceManager] 异步创建新实例: {path}");
+                if (enableLog) Debug.Log($"[GameObjectPoolManager] 异步创建新实例: {path}");
             }
 
             // 记录活跃实例
@@ -291,7 +308,7 @@ public class ResourceManager : BaseManager
 
         // 重置对象状态
         instance.SetActive(false);
-        instance.transform.SetParent(null);
+        instance.transform.SetParent(_poolRoot);
 
         lock (_cacheLock)
         {
@@ -323,7 +340,7 @@ public class ResourceManager : BaseManager
                     }
                 }
                 _instancePools.Remove(path);
-                Debug.Log($"[ResourceManager] 已清理对象池: {path}");
+                if (enableLog) Debug.Log($"[GameObjectPoolManager] 已清理对象池: {path}");
             }
         }
     }
@@ -347,7 +364,7 @@ public class ResourceManager : BaseManager
                 }
             }
             _instancePools.Clear();
-            Debug.Log("[ResourceManager] 已清理所有对象池");
+            if (enableLog) Debug.Log("[GameObjectPoolManager] 已清理所有对象池");
         }
     }
 
@@ -368,7 +385,7 @@ public class ResourceManager : BaseManager
             }
         }
         _activeInstances.Clear();
-        Debug.Log("[ResourceManager] 已清理所有活跃实例");
+        if (enableLog) Debug.Log("[GameObjectPoolManager] 已清理所有活跃实例");
     }
 
     /// <summary>

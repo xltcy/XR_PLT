@@ -1,6 +1,6 @@
 ﻿// =====================================================
 // 自动生成的 Manager 引用类
-// 生成时间: 2026-01-22 20:06:40
+// 生成时间: 2026-01-23 16:13:29
 // 包含 5 个继承 BaseManager 的类
 // =====================================================
 
@@ -30,21 +30,21 @@ public static class ManagerRefer
         }
     }
 
+    private static GameObjectPoolManager _gameObjectPoolManager;
+    public static GameObjectPoolManager GameObjectPoolManager
+    {
+        get
+        {
+            return _gameObjectPoolManager ??= ManagerRegister.Instance?.GetManager<GameObjectPoolManager>();
+        }
+    }
+
     private static NetworkServiceManager _networkServiceManager;
     public static NetworkServiceManager NetworkServiceManager
     {
         get
         {
             return _networkServiceManager ??= ManagerRegister.Instance?.GetManager<NetworkServiceManager>();
-        }
-    }
-
-    private static ResourceManager _resourceManager;
-    public static ResourceManager ResourceManager
-    {
-        get
-        {
-            return _resourceManager ??= ManagerRegister.Instance?.GetManager<ResourceManager>();
         }
     }
 
@@ -85,10 +85,10 @@ public static class ManagerRefer
                 return CoroutineManager;
             case "EventManager":
                 return EventManager;
+            case "GameObjectPoolManager":
+                return GameObjectPoolManager;
             case "NetworkServiceManager":
                 return NetworkServiceManager;
-            case "ResourceManager":
-                return ResourceManager;
             case "UIManager":
                 return UIManager;
             default:
@@ -104,8 +104,8 @@ public static class ManagerRefer
     {
         _coroutineManager = null;
         _eventManager = null;
+        _gameObjectPoolManager = null;
         _networkServiceManager = null;
-        _resourceManager = null;
         _uIManager = null;
     }
 }
