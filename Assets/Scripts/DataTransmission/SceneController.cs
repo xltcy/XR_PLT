@@ -27,7 +27,7 @@ public class SceneController : BaseController
     public Text jsonLocationHint;
 
     //public static string TEST_JSON_PC_HOME_PATH = "E:/Unity Proj/XR_PLT/";
-    public static string TEST_JSON_PC_HOME_PATH = "H:/UnityProject/XR_PLT/";
+    public static string TEST_JSON_PC_HOME_PATH = "G:/learning/core/gd/my_gd/XR_PLT";
     public static string TEST_JSON_ANDROID_HOME_PATH = "/storage/emulated/0/Download/";
     private string jsonHomePath = "";
 
@@ -79,7 +79,8 @@ public class SceneController : BaseController
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
         
         InitiatePath();
-        RequireSummaryData();
+        //修改，先删除这一个
+        //RequireSummaryData();
     }
 
     public override void OnUnregister()
@@ -125,11 +126,14 @@ public class SceneController : BaseController
         if (!DebugSwitch.Instance.DEBUG_USING_NETWORK_JSON)
         {
             GetSceneSummaryTestRequest(
-                onSuccess: (res) => {
+                onSuccess: (res) =>
+                {
                     SummaryData = res;
                     InitSceneSummary(res.items);
                 },
-                onFail: (errorText) => {
+                onFail:
+                (errorText) =>
+                {
                     //TODO
                 }
             );
@@ -305,12 +309,197 @@ public class SceneController : BaseController
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new StringEnumConverter());
             var data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
+            SceneData = data;
             onSuccess?.Invoke(data);
         } else
         {
             onFail?.Invoke("jsonFail");
         }
+        
     }
+
+    ///<summary>
+    ///only  use for 太和殿
+    /// </summary>
+    public void LoadSceneData()
+    {
+        SummaryItemData sumId = new SummaryItemData
+        {
+            sceneName = "太和殿",
+            sceneKey = "test-THD",
+            sceneRelocateAlgo = "vggt_camera_locate"
+        };
+        string localJsonPath = sumId.sceneKey;
+
+        // Temp logic start
+        var jsonString = Resources.Load<TextAsset>("Configs/" + localJsonPath).text;
+        if (jsonString != null)
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new StringEnumConverter());
+            var data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
+            SceneData = data;
+            Debug.Log("Get Response json: Data:" + data);
+        } else
+        {
+            Debug.Log("jsonFail");
+        }
+        GameObject prefab = Resources.Load<GameObject>("Prefab/" + SceneData.sceneModelPath);
+        scene = Instantiate(prefab);
+        scene.name = "THD";  
+        scene.tag = nameof(GameObjectTag.Mesh);
+        scene.transform.localRotation = Quaternion.Euler(0f, 0f, 180f) * scene.transform.localRotation;
+        GenerateBoundingBoxesForHighlightNodes();
+    }
+    #region 生成bounding_box
+    // 只在 SceneController 里维护
+    private readonly string[] autoBoundingBoxPaths =
+    {
+        "兽"
+    };
+
+    private void GenerateBoundingBoxesForHighlightNodes()
+    {
+        if (scene == null)
+        {
+            Debug.LogError("[BoundingBox] Scene not instantiated");
+            return;
+        }
+
+        foreach (string path in autoBoundingBoxPaths)
+        {
+            GenerateBoundingBoxMeshForNode(path);
+        }
+    }
+    private void GenerateBoundingBoxMeshForNode(string nodePath)
+    {
+        Transform node = FindTransformByPath(scene.transform, nodePath);
+        if (node == null)
+        {
+            Debug.LogWarning($"[BoundingBox] Node not found: {nodePath}");
+            return;
+        }
+
+        if (!CalculateWorldBounds(node, out Bounds worldBounds))
+        {
+            Debug.LogWarning(
+                $"[BoundingBox] No renderer under node: {node.name}");
+            return;
+        }
+
+        ApplyBoundingBoxMeshToNode(node, worldBounds);
+    }
+    private static bool CalculateWorldBounds(
+        Transform root,
+        out Bounds worldBounds
+    )
+    {
+        worldBounds = new Bounds();
+        bool hasBounds = false;
+
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer r in renderers)
+        {
+
+            if (!hasBounds)
+            {
+                worldBounds = r.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                worldBounds.Encapsulate(r.bounds);
+            }
+        }
+
+        return hasBounds;
+    }
+    private static void ApplyBoundingBoxMeshToNode(
+        Transform node,
+        Bounds worldBounds
+    )
+    {
+        GameObject go = node.gameObject;
+
+        // MeshFilter（必须）
+        MeshFilter mf = go.GetComponent<MeshFilter>();
+        if (mf == null)
+            mf = go.AddComponent<MeshFilter>();
+
+        // MeshRenderer（Outline 必须依赖）
+        MeshRenderer mr = go.GetComponent<MeshRenderer>();
+        if (mr == null)
+            mr = go.AddComponent<MeshRenderer>();
+
+        // Renderer 
+        mr.enabled = true;
+        // 生成包围盒 Mesh
+        Mesh bboxMesh = CreateBoundingBoxMesh(node, worldBounds);
+        Debug.Log("generated!");
+        mf.sharedMesh = bboxMesh;
+    }
+    
+    private static Mesh CreateBoundingBoxMesh(
+        Transform node,
+        Bounds worldBounds
+    )
+    {
+        Vector3 half = Vector3.one * 0.5f;
+
+        Vector3[] vertices =
+        {
+            new Vector3(-half.x, -half.y, -half.z),
+            new Vector3( half.x, -half.y, -half.z),
+            new Vector3( half.x,  half.y, -half.z),
+            new Vector3(-half.x,  half.y, -half.z),
+
+            new Vector3(-half.x, -half.y,  half.z),
+            new Vector3( half.x, -half.y,  half.z),
+            new Vector3( half.x,  half.y,  half.z),
+            new Vector3(-half.x,  half.y,  half.z),
+        };
+
+        int[] triangles =
+        {
+            0,2,1, 0,3,2,
+            4,5,6, 4,6,7,
+            0,1,5, 0,5,4,
+            2,3,7, 2,7,6,
+            0,4,7, 0,7,3,
+            1,2,6, 1,6,5
+        };
+
+        Mesh mesh = new Mesh();
+        mesh.name = node.name + "_boundingBox";
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+    private static Transform FindTransformByPath(
+        Transform root,
+        string path
+    )
+    {
+        if (root == null || string.IsNullOrEmpty(path))
+            return null;
+
+        string[] nodes = path.Trim('/').Split('/');
+        Transform current = root;
+
+        foreach (string node in nodes)
+        {
+            current = current.Find(node);
+            if (current == null)
+                return null;
+        }
+
+        return current;
+    }
+    
+    #endregion
+
 
     /// <summary>
     /// 上传场景数据

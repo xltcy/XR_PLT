@@ -15,6 +15,11 @@
       "sceneKey": "test-SJS",
       "sceneRelocateAlgo":"request_NVLAD_redir",
       "sceneDataSet": "sjs01"
+    },
+    {
+      "sceneName":"太和殿",
+      "sceneKey": "test-THD",
+      "sceneRelocateAlgo":"vggt_camera_locate" 
     }
   ]
 }

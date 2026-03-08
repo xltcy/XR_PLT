@@ -34,7 +34,8 @@ public class ModelComponent : MonoBehaviour
         return center / transform.childCount;
     }
     #endregion
-
+    
+    
     void Update()
     {
 
