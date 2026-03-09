@@ -79,8 +79,7 @@ public class SceneController : BaseController
         ManagerRefer.NetworkServiceManager.AddResponseListener(NetworkConstant.SCENE_DATA, RequestSceneDataByKeyCallback);
         
         InitiatePath();
-        //修改，先删除这一个
-        //RequireSummaryData();
+        RequireSummaryData();
     }
 
     public override void OnUnregister()
