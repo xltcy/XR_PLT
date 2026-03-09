@@ -345,10 +345,10 @@ public class SceneController : BaseController
             Debug.Log("jsonFail");
         }
         GameObject prefab = Resources.Load<GameObject>("Prefab/" + SceneData.sceneModelPath);
-        scene = Instantiate(prefab);
-        scene.name = "THD";  
-        scene.tag = nameof(GameObjectTag.Mesh);
-        scene.transform.localRotation = Quaternion.Euler(0f, 0f, 180f) * scene.transform.localRotation;
+        Scene = Instantiate(prefab);
+        Scene.name = "THD";  
+        Scene.tag = nameof(GameObjectTag.Mesh);
+        Scene.transform.localRotation = Quaternion.Euler(0f, 0f, 180f) * Scene.transform.localRotation;
         GenerateBoundingBoxesForHighlightNodes();
     }
     #region 生成bounding_box
@@ -360,7 +360,7 @@ public class SceneController : BaseController
 
     private void GenerateBoundingBoxesForHighlightNodes()
     {
-        if (scene == null)
+        if (Scene == null)
         {
             Debug.LogError("[BoundingBox] Scene not instantiated");
             return;
@@ -373,7 +373,7 @@ public class SceneController : BaseController
     }
     private void GenerateBoundingBoxMeshForNode(string nodePath)
     {
-        Transform node = FindTransformByPath(scene.transform, nodePath);
+        Transform node = FindTransformByPath(Scene.transform, nodePath);
         if (node == null)
         {
             Debug.LogWarning($"[BoundingBox] Node not found: {nodePath}");

@@ -47,7 +47,7 @@ public class THD_DEMO : MonoBehaviour
             Debug.Log("1");
             if(sceneController == null) Debug.Log("sceneController == null");
             sceneController.LoadSceneData();
-            scenePrefab = sceneController.scene; 
+            scenePrefab = sceneController.Scene; 
         }
         else if (Input.GetKeyUp(KeyCode.Alpha2))
         {
