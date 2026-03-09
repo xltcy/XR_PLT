@@ -291,6 +291,10 @@ public class SMPLController : BaseController
 
     public void SetDestination(Vector3 des, String initialIntro = "", String arriveIntro = "")
     {
+        if (!destination || !scene)
+        {
+            return;
+        }
         arriveIntroduction = arriveIntro;
         SpeechManager.SayFromStr(initialIntro, onSpeakComplete: () => {
             MainThreadDispatcher.InvokeOnMainThread(() =>
