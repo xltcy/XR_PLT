@@ -235,7 +235,7 @@ public class SceneController : BaseController
         {
             GetSceneDataTestRequest(sceneItemData, 
                 onSuccess: (res) => {
-                    if (SceneData == null || sceneItemData.sceneName != res.sceneName || SceneData.timestampMs < res.timestampMs)
+                    if (SceneData == null || SceneData.sceneName != res.sceneName || SceneData.timestampMs < res.timestampMs)
                     {
                         // TODO save to local
                         SceneData = res;
@@ -308,7 +308,6 @@ public class SceneController : BaseController
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new StringEnumConverter());
             var data = JsonConvert.DeserializeObject<SceneData>(jsonString, settings);
-            SceneData = data;
             onSuccess?.Invoke(data);
         } else
         {

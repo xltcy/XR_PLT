@@ -32,10 +32,11 @@ public class CoroutineManager : BaseManager
         // 创建协程运行器GameObject
         GameObject runnerObj = new GameObject("CoroutineRunner");
         var dontDestroyOnLoadTrans = GameObject.Find("DontDestroyOnLoad");
-        if (dontDestroyOnLoadTrans)
+        if (!dontDestroyOnLoadTrans)
         {
-            runnerObj.transform.SetParent(dontDestroyOnLoadTrans.transform);
+            dontDestroyOnLoadTrans = new GameObject("DontDestroyOnLoad");
         }
+        runnerObj.transform.SetParent(dontDestroyOnLoadTrans.transform);
         runner = runnerObj.AddComponent<CoroutineRunner>();
     }
 
