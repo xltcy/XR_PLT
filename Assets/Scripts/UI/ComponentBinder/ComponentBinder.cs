@@ -10,8 +10,11 @@ using Object = UnityEngine.Object;
 
 public class ComponentBinder : MonoBehaviour
 {
+    [SerializeField, HideInInspector]
     private bool autoBindOnAwake = true;
+    [SerializeField, HideInInspector]
     private bool logBindResults = false;
+    [SerializeField, HideInInspector]
     private bool searchInactiveNodes = true;
     
     // 缓存查找结果以提高性能
