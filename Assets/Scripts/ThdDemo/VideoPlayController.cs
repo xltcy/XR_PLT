@@ -33,6 +33,8 @@ public class VideoPlayController : BaseController
         videoDisplay.texture = renderTexture;
     }
 
+   
+
     public void LoadAndPlay(string videoPath)
     {
         videoPlayer.url = videoPath;

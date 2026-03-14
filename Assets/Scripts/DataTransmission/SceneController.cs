@@ -350,12 +350,35 @@ public class SceneController : BaseController
         GenerateBoundingBoxesForHighlightNodes();
     }
     #region 生成bounding_box
+    
     // 只在 SceneController 里维护
     private readonly string[] autoBoundingBoxPaths =
     {
-        "兽"
+        "兽",
+        "面阔"
+    };
+    private static readonly int[] BoundingBoxTriangles =
+    {
+        0, 1, 2, 0, 2, 3,        // Front
+        4, 5, 6, 4, 6, 7,        // Back
+        8, 9,10, 8,10,11,        // Left
+        12,13,14, 12,14,15,      // Right
+        16,17,18, 16,18,19,      // Top
+        20,21,22, 20,22,23       // Bottom
     };
 
+    private static readonly Vector3[] BoundingBoxNormals =
+    {
+        Vector3.forward, Vector3.forward, Vector3.forward, Vector3.forward,
+        Vector3.back,    Vector3.back,    Vector3.back,    Vector3.back,
+        Vector3.left,    Vector3.left,    Vector3.left,    Vector3.left,
+        Vector3.right,   Vector3.right,   Vector3.right,   Vector3.right,
+        Vector3.up,      Vector3.up,      Vector3.up,      Vector3.up,
+        Vector3.down,    Vector3.down,    Vector3.down,    Vector3.down
+    };
+    // 视觉上略微放大一点
+    [SerializeField] private float boundingBoxExpandFactor = 1.15f;
+    [SerializeField] private Material boundingBoxGhostMaterial;
     private void GenerateBoundingBoxesForHighlightNodes()
     {
         if (Scene == null)
@@ -369,6 +392,7 @@ public class SceneController : BaseController
             GenerateBoundingBoxMeshForNode(path);
         }
     }
+
     private void GenerateBoundingBoxMeshForNode(string nodePath)
     {
         Transform node = FindTransformByPath(Scene.transform, nodePath);
@@ -377,104 +401,134 @@ public class SceneController : BaseController
             Debug.LogWarning($"[BoundingBox] Node not found: {nodePath}");
             return;
         }
-
-        if (!CalculateWorldBounds(node, out Bounds worldBounds))
+        //获取节点的MeshFilter组件
+        MeshFilter sourceMf = node.GetComponent<MeshFilter>();
+        if (sourceMf == null || sourceMf.sharedMesh == null)
         {
-            Debug.LogWarning(
-                $"[BoundingBox] No renderer under node: {node.name}");
+            Debug.LogWarning($"[BoundingBox] Node has no valid MeshFilter: {node.name}");
             return;
         }
 
-        ApplyBoundingBoxMeshToNode(node, worldBounds);
+        ApplyBoundingBoxMeshToNode(node, sourceMf, boundingBoxExpandFactor);
     }
-    private static bool CalculateWorldBounds(
-        Transform root,
-        out Bounds worldBounds
+
+    private void ApplyBoundingBoxMeshToNode(
+        Transform node,
+        MeshFilter sourceMf,
+        float expandFactor
     )
     {
-        worldBounds = new Bounds();
-        bool hasBounds = false;
+        // 不要污染原来的模型节点，单独创建一个子节点来放 bounding box
+        string bboxName = node.name + "_BoundingBox";
+        Transform bboxNode = node.Find(bboxName);
 
-        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
-        foreach (Renderer r in renderers)
+        GameObject bboxGo;
+        if (bboxNode == null)
         {
-
-            if (!hasBounds)
-            {
-                worldBounds = r.bounds;
-                hasBounds = true;
-            }
-            else
-            {
-                worldBounds.Encapsulate(r.bounds);
-            }
+            bboxGo = new GameObject(bboxName);
+            bboxGo.transform.SetParent(node, false);
+            bboxGo.transform.localPosition = Vector3.zero;
+            bboxGo.transform.localRotation = Quaternion.identity;
+            bboxGo.transform.localScale = Vector3.one;
+        }
+        else
+        {
+            bboxGo = bboxNode.gameObject;
         }
 
-        return hasBounds;
+        // BoundingBox 自己的 MeshFilter / MeshRenderer
+        MeshFilter bboxMf = bboxGo.GetComponent<MeshFilter>();
+        if (bboxMf == null)
+            bboxMf = bboxGo.AddComponent<MeshFilter>();
+
+        MeshRenderer bboxMr = bboxGo.GetComponent<MeshRenderer>();
+        if (bboxMr == null)
+            bboxMr = bboxGo.AddComponent<MeshRenderer>();
+
+        bboxMr.enabled = true;
+
+        // 生成真正基于 sourceMf.bounds 的包围盒 Mesh
+        Mesh bboxMesh = CreateBoundingBoxMesh(sourceMf, new Vector3(expandFactor, expandFactor, expandFactor));//可以根据不同轴进行扩张
+        bboxMf.sharedMesh = bboxMesh;
+        bboxMr.enabled = true;
+        boundingBoxGhostMaterial = Resources.Load<Material>("Materials/BoundingBoxGhost");
+        bboxMr.material = boundingBoxGhostMaterial;
+        Debug.Log($"[BoundingBox] generated for node: {node.name}");
     }
-    private static void ApplyBoundingBoxMeshToNode(
-        Transform node,
-        Bounds worldBounds
-    )
-    {
-        GameObject go = node.gameObject;
 
-        // MeshFilter（必须）
-        MeshFilter mf = go.GetComponent<MeshFilter>();
-        if (mf == null)
-            mf = go.AddComponent<MeshFilter>();
-
-        // MeshRenderer（Outline 必须依赖）
-        MeshRenderer mr = go.GetComponent<MeshRenderer>();
-        if (mr == null)
-            mr = go.AddComponent<MeshRenderer>();
-
-        // Renderer 
-        mr.enabled = true;
-        // 生成包围盒 Mesh
-        Mesh bboxMesh = CreateBoundingBoxMesh(node, worldBounds);
-        Debug.Log("generated!");
-        mf.sharedMesh = bboxMesh;
-    }
-    
     private static Mesh CreateBoundingBoxMesh(
-        Transform node,
-        Bounds worldBounds
+        MeshFilter sourceMf,
+        Vector3 expandScale
     )
     {
-        Vector3 half = Vector3.one * 0.5f;
+        if (sourceMf == null || sourceMf.sharedMesh == null)
+        {
+            Debug.LogError("[BoundingBox] Invalid source MeshFilter.");
+            return null;
+        }
+
+        Bounds b = sourceMf.sharedMesh.bounds;
+        Vector3 center = b.center;
+        Vector3 half = Vector3.Scale(b.extents, expandScale);
+
+        float minX = center.x - half.x;
+        float maxX = center.x + half.x;
+        float minY = center.y - half.y;
+        float maxY = center.y + half.y;
+        float minZ = center.z - half.z;
+        float maxZ = center.z + half.z;
 
         Vector3[] vertices =
         {
-            new Vector3(-half.x, -half.y, -half.z),
-            new Vector3( half.x, -half.y, -half.z),
-            new Vector3( half.x,  half.y, -half.z),
-            new Vector3(-half.x,  half.y, -half.z),
+            // Front (+Z)
+            new Vector3(minX, minY, maxZ),
+            new Vector3(maxX, minY, maxZ),
+            new Vector3(maxX, maxY, maxZ),
+            new Vector3(minX, maxY, maxZ),
 
-            new Vector3(-half.x, -half.y,  half.z),
-            new Vector3( half.x, -half.y,  half.z),
-            new Vector3( half.x,  half.y,  half.z),
-            new Vector3(-half.x,  half.y,  half.z),
+            // Back (-Z)
+            new Vector3(maxX, minY, minZ),
+            new Vector3(minX, minY, minZ),
+            new Vector3(minX, maxY, minZ),
+            new Vector3(maxX, maxY, minZ),
+
+            // Left (-X)
+            new Vector3(minX, minY, minZ),
+            new Vector3(minX, minY, maxZ),
+            new Vector3(minX, maxY, maxZ),
+            new Vector3(minX, maxY, minZ),
+
+            // Right (+X)
+            new Vector3(maxX, minY, maxZ),
+            new Vector3(maxX, minY, minZ),
+            new Vector3(maxX, maxY, minZ),
+            new Vector3(maxX, maxY, maxZ),
+
+            // Top (+Y)
+            new Vector3(minX, maxY, maxZ),
+            new Vector3(maxX, maxY, maxZ),
+            new Vector3(maxX, maxY, minZ),
+            new Vector3(minX, maxY, minZ),
+
+            // Bottom (-Y)
+            new Vector3(minX, minY, minZ),
+            new Vector3(maxX, minY, minZ),
+            new Vector3(maxX, minY, maxZ),
+            new Vector3(minX, minY, maxZ),
         };
 
-        int[] triangles =
+        Mesh mesh = new Mesh
         {
-            0,2,1, 0,3,2,
-            4,5,6, 4,6,7,
-            0,1,5, 0,5,4,
-            2,3,7, 2,7,6,
-            0,4,7, 0,7,3,
-            1,2,6, 1,6,5
+            name = $"{sourceMf.gameObject.name}_BoundingBoxMesh"
         };
-
-        Mesh mesh = new Mesh();
-        mesh.name = node.name + "_boundingBox";
         mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        mesh.triangles = BoundingBoxTriangles;
+        mesh.normals = BoundingBoxNormals;
         mesh.RecalculateBounds();
+
         return mesh;
     }
+
     private static Transform FindTransformByPath(
         Transform root,
         string path
@@ -495,7 +549,7 @@ public class SceneController : BaseController
 
         return current;
     }
-    
+
     #endregion
 
 
@@ -557,9 +611,12 @@ public class SceneController : BaseController
         // init object for SMPLController
 
         // load scene
-        ManagerRefer.GameObjectPoolManager.Recycle(Scene);
-        Scene = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/{SceneData.sceneModelPath}");
-        Scene.tag = nameof(GameObjectTag.Mesh);
+        if (Scene == null)
+        {
+            ManagerRefer.GameObjectPoolManager.Recycle(Scene);
+            Scene = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/{SceneData.sceneModelPath}");
+            Scene.tag = nameof(GameObjectTag.Mesh);
+        }
 
         // Generate ObjectDatas
         prefabs.Clear();
