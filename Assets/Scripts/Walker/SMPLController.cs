@@ -8,7 +8,8 @@ using static VirHumanVoiceRecCommand;
 
 public class SMPLController : BaseController, ITickerUpdate
 {
-    public string AvatarModelName = "guide_qs";
+    public string DefaultAvatarModelName = "guide_qs";
+    public string SelectedAvatarName = string.Empty;
     
     //Audio
     private Dictionary<string, VirHumanVoiceRecCommand> desCommand = new Dictionary<string, VirHumanVoiceRecCommand>
@@ -107,8 +108,7 @@ public class SMPLController : BaseController, ITickerUpdate
 
     public void CreateSelectedModel()
     {
-        var ss = "";
-        CreateModel(ss);
+        CreateModel(SelectedAvatarName);
     }
     
     public void CreateModel(string avatarModelName = "")
@@ -119,7 +119,7 @@ public class SMPLController : BaseController, ITickerUpdate
             return;
         }
         
-        avatarModelName = avatarModelName == string.Empty ? AvatarModelName : avatarModelName;
+        avatarModelName = avatarModelName == string.Empty ? DefaultAvatarModelName : avatarModelName;
         
         ManagerRefer.GameObjectPoolManager.Recycle(avatarModel);
         avatarModel = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/Avatar/{avatarModelName}", transform);
