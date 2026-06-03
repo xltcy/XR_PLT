@@ -8,7 +8,7 @@ using static VirHumanVoiceRecCommand;
 
 public class SMPLController : BaseController, ITickerUpdate
 {
-    public string DefaultAvatarModelName = "guide_qs";
+    private string DefaultAvatarModelName = "guide_qs";
     public string SelectedAvatarName = string.Empty;
     
     //Audio
@@ -19,6 +19,7 @@ public class SMPLController : BaseController, ITickerUpdate
     private GameObject scene;
     private Animator avatarAnimator;
 
+    public Transform avatarRoot;
     public GameObject destination;
     public GameObject avatarModel;
 
@@ -122,7 +123,7 @@ public class SMPLController : BaseController, ITickerUpdate
         avatarModelName = avatarModelName == string.Empty ? DefaultAvatarModelName : avatarModelName;
         
         ManagerRefer.GameObjectPoolManager.Recycle(avatarModel);
-        avatarModel = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/Avatar/{avatarModelName}", transform);
+        avatarModel = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/Avatar/{avatarModelName}", avatarRoot);
         
         
         // 设置寻路目标

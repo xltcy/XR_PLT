@@ -1,5 +1,6 @@
 {
   "DebugUIMediator": "UIPrefabs/ui_debug",
+  "GxlIntroduceStartHudUIMediator": "UIPrefabs/ui_start_gxl_introduce_hud",
   "LoadingUIMediator": "UIPrefabs/ui_loading",
   "SelectDesUIMediator": "UIPrefabs/ui_select_des",
   "StartHudUIMediator": "UIPrefabs/ui_start_hud",
