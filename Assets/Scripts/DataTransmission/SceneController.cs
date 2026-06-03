@@ -572,6 +572,9 @@ public class SceneController : BaseController
             }
             prefabs[objectData.id] = prefab;
         }
+        // 生成虚拟人
+        ControllerRefer.SMPLController.CreateSelectedModel();
+        
         // explanationPoints. Use in selectDesController
 
         // Init voice commands

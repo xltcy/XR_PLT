@@ -2,22 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Pathfinding;
+using TickSystem;
 using static VirHumanVoiceRecCommand;
 
-public class SMPLController : BaseController
+public class SMPLController : BaseController, ITickerUpdate
 {
+    public string AvatarModelName = "guide_qs";
+    
     //Audio
     private Dictionary<string, VirHumanVoiceRecCommand> desCommand = new Dictionary<string, VirHumanVoiceRecCommand>
     {
         {"ShengNa", new VirHumanVoiceRecCommand("", VirHumanCommandType.shengNa) }
     };
     private GameObject scene;
-    private Animator walkAnim;
-    private Animator talkAnim;
+    private Animator avatarAnimator;
 
     public GameObject destination;
-    public GameObject walkingModel;
-    public GameObject talkingModel;
+    public GameObject avatarModel;
 
     private AnimatorStateInfo animState;
 
@@ -53,6 +55,7 @@ public class SMPLController : BaseController
     public override void OnUnregister()
     {
         base.OnUnregister();
+        SetModelActive(false);
     }
 
     public static void SetConsPos(Vector3 pos)
@@ -83,26 +86,72 @@ public class SMPLController : BaseController
     // Start is called before the first frame update
     void Init()
     {
-        walkAnim = walkingModel.GetComponent<Animator>();
-        talkAnim = talkingModel.GetComponent<Animator>();
-
         hasSpoken = false;
         isWalking = false;
         isInitPos = true;
     }
 
+    public void SetModelActive(bool isActive)
+    {
+        avatarModel.SetVisible(isActive);
+        
+        if (isActive)
+        {
+            TickController.RegisterTick(this);
+        }
+        else
+        {
+            TickController.UnRegisterTick(this);
+        }
+    }
+
+    public void CreateSelectedModel()
+    {
+        var ss = "";
+        CreateModel(ss);
+    }
+    
+    public void CreateModel(string avatarModelName = "")
+    {
+        // 如果avatarModelName为空且avatarModel已经存在，则不重新创建模型
+        if (avatarModelName.IsNullOrEmpty() && avatarModel)
+        {
+            return;
+        }
+        
+        avatarModelName = avatarModelName == string.Empty ? AvatarModelName : avatarModelName;
+        
+        ManagerRefer.GameObjectPoolManager.Recycle(avatarModel);
+        avatarModel = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/Avatar/{avatarModelName}", transform);
+        
+        
+        // 设置寻路目标
+        if (avatarModel)
+        {
+            var richAI = avatarModel.GetComponent<RichAI>();
+            if (richAI)
+            {
+                richAI.canMove = false;
+            }
+            
+            var aiDestinationSetter = avatarModel.transform.GetComponent<AIDestinationSetter>();
+            if (aiDestinationSetter)
+            {
+                aiDestinationSetter.target = destination.transform;
+            }
+        }
+        
+        avatarAnimator = avatarModel.GetComponent<Animator>();
+    }
+
     // Update is called once per frame
-    void Update()
+    public void Tick()
     {
         //destination.transform.position = despositions[dropDown.options[dropDown.value].text];
-        //debugText.text = $"Destination: {destination.transform.position}\nGuide:{walkingModel.transform.position}";
-        if (walkingModel.activeSelf)
+        //debugText.text = $"Destination: {destination.transform.position}\nGuide:{avatarModel.transform.position}";
+        if (avatarModel && avatarModel.activeSelf)
         {
-            animState = walkAnim.GetCurrentAnimatorStateInfo(0);
-        }
-        if (talkingModel.activeSelf)
-        {
-            animState = talkAnim.GetCurrentAnimatorStateInfo(0);
+            animState = avatarAnimator.GetCurrentAnimatorStateInfo(0);
         }
 
         if (destination != null)
@@ -141,12 +190,12 @@ public class SMPLController : BaseController
         {
             if (isWalking)
             {
-                if (NearEnough(destination.transform.position, walkingModel.transform.position))
+                if (NearEnough(destination.transform.position, avatarModel.transform.position))
                 {
                     StopWalking();
                     SwitchToTalkMode();
                 }
-                else if (FarAway(arCamera.transform.position, walkingModel.transform.position))
+                else if (FarAway(arCamera.transform.position, avatarModel.transform.position))
                 {
                     StopWalking();
                     SwitchToTalkMode();
@@ -158,19 +207,19 @@ public class SMPLController : BaseController
             }
             else
             {
-                if (NearEnough(destination.transform.position, walkingModel.transform.position))
+                if (NearEnough(destination.transform.position, avatarModel.transform.position))
                 {
                     LookAtMe(true);
                     if (!hasSpoken)
                     {
                         String str = arriveIntroduction.Length == 0 ? toSpeak : arriveIntroduction;
                         SpeechManager.SayFromStr(str);
-                        //talkAnim.SetTrigger("introduce");
+                        //avatarAnimator.SetTrigger("introduce");
                         UnityEngine.Debug.Log("Msg in Update:" + str);
                         hasSpoken = true;
                     }
                 }
-                else if (FarAway(arCamera.transform.position, walkingModel.transform.position))
+                else if (FarAway(arCamera.transform.position, avatarModel.transform.position))
                 {
                     //SwitchToWalkMode();
                     LookAtMe(true);
@@ -229,8 +278,7 @@ public class SMPLController : BaseController
     {
         InitilizeObjectWithTag();
 
-        walkingModel.transform.position = initPos;
-        talkingModel.transform.position = initPos;
+        avatarModel.transform.position = initPos;
         destination.transform.position = initPos;
 
         SwitchToTalkMode();
@@ -241,16 +289,14 @@ public class SMPLController : BaseController
     {
         if (!isSmooth)
         {
-            walkingModel.transform.LookAt(new Vector3(arCamera.transform.position.x, walkingModel.transform.position.y, arCamera.transform.position.z));
-            CopyTransformState(walkingModel.transform, talkingModel.transform);
+            avatarModel.transform.LookAt(new Vector3(arCamera.transform.position.x, avatarModel.transform.position.y, arCamera.transform.position.z));
         }
         else
         {
-            Vector3 targetPos = arCamera.transform.position - walkingModel.transform.position;
+            Vector3 targetPos = arCamera.transform.position - avatarModel.transform.position;
             targetPos.y = 0;
             desRotation = Quaternion.LookRotation(targetPos);
-            walkingModel.transform.rotation = Quaternion.Slerp(walkingModel.transform.rotation, desRotation, 0.05f);
-            talkingModel.transform.rotation = Quaternion.Slerp(talkingModel.transform.rotation, desRotation, 0.05f);
+            avatarModel.transform.rotation = Quaternion.Slerp(avatarModel.transform.rotation, desRotation, 0.05f);
         }
     }
     private void CopyTransformState(Transform from, Transform to) // walk模型和talk模型的比例不同，需要转换坐标，乘以0.213比例系数，确保两个模型位置同步
@@ -263,30 +309,33 @@ public class SMPLController : BaseController
     public void SwitchToWalkMode() 
     {
         isWalking = true;
-        CopyTransformState(talkingModel.transform, walkingModel.transform); // 将talk模型的位置信息复制给walk模型
-        walkingModel.SetActive(true);
-        talkingModel.SetActive(false);
     }
 
     private void SwitchToTalkMode(bool lookAtInSmooth = false) // 切换到talk模式
     {
         //StopWalking();
-
         isWalking = false;
-        CopyTransformState(walkingModel.transform, talkingModel.transform); // 将walk模型的位置信息复制给talk模型
-        walkingModel.SetActive(false);
-        talkingModel.SetActive(true);
         //LookAtMe(lookAtInSmooth);
     }
 
     private void StopWalking()
     {
-        walkAnim.SetFloat("Speed", 0);
+        avatarAnimator?.SetFloat("Speed", 0);
+        if (avatarModel)
+        {
+            var richAI = avatarModel.GetComponent<RichAI>();
+            if (richAI) richAI.canMove = false;
+        }
     }
 
     private void StartWalking(float speed)
     {
-        walkAnim.SetFloat("Speed", speed);
+        avatarAnimator?.SetFloat("Speed", speed);
+        if (avatarModel)
+        {
+            var richAI = avatarModel.GetComponent<RichAI>();
+            if (richAI) richAI.canMove = true;
+        }
     }
 
     public void SetDestination(Vector3 des, String initialIntro = "", String arriveIntro = "")
@@ -322,14 +371,14 @@ public class SMPLController : BaseController
         destination.transform.position = des;
         StartWalking(0.7f);
         UnityEngine.Debug.Log("Msg in SMPL: 开始寻路");
-        yield return new WaitUntil(() => NearEnough(walkingModel.transform.position, destination.transform.position));
+        yield return new WaitUntil(() => NearEnough(avatarModel.transform.position, destination.transform.position));
         StopWalking();
         // yield return new WaitUntil(() => animState.IsName("Base Layer.Idle"));
         //
         UnityEngine.Debug.Log("Msg in SMPL: 已经到达并进入站立状态");
         SwitchToTalkMode();
         LookAtMe(true);
-        talkAnim.SetBool("Talk", SpeechManager.IsSpeaking);
+        avatarAnimator.SetBool("Talk", SpeechManager.IsSpeaking);
         if (!hasSpoken)
         {
             SpeechManager.SayFromStr(toSpeak);
@@ -347,14 +396,14 @@ public class SMPLController : BaseController
         destination.transform.position = desCmd.desLocalPosition;
         StartWalking(0.7f);
         UnityEngine.Debug.Log("Msg in SMPL: 开始寻路去" + desCmd.commandType);
-        yield return new WaitUntil(() => NearEnough(walkingModel.transform.position, destination.transform.position));
+        yield return new WaitUntil(() => NearEnough(avatarModel.transform.position, destination.transform.position));
         StopWalking();
         // yield return new WaitUntil(() => animState.IsName("Base Layer.Idle"));
         //
         UnityEngine.Debug.Log("Msg in SMPL: 到达" + desCmd.commandType);
         SwitchToTalkMode();
         LookAtMe(true);
-        talkAnim.SetBool("Talk", SpeechManager.IsSpeaking);
+        avatarAnimator.SetBool("Talk", SpeechManager.IsSpeaking);
         if (!hasSpoken)
         {
             toSpeak = desCmd.introduction;
@@ -390,7 +439,7 @@ public class SMPLController : BaseController
 
     public void IntroduceString(String introduction, Action onComplete = null)
     {
-        //talkAnim.SetTrigger("introduce");
+        //avatarAnimator.SetTrigger("introduce");
         SpeechManager.SayFromStr(introduction, onComplete);
     }
 
@@ -401,7 +450,7 @@ public class SMPLController : BaseController
     {
         if (!isWalking)
         {
-            talkAnim.SetTrigger(animTrigger);
+            avatarAnimator.SetTrigger(animTrigger);
         }
     }
 

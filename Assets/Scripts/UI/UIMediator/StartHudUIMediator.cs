@@ -117,15 +117,18 @@ public class StartHudUIMediator : BaseUIMediator
         if (sceneData == null)
         {
             // Error
-            Debug.Log("No vailable explaination point!!!");
+            Debug.Log("No available explanation point!!!");
             return;
         }
+        
         if (!initSMPL)
         {
             ControllerRefer.SMPLController.SetVisible(true);
             ControllerRefer.SMPLController.InitializeSmplPosition();
+            ControllerRefer.SMPLController.SetModelActive(true);
             initSMPL = true;
         }
+        
         if (sceneData.explanationPoints.Count == 1)
         {
             // skip selectDestination.
