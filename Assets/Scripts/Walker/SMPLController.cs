@@ -57,7 +57,7 @@ public class SMPLController : BaseController, ITickerUpdate
     public override void OnUnregister()
     {
         base.OnUnregister();
-        SetModelActive(false);
+        SetControllerTickActive(false);
     }
 
     public static void SetConsPos(Vector3 pos)
@@ -93,7 +93,12 @@ public class SMPLController : BaseController, ITickerUpdate
         isInitPos = true;
     }
 
-    public void SetModelActive(bool isActive)
+    /// <summary>
+    /// 设置模型的激活状态，同时注册或注销Tick更新。
+    /// 与 StopWalking()功能不一样，注意区别
+    /// </summary>
+    /// <param name="isActive"></param>
+    public void SetControllerTickActive(bool isActive)
     {
         avatarModel.SetVisible(isActive);
         
@@ -129,12 +134,6 @@ public class SMPLController : BaseController, ITickerUpdate
         // 设置寻路目标
         if (avatarModel)
         {
-            var richAI = avatarModel.GetComponent<RichAI>();
-            if (richAI)
-            {
-                richAI.canMove = false;
-            }
-            
             var aiDestinationSetter = avatarModel.transform.GetComponent<AIDestinationSetter>();
             if (aiDestinationSetter)
             {
@@ -143,9 +142,13 @@ public class SMPLController : BaseController, ITickerUpdate
         }
         
         avatarAnimator = avatarModel.GetComponent<Animator>();
+        
+        //停止运动
+        StopWalking();
+        SwitchToTalkMode();
     }
 
-    // Update is called once per frame
+    // Tick is called once per frame
     public void Tick()
     {
         //destination.transform.position = despositions[dropDown.options[dropDown.value].text];
@@ -279,10 +282,12 @@ public class SMPLController : BaseController, ITickerUpdate
     {
         InitilizeObjectWithTag();
 
+        StopWalking();
+        SwitchToTalkMode();
+        
         avatarModel.transform.position = initPos;
         destination.transform.position = initPos;
-
-        SwitchToTalkMode();
+        
         LookAtMe();
     }
 
@@ -314,28 +319,39 @@ public class SMPLController : BaseController, ITickerUpdate
 
     private void SwitchToTalkMode(bool lookAtInSmooth = false) // 切换到talk模式
     {
-        //StopWalking();
         isWalking = false;
         //LookAtMe(lookAtInSmooth);
     }
 
+    /// <summary>
+    /// 虚拟人走路动画停止，RichAI停止移动
+    /// </summary>
     private void StopWalking()
     {
         avatarAnimator?.SetFloat("Speed", 0);
         if (avatarModel)
         {
             var richAI = avatarModel.GetComponent<RichAI>();
-            if (richAI) richAI.canMove = false;
+            if (richAI)
+            {
+                richAI.enabled = false;
+            }
         }
     }
 
+    /// <summary>
+    /// 虚拟人走路动画停止，RichAI开始移动
+    /// </summary>
     private void StartWalking(float speed)
     {
         avatarAnimator?.SetFloat("Speed", speed);
         if (avatarModel)
         {
             var richAI = avatarModel.GetComponent<RichAI>();
-            if (richAI) richAI.canMove = true;
+            if (richAI)
+            {
+                richAI.enabled = true;
+            }
         }
     }
 

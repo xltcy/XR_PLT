@@ -147,7 +147,7 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         {
             ControllerRefer.SMPLController.SetVisible(true);
             ControllerRefer.SMPLController.InitializeSmplPosition();
-            ControllerRefer.SMPLController.SetModelActive(true);
+            ControllerRefer.SMPLController.SetControllerTickActive(true);
             initSMPL = true;
         }
         
