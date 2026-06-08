@@ -15,6 +15,12 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     [BindChild("p_btn_start"), ButtonCallback(nameof(OnBtnStartClick))]
     private Button btnStart;
     
+    [BindChild("p_btn_refresh_link"), ButtonCallback(nameof(OnBtnRefreshLinkClick))]
+    private Button btnRefreshLink;
+    
+    [BindChild("p_inputfield_refresh_link_state")]
+    private TMP_InputField inputFieldRefreshLinkState;
+    
     [BindChild("p_btn_show_model"), ButtonCallback(nameof(OnBtnShowModelClick))]
     private Button btnShowModel;
     
@@ -82,6 +88,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         btnRelocate.SetVisible(index == 1);
         btnSummonModel.SetVisible(index == 2);
         btnRelocate.SetVisible(index == 1);
+
+        SetRefreshLinkState();
     }
 
     private void SetModelBtnGroup(bool modelVisible)
@@ -102,6 +110,20 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
             return avatarNames[index];
         }
         return avatarNames[0];
+    }
+    
+    private void SetRefreshLinkState()
+    {
+        string text = "未连接 PPT 控制端，请先在电脑上启动脚本，再点击刷新按钮";
+        if (ControllerRefer.PptRemoteController.IsConnected())
+        {
+            text = ControllerRefer.PptRemoteController.GetConnectionDescription();
+        }
+
+        if (inputFieldRefreshLinkState)
+        {
+            inputFieldRefreshLinkState.text = text;
+        }
     }
     
     #region callback
@@ -169,6 +191,12 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         }
 
         CloseSelf();
+    }
+
+    private void OnBtnRefreshLinkClick()
+    {
+        ControllerRefer.PptRemoteController.RefreshConnection();
+        SetRefreshLinkState();
     }
 
     private void OnBtnShowModelClick()

@@ -33,6 +33,13 @@ public class PptRemoteDiscoveryMessage
     public long timestamp;
 }
 
+public enum PptRemoteConnectionState
+{
+    Disconnected,
+    Searching,
+    Connected
+}
+
 public class PptRemoteController : BaseController, ITickerUpdate
 {
     private const string DiscoveryServiceName = "XR_PLT_PPT_REMOTE";
@@ -44,12 +51,15 @@ public class PptRemoteController : BaseController, ITickerUpdate
     [Header("Discovery")]
     [SerializeField] private bool enableDiscovery = true;
     [SerializeField] private int discoveryPort = 3415;
+    [SerializeField] private float connectionTimeoutSeconds = 5f;
 
     private UdpClient udpClient;
     private UdpClient discoveryClient;
     private IPEndPoint remoteEndPoint;
     private readonly object discoveryLock = new object();
     private IPEndPoint pendingDiscoveredEndPoint;
+    private DateTime lastDiscoveryTimeUtc = DateTime.MinValue;
+    private bool isSearching;
 
     public override void OnRegister()
     {
@@ -94,7 +104,52 @@ public class PptRemoteController : BaseController, ITickerUpdate
         if (discoveredEndPoint != null)
         {
             SetRemoteEndPoint(discoveredEndPoint.Address.ToString(), discoveredEndPoint.Port, true);
+            lastDiscoveryTimeUtc = DateTime.UtcNow;
+            isSearching = false;
         }
+    }
+
+    public void RefreshConnection()
+    {
+        lastDiscoveryTimeUtc = DateTime.MinValue;
+        isSearching = true;
+
+        if (enableDiscovery && discoveryClient == null)
+        {
+            StartDiscovery();
+        }
+
+        Debug.Log($"[PptRemoteController] Refresh PPT connection. State: {GetConnectionState()}, target: {GetConnectionDescription()}");
+    }
+
+    public PptRemoteConnectionState GetConnectionState()
+    {
+        if (!enableDiscovery)
+        {
+            return remoteEndPoint != null ? PptRemoteConnectionState.Connected : PptRemoteConnectionState.Disconnected;
+        }
+
+        if (lastDiscoveryTimeUtc != DateTime.MinValue)
+        {
+            double elapsedSeconds = (DateTime.UtcNow - lastDiscoveryTimeUtc).TotalSeconds;
+            if (elapsedSeconds <= connectionTimeoutSeconds)
+            {
+                return PptRemoteConnectionState.Connected;
+            }
+        }
+
+        return isSearching ? PptRemoteConnectionState.Searching : PptRemoteConnectionState.Disconnected;
+    }
+
+    public bool IsConnected()
+    {
+        return GetConnectionState() == PptRemoteConnectionState.Connected;
+    }
+
+    public string GetConnectionDescription()
+    {
+        string endpoint = remoteEndPoint != null ? $"{remoteEndPoint.Address}:{remoteEndPoint.Port}" : "none";
+        return $"{GetConnectionState()} ({endpoint})";
     }
 
     public void SendNext()
@@ -140,6 +195,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
         {
             discoveryClient = new UdpClient(discoveryPort);
             discoveryClient.BeginReceive(OnDiscoveryReceived, null);
+            isSearching = true;
             Debug.Log($"[PptRemoteController] Listening for PPT receiver discovery on UDP port {discoveryPort}.");
         }
         catch (Exception e)

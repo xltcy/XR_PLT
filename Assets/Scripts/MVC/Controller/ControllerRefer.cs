@@ -1,6 +1,6 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2026-01-22 19:38:47
+// 生成时间: 2026-06-08 19:55:19
 // 包含 19 个继承 BaseController 的类
 // =====================================================
 
@@ -72,6 +72,15 @@ public static class ControllerRefer
         get
         {
             return _moveController ??= ControllerRegister.Instance?.GetController<MoveController>();
+        }
+    }
+
+    private static PptRemoteController _pptRemoteController;
+    public static PptRemoteController PptRemoteController
+    {
+        get
+        {
+            return _pptRemoteController ??= ControllerRegister.Instance?.GetController<PptRemoteController>();
         }
     }
 
@@ -212,6 +221,8 @@ public static class ControllerRefer
                 return MeshController;
             case "MoveController":
                 return MoveController;
+            case "PptRemoteController":
+                return PptRemoteController;
             case "RelocateController":
                 return RelocateController;
             case "RotateController":
@@ -252,6 +263,7 @@ public static class ControllerRefer
         _materialController = null;
         _meshController = null;
         _moveController = null;
+        _pptRemoteController = null;
         _relocateController = null;
         _rotateController = null;
         _sceneController = null;
