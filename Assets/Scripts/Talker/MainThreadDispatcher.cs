@@ -40,10 +40,24 @@ public class MainThreadDispatcher : MonoBehaviour
     public static void InvokeOnMainThread(Action action)
     {
         if (action is null) throw new ArgumentNullException(nameof(action));
-        lock (Instance.queue)
+        var dispatcher = Instance;
+        if (dispatcher == null)
         {
-            Instance.queue.Enqueue(action);
-            Instance.queued = true;
+            return;
+        }
+
+        lock (dispatcher.queue)
+        {
+            dispatcher.queue.Enqueue(action);
+            dispatcher.queued = true;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 }

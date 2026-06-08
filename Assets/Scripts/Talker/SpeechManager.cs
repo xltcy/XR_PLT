@@ -20,7 +20,8 @@ public class SpeechManager : BaseController
     private AudioClip recordingClip = null;
     private AudioSource _audioSource;
     internal static SpeechManager Instance = null;
-    private SpeechSynthesizer synthesizer = new SpeechSynthesizer(AzureAuth.SpeechConfig);
+    private SpeechSynthesizer synthesizer;
+    private bool isShuttingDown;
     private int testCnt = 0;
 
     //Is virHuman speaking
@@ -38,12 +39,15 @@ public class SpeechManager : BaseController
 
     public override void OnUnregister()
     {
+        ShutdownSpeechSynthesizer();
         base.OnUnregister();
     }
 
     void Init()
     {
+        isShuttingDown = false;
         Instance = this;
+        InitSpeechSynthesizer();
         _audioSource = GetComponent<AudioSource>();
         if (Microphone.devices.IsEmpty())
         {
@@ -56,6 +60,16 @@ public class SpeechManager : BaseController
             Debug.Log($"[SR] Using device: {microphone}.", gameObject);
             _microphone = microphone;
         }
+    }
+
+    private void InitSpeechSynthesizer()
+    {
+        if (synthesizer != null)
+        {
+            return;
+        }
+
+        synthesizer = new SpeechSynthesizer(AzureAuth.SpeechConfig);
         synthesizer.SynthesisStarted += (self, args) =>
         {
             Debug.Log("text SynthesisStarted: Synthesis completed: {args.Result.Reason}");
@@ -81,9 +95,55 @@ public class SpeechManager : BaseController
             // 必须在主线程设置 BlendShape（Unity 限制）
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
-                speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
+                if (!isShuttingDown && speech2BlendshapeController != null)
+                {
+                    speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
+                }
             });
         };
+    }
+
+    private void ShutdownSpeechSynthesizer()
+    {
+        if (isShuttingDown)
+        {
+            return;
+        }
+
+        isShuttingDown = true;
+        isSpeaking = false;
+
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+
+        if (synthesizer == null)
+        {
+            return;
+        }
+
+        try
+        {
+            synthesizer.StopSpeakingAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Message}");
+        }
+
+        try
+        {
+            synthesizer.Dispose();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SpeechManager] Dispose synthesizer failed during shutdown: {e.Message}");
+        }
+        finally
+        {
+            synthesizer = null;
+        }
     }
 
     AudioClip StartRecording()
@@ -164,7 +224,7 @@ public class SpeechManager : BaseController
     public static void SayFromStr(string str, Action onSpeakComplete = null)
     {
         Debug.Log($"Msg in SayFromStr: {str}");
-        if (Instance != null)
+        if (Instance != null && !Instance.isShuttingDown)
         {
             var speakTask = Instance.OnlySpeakText(str, onSpeakComplete);
             Instance.RunTask(speakTask);
@@ -196,8 +256,11 @@ public class SpeechManager : BaseController
         {
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
-                // controller.LongTalk();
-                TextBubble.SetGlobalText(text);
+                if (!isShuttingDown)
+                {
+                    // controller.LongTalk();
+                    TextBubble.SetGlobalText(text);
+                }
             });
         };
         synthesis.SynthesisCompleted += (self, args) =>
@@ -205,16 +268,22 @@ public class SpeechManager : BaseController
             Debug.Log($"[{nameof(SpeakText)}]: Synthesis completed: {args.Result.Reason}", gameObject);
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
-                TextBubble.SetGlobalText(string.Empty);
-                // controller.StopTalk();
+                if (!isShuttingDown)
+                {
+                    TextBubble.SetGlobalText(string.Empty);
+                    // controller.StopTalk();
+                }
             });
         };
         var result = await synthesis.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
         //var result = await synthesis.SpeakTextAsync(text).ConfigureAwait(false);
         MainThreadDispatcher.InvokeOnMainThread(() =>
         {
-            TextBubble.SetGlobalText(string.Empty);
-            // controller.StopTalk();
+            if (!isShuttingDown)
+            {
+                TextBubble.SetGlobalText(string.Empty);
+                // controller.StopTalk();
+            }
         });
         Debug.Log($"Msg: {result.AudioData.Length}");
         // var clip = MakeClip(result.AudioData);
@@ -229,20 +298,51 @@ public class SpeechManager : BaseController
             Debug.Log("Msg: Empty String");
             return;
         }
-        await synthesizer.StopSpeakingAsync();
-        Debug.Log("Msg: " + text + "prepare");
-
-        var result = await synthesizer.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
-        Debug.Log("Msg: " + text + "result" + result.AudioData.Length);
-        if (onSpeakComplete != null)
+        if (isShuttingDown || synthesizer == null)
         {
-            MainThreadDispatcher.InvokeOnMainThread(onSpeakComplete);
+            return;
+        }
+
+        try
+        {
+            await synthesizer.StopSpeakingAsync().ConfigureAwait(false);
+            if (isShuttingDown || synthesizer == null)
+            {
+                return;
+            }
+
+            Debug.Log("Msg: " + text + "prepare");
+            var result = await synthesizer.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
+            if (isShuttingDown)
+            {
+                return;
+            }
+
+            Debug.Log("Msg: " + text + "result" + result.AudioData.Length);
+            if (onSpeakComplete != null)
+            {
+                MainThreadDispatcher.InvokeOnMainThread(onSpeakComplete);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // Unity domain reload or scene unload disposed the synthesizer while speech was running.
+        }
+        catch (Exception e)
+        {
+            if (!isShuttingDown)
+            {
+                Debug.LogError($"[SpeechManager] Speak text failed: {e}");
+            }
         }
     }
 
     public async Task ForceStopSpeak()
     {
-        await synthesizer.StopSpeakingAsync();
+        if (synthesizer != null)
+        {
+            await synthesizer.StopSpeakingAsync().ConfigureAwait(false);
+        }
         //isSpeaking = false;
     }
 
@@ -262,6 +362,11 @@ public class SpeechManager : BaseController
 
     private void OnDestroy()
     {
-        synthesizer?.StopSpeakingAsync();
+        ShutdownSpeechSynthesizer();
+    }
+
+    private void OnApplicationQuit()
+    {
+        ShutdownSpeechSynthesizer();
     }
 }
