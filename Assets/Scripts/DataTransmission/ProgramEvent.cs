@@ -11,6 +11,7 @@ public class ProgramEvent
     {
         HIGHLIGHT_OBJECT,
         GENERATE_WAVE,
+        PPT_CONTROL,
     }
     
     #region jsonConverter
@@ -46,6 +47,9 @@ public class ProgramEvent
                     break;
                 case ProgramEventType.GENERATE_WAVE:
                     programEventParam = new GenerateWaveEventParam();
+                    break;
+                case ProgramEventType.PPT_CONTROL:
+                    programEventParam = new PptControlEventParam();
                     break;
                 //... 添加更多事件类型
                 default:
@@ -85,6 +89,17 @@ public class ProgramEvent
         public override string GetEventConstant()
         {
             return EventConstant.GENERATE_WAVE;
+        }
+    }
+
+    public class PptControlEventParam : ProgramEventParamBase
+    {
+        public string command = "next";
+        public int slideNumber = -1;
+
+        public override string GetEventConstant()
+        {
+            return EventConstant.PPT_CONTROL;
         }
     }
     

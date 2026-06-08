@@ -47,6 +47,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     public override void OnOpen(UIParams uiParams = null)
     {
+        textDataset.text = "开始";
+        dropdownSceneSelect.SetVisible(false);
         dropdownSceneSelect.onValueChanged.AddListener(OnSceneSelectChanged);
         dropdownAvatarSelect.onValueChanged.AddListener(OnAvatarSelectChanged);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
@@ -135,6 +137,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     private void OnBtnStartClick()
     {
+        OnBtnHideModelClick();
+        
         var sceneData = ControllerRefer.SceneController.SceneData;
         if (sceneData == null)
         {
@@ -222,6 +226,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     {
         SetUI(2);
         btnStart.SetVisible(true);
+
+        OnBtnSummonModelClick();
     }
 
     private void OnAvatarSelectChanged(int index)

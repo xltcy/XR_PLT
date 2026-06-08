@@ -16,8 +16,8 @@
         "y": -1.38,
         "z": -3.589
       },
-      "initialIntroduction": "大家好，欢迎来到北京航空航天大学虚拟现实技术与系统全国重点实验室，我是小薇。",
-      "arriveIntroduction": "下面由我为您讲解。",
+      "initialIntroduction": "大家好，欢迎来到北京航空航天大学虚拟现实技术与系统全国重点实验室，我是小薇。下面由我为您讲解。",
+      "arriveIntroduction": "",
       "thumb": "abc",
       "actions": [
         {
@@ -34,12 +34,30 @@
           "introduction": "虚拟现实是未来物理世界与虚拟世界贯通的核心技术和新一代沉浸式人机交互环境，日益成为各行业升级换代发展的支撑平台、虚实融合新型社会形态演进和数字经济发展的强大引擎。发展虚拟现实，使其在我国率先实现从3I虚拟现实（1.0）到6I虚拟现实（2.0）的跨越，从而引领虚拟现实和混合增强智能发展与应用，已确立为国家科技发展的重要战略目标和数字经济重点产业。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 2,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 1,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 3,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 1,
-            "delay": 2
+            "afterActionId": 2,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -47,12 +65,30 @@
           "introduction": "实验室创立于1994年，是国内最早开展VR/AR技术研究和应用的单位之一，2000成为教育部重点实验室，2007年获批建设国家重点实验室，2016年获批建设虚拟现实增强现实国家工程实验室，2022年完成优化重组，成为首批全国重点实验室建设单位，也是目前国内虚拟现实领域唯一的国家级实验室。同时也是教育部2019年首次设立虚拟现实本科专业以来，985高校中唯一获批虚拟现实本科专业的院校。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 4,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 3,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 5,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 3,
-            "delay": 2
+            "afterActionId": 4,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -60,12 +96,30 @@
           "introduction": "30多年来，实验室历经创始人赵沁平院士、上一任主任胡事民院士，现任主任吕卫锋教授的接续指导和薪火相传，始终锚定国家需求，坚持目标导向，开展理论研究、技术突破、系统研制和应用示范，形成了学科交叉、军民两用、理论研究与系统研发并重的优势特色，已成为我国VR技术创新的战略科技力量和高层次人才培养的重要基地。赵沁平院士指出，互联网3.0为实现人类在物理世界与数字世界共享生存并自由穿梭的开辟了希望之路，并对虚拟现实技术提出了一系列新的创新需求，从而推动虚拟现实进入2.0阶段。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 6,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 5,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 7,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 5,
-            "delay": 2
+            "afterActionId": 6,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -73,12 +127,30 @@
           "introduction": "30多年来，实验室建立起一支以院士、各类人才计划获得者、资深教授为主的学术带头人队伍，固定研究人员近120人，来自北航10个学院，涵盖理工医艺4个学科门类、空天信医艺理9个一级学科，具有国家级人才称号的老师占比超过四分之一。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 8,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 7,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 9,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 7,
-            "delay": 2
+            "afterActionId": 8,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -86,12 +158,30 @@
           "introduction": "作为国内虚拟现实基础研究的开拓者，实验室立足领域科技前沿，始终将原创性理论创新作为核心使命，构建了以“场景智能建模、自然人机交互、虚实空间贯通”为核心的基础理论研究矩阵。通过设立三个前沿研究室，在人体复杂生理结构的数学建模、虚拟人机体生化属性的感知机理、以及数字孪生生成式网络底层架构等领域取得了实质性理论突破，多项标志性成果发表于Nature、IEEE TPAMI、NeurIPS等国际顶尖期刊会议，系统性地提升了我国在虚拟现实基础科学研究领域的国际话语权。其中，赵沁平院士2009年发表的《虚拟现实综述》一文，始终位列中国知网“虚拟现实”主题引用率最高榜榜首。同时，实验室获批的虚拟现实领域授权专利也始终位列国内科研机构前三。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 10,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 9,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 11,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 9,
-            "delay": 2
+            "afterActionId": 10,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -99,12 +189,30 @@
           "introduction": "北航以“空天报国”使命为引领，构建“大平台、大团队、大项目、大贡献”（“四大模式”）体系化创新机制，持续强化有组织的科研，全面提升科技创新能力，重大科技成果持续涌现。在学校的指引下，实验室研究团队在国防建设、健康医疗、工业生产、装备制造等领域陆续产出了国家科技进步一等奖、二等奖，技术发明二等奖等成果，为国家重大战略需求做出了贡献。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 12,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 11,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 13,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 11,
-            "delay": 2
+            "afterActionId": 12,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -112,12 +220,30 @@
           "introduction": "实验室始终把服务国家作为最高追求，积极承担国家重大任务，早在2002年，实验室研究团队就加入了张艺谋导演领衔的北京奥运会开闭幕式创作团队，在鸟巢还未建成的情况下，把自主研发的三维图形技术应用在开闭幕式流程预演和创意仿真中，并在2008年8月8日开幕式直播过程中实时支持了导演团队的现场决策和指挥，之后团队又参加了2022年北京冬奥会科技冬奥项目，建立了一套交互式多维度观赛体验系统，服务赛事转播和观众观赛。2009年和2015年，实验室研究团队和北京军区合作，将虚拟现实技术首次应用于国庆阅兵，并向国家最高领导人汇报。2014年，在南京举行的首次国家公祭日重大活动中，实验室研究团队协助南京市公安局打造了针对国家公祭日活动期间的三维视频融合监控系统，充分实现了信息化综合功能，保障了国家公祭日当天现场的安保信息化工作，为领导人出行重大安保活动提供了智能化的解决方案。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 14,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 13,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 15,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 13,
-            "delay": 2
+            "afterActionId": 14,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -125,12 +251,30 @@
           "introduction": "虚拟现实在航空领域的典型应用是飞行模拟器，大型飞机高等级飞行模拟机系统一直以来被国外垄断，严重影响了我国飞行培训行业的发展以及型号保障能力的提高。早在2001年，实验室研究团队就与中国商飞合作，参与了国产中型客机ARJ21的飞机驾驶舱、仪表盘和座椅等的研发、设计和仿真工作，也就是现在的C909飞机。经过20多年的努力和钻研，2023年，实验室产学研孵化的北京东方瑞丰航空技术有限公司研制的B737-800W飞行模拟机获得中国民用航空局飞行标准司颁发的D级合格证，这是飞行模拟机认证的最高等级，可以模拟真飞机90%以上的飞行实验。此次交付的B737-800W全动飞行模拟机系统国产化率超过85%。这些具有完全自主知识产权的技术为解决我国大飞机高等级训练模拟机卡脖子问题奠定了雄厚的技术支撑。视频中是2019年北京国际航空展上，C919总设计师吴院士体验的工业版C919高等级飞行模拟机，此模拟机已经产业化落地在郑州，供一线飞行员日常训练使用。实验室现场也有教学版的C919飞行模拟机系统，稍后可以体验。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 16,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 15,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 17,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 15,
-            "delay": 2
+            "afterActionId": 16,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -138,12 +282,30 @@
           "introduction": "虚拟现实在医学领域的研究集中在虚拟人体和虚拟手术技术的研发方面。模拟仿真人体器官及人体，用于医学研究和医学人才培养，一直是科技界和医学界的共同目标，实验室依托计算机、控制、机械、生物医学等多个一级学科科研力量，进行了个性化血管介入手术、多功能口腔手术、腹腔镜手术等视觉与力觉一致的系列手术模拟器研发，成果被列为国家转化医学重大科技基础设施的五个单元之一，入列国家口腔手术测评专用设备开展规模化应用，并在70余家医疗机构和医学院校应用，取得满意的效果，打破了国外产品的市场垄断，推动了我国手术医疗领域的技术进步。实验室现场也有各科室的手术模拟器，稍后可以体验。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 18,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 17,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 19,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 17,
-            "delay": 2
+            "afterActionId": 18,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -151,12 +313,30 @@
           "introduction": "虚拟现实在工业制造和智慧城市等领域的典型应用是数字孪生技术，数字孪生是通过数字化手段构建与物理对象一致的数字系统并实现虚实实时交互的技术，实验室研究团队研发的国内外首个数字孪生工业软件平台makeTwin以及实景增强的开放场景数字孪生技术，在智慧城市、智慧交通、公共安全、工业生产等领域以及港口、车站、机场、核电站、水电站等场景得到了广泛推广和应用。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 20,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 19,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 21,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 19,
-            "delay": 2
+            "afterActionId": 20,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -164,12 +344,30 @@
           "introduction": "实验室作为985高校中唯一的虚拟现实本科专业教学承担单位和教育部虚拟仿真实验教学项目建设单位，通过牵头组建联盟、编制规范和团体标准，举办研讨会，设置开放课题等方式积极支持国内虚拟现实和仿真实验室教学工作。探讨多样化的虚拟现实技术本科人才培养模式，推动中国虚拟现实技术专业人才的可持续发展。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 22,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 21,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 23,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 21,
-            "delay": 2
+            "afterActionId": 22,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -177,12 +375,30 @@
           "introduction": "实验室成立30多年来，培养了一批又一批的虚拟现实创新创业人才，近十年，培养VR专业博士、硕士研究生1400余名，校级以上优博优硕100余名，成为国内规模大质量高的高端VR人才科教协同培养基地。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 24,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 23,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 25,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 23,
-            "delay": 2
+            "afterActionId": 24,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -190,12 +406,30 @@
           "introduction": "实验室在30多年的建设与发展中，始终引领我国虚拟现实基础理论、关键技术与系统创新的前沿。面向“十五五”时期，实验室将坚持服务国家重大战略需求，紧密围绕虚拟现实、人工智能与具身智能的深度融合，开展前瞻性、战略性、原创性研究。重点突破沉浸式交互、智能体认知、虚实协同计算等核心方向，构建支撑国家工业制造、航空航天、国防安全等重大领域的关键技术体系与应用示范平台。"
         },
         {
+          "type": "ProgramEvent",
+          "id": 26,
+          "startTrigger": {
+            "mode": "AfterAction",
+            "afterActionId": 25,
+            "isWhenActionStart": false,
+            "delay": 1
+          },
+          "stopTrigger": {
+            "mode": "Never"
+          },
+          "eventData": {
+            "type": "PPT_CONTROL",
+            "command": "next"
+          }
+        },
+        {
           "type": "Introduce",
           "id": 27,
           "startTrigger": {
             "mode": "AfterAction",
-            "afterActionId": 25,
-            "delay": 2
+            "afterActionId": 26,
+            "isWhenActionStart": false,
+            "delay": 1
           },
           "stopTrigger": {
             "mode": "Never"
@@ -214,6 +448,6 @@
       "isExplosible": false
     }
   ],
-  "systemPrompt": "你是一个专业的博物馆导览员，负责向游客介绍展品，现在展品有声呐和太空站。你的角色特点：1. 专业且友好，2. 使用简洁清晰的语言，3. 能够引导游客参与互动。请根据游客的输入，给出合适的回应。",
-  "questPrompt": "现在你们正位于工训楼，用户提问的问题是{0}，请以一个精通声呐知识的专家身份回答，每次回答尽量不要超过五十字。"
+  "systemPrompt": "你是一个专业的北航虚拟现实实验室主持人讲解员，负责向各位领导老师同学们介绍实验室。你的角色特点：1. 专业且友好，2. 使用简洁清晰的语言，3. 能够引导参观者参与互动。请根据参观者的输入，给出合适的回应。",
+  "questPrompt": "现在你们正位于工训楼，用户提问的问题是{0}，请以一个专业的虚拟现实专家以及讲解员身份回答，每次回答尽量不要超过五十字。"
 }

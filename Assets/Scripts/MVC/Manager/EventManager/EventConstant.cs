@@ -8,4 +8,5 @@ public class EventConstant
     public static string COMPLETE_RELOCATE_SCENE = "COMPLETE_RELOCATE_SCENE";
     public static string COMPLETE_RELOCATE_SONAR = "COMPLETE_RELOCATE_SONAR";
     public static string VOICE_RECOGNITION_END = "VOICE_RECOGNITION_END";
+    public static string PPT_CONTROL = "PPT_CONTROL";
 }

@@ -46,7 +46,7 @@ public class SMPLController : BaseController, ITickerUpdate
 
     // The diastance whether virtualHuman wallking
     private float minDistance = 0.1f;
-    private float maxDistance = 15.0f;
+    private float maxDistance = 36.0f; // TODO 原15f，工训楼介绍临时修改为36
 
     public override void OnRegister()
     {
