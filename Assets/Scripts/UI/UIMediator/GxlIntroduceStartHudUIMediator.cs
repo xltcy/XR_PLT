@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -195,8 +196,36 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     private void OnBtnRefreshLinkClick()
     {
-        ControllerRefer.PptRemoteController.RefreshConnection();
+        string host = GetInputIPv4Address();
+        if (string.IsNullOrEmpty(host))
+        {
+            ControllerRefer.PptRemoteController.RefreshConnection();
+        }
+        else
+        {
+            ControllerRefer.PptRemoteController.RefreshConnection(host);
+        }
+
         SetRefreshLinkState();
+    }
+
+    private string GetInputIPv4Address()
+    {
+        if (!inputFieldRefreshLinkState) return null;
+
+        string text = inputFieldRefreshLinkState.text;
+        if (string.IsNullOrWhiteSpace(text)) return null;
+
+        string[] parts = text.Split(new[] { ' ', '\t', '\r', '\n', '(', ')', ':', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (string part in parts)
+        {
+            if (IPAddress.TryParse(part, out IPAddress address) && address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                return address.ToString();
+            }
+        }
+
+        return null;
     }
 
     private void OnBtnShowModelClick()

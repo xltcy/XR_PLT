@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using TickSystem;
@@ -22,6 +23,8 @@ public class PptRemoteMessage
     public string command = "next";
     public int slideNumber = -1;
     public long timestamp;
+    public string service;
+    public int replyPort = -1;
 }
 
 [Serializable]
@@ -52,6 +55,10 @@ public class PptRemoteController : BaseController, ITickerUpdate
     [SerializeField] private bool enableDiscovery = true;
     [SerializeField] private int discoveryPort = 3415;
     [SerializeField] private float connectionTimeoutSeconds = 5f;
+
+    private static readonly bool EnableSubnetDiscovery = true;
+    private const int SubnetDiscoveryStart = 1;
+    private const int SubnetDiscoveryEnd = 254;
 
     private UdpClient udpClient;
     private UdpClient discoveryClient;
@@ -119,7 +126,22 @@ public class PptRemoteController : BaseController, ITickerUpdate
             StartDiscovery();
         }
 
+        SendDiscoveryProbe();
         Debug.Log($"[PptRemoteController] Refresh PPT connection. State: {GetConnectionState()}, target: {GetConnectionDescription()}");
+    }
+
+    public void RefreshConnection(string host)
+    {
+        ConfigureRemoteHost(host);
+        RefreshConnection();
+    }
+
+    public void ConfigureRemoteHost(string host, int port = -1)
+    {
+        if (string.IsNullOrWhiteSpace(host)) return;
+
+        int targetPort = port > 0 ? port : windowsPort;
+        SetRemoteEndPoint(host.Trim(), targetPort, false);
     }
 
     public PptRemoteConnectionState GetConnectionState()
@@ -204,6 +226,176 @@ public class PptRemoteController : BaseController, ITickerUpdate
         }
     }
 
+    private void SendDiscoveryProbe()
+    {
+        if (udpClient == null) return;
+
+        var message = new PptRemoteMessage
+        {
+            service = DiscoveryServiceName,
+            command = "discover",
+            replyPort = discoveryPort,
+            timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+        };
+
+        string json = JsonUtility.ToJson(message);
+        byte[] bytes = Encoding.UTF8.GetBytes(json);
+
+        try
+        {
+            udpClient.EnableBroadcast = true;
+            udpClient.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Broadcast, windowsPort));
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PptRemoteController] Broadcast discovery probe failed: {e.Message}");
+        }
+
+        if (remoteEndPoint != null)
+        {
+            try
+            {
+                udpClient.Send(bytes, bytes.Length, remoteEndPoint);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[PptRemoteController] Direct discovery probe failed: {e.Message}");
+            }
+        }
+
+        foreach (IPAddress broadcastAddress in GetLocalBroadcastAddresses())
+        {
+            try
+            {
+                udpClient.Send(bytes, bytes.Length, new IPEndPoint(broadcastAddress, windowsPort));
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[PptRemoteController] Local broadcast discovery probe failed ({broadcastAddress}): {e.Message}");
+            }
+        }
+
+        if (!EnableSubnetDiscovery) return;
+
+        foreach (string prefix in GetLocalSubnetPrefixes())
+        {
+            int start = Mathf.Clamp(SubnetDiscoveryStart, 1, 254);
+            int end = Mathf.Clamp(SubnetDiscoveryEnd, start, 254);
+            for (int i = start; i <= end; i++)
+            {
+                try
+                {
+                    udpClient.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse($"{prefix}.{i}"), windowsPort));
+                }
+                catch
+                {
+                    // Ignore unreachable or unsupported addresses during a manual scan.
+                }
+            }
+        }
+    }
+
+    private static IPAddress[] GetLocalBroadcastAddresses()
+    {
+        try
+        {
+            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+            var addresses = new System.Collections.Generic.List<IPAddress>();
+
+            foreach (NetworkInterface networkInterface in interfaces)
+            {
+                if (networkInterface.OperationalStatus != OperationalStatus.Up)
+                {
+                    continue;
+                }
+
+                IPInterfaceProperties properties = networkInterface.GetIPProperties();
+                foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
+                {
+                    IPAddress address = unicastAddress.Address;
+                    IPAddress mask = unicastAddress.IPv4Mask;
+                    if (address.AddressFamily != AddressFamily.InterNetwork || mask == null || IsIgnoredLocalAddress(address))
+                    {
+                        continue;
+                    }
+
+                    byte[] ipBytes = address.GetAddressBytes();
+                    byte[] maskBytes = mask.GetAddressBytes();
+                    byte[] broadcastBytes = new byte[ipBytes.Length];
+                    for (int i = 0; i < ipBytes.Length; i++)
+                    {
+                        broadcastBytes[i] = (byte)(ipBytes[i] | ~maskBytes[i]);
+                    }
+
+                    IPAddress broadcastAddress = new IPAddress(broadcastBytes);
+                    if (!addresses.Contains(broadcastAddress))
+                    {
+                        addresses.Add(broadcastAddress);
+                    }
+                }
+            }
+
+            return addresses.ToArray();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PptRemoteController] Failed to get local broadcast addresses: {e.Message}");
+            return Array.Empty<IPAddress>();
+        }
+    }
+
+    private static string[] GetLocalSubnetPrefixes()
+    {
+        try
+        {
+            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
+            var prefixes = new System.Collections.Generic.List<string>();
+
+            foreach (NetworkInterface networkInterface in interfaces)
+            {
+                if (networkInterface.OperationalStatus != OperationalStatus.Up)
+                {
+                    continue;
+                }
+
+                IPInterfaceProperties properties = networkInterface.GetIPProperties();
+                foreach (UnicastIPAddressInformation unicastAddress in properties.UnicastAddresses)
+                {
+                    IPAddress address = unicastAddress.Address;
+                    if (address.AddressFamily != AddressFamily.InterNetwork || IsIgnoredLocalAddress(address))
+                    {
+                        continue;
+                    }
+
+                    string[] parts = address.ToString().Split('.');
+                    if (parts.Length != 4)
+                    {
+                        continue;
+                    }
+
+                    string prefix = $"{parts[0]}.{parts[1]}.{parts[2]}";
+                    if (!prefixes.Contains(prefix))
+                    {
+                        prefixes.Add(prefix);
+                    }
+                }
+            }
+
+            return prefixes.ToArray();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[PptRemoteController] Failed to get local subnet prefixes: {e.Message}");
+            return Array.Empty<string>();
+        }
+    }
+
+    private static bool IsIgnoredLocalAddress(IPAddress address)
+    {
+        string text = address.ToString();
+        return IPAddress.IsLoopback(address) || text.StartsWith("169.254.", StringComparison.Ordinal);
+    }
+
     private void OnDiscoveryReceived(IAsyncResult result)
     {
         if (discoveryClient == null) return;
@@ -274,6 +466,11 @@ public class PptRemoteController : BaseController, ITickerUpdate
         if (eventData == null) return;
 
         var programEventData = eventData.GetData<SceneController.ProgramEventData>();
+        if (programEventData != null && !programEventData.isStartAction)
+        {
+            return;
+        }
+
         var pptParam = programEventData?.actionData?.eventData as ProgramEvent.PptControlEventParam;
         if (pptParam != null)
         {

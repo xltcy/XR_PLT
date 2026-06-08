@@ -3,7 +3,7 @@ param(
     [int]$DiscoveryPort = 3415,
     [int]$BeaconIntervalSeconds = 1,
     [string]$DiscoveryTarget = "255.255.255.255",
-    [int]$StatusIntervalSeconds = 5,
+    [int]$StatusIntervalSeconds = 1,
     [ValidateSet("Auto", "PowerPoint", "WPS", "SendKeys")]
     [string]$ControlMode = "Auto"
 )
@@ -37,6 +37,7 @@ $lastCommand = $null
 $lastCommandTime = $null
 $commandCount = 0
 $beaconCount = 0
+$probeCount = 0
 $autoHotkeyExe = $null
 $lastStatusTextLength = 0
 $automationNotice = ""
@@ -79,7 +80,8 @@ function Write-ServerStatus {
     [Console]::WriteLine("$(U 0x672C,0x673A): $localIpText")
     [Console]::WriteLine("$(U 0x63A7,0x5236)$([char]0x7AEF)$([char]0x53E3): $Port    $(U 0x53D1,0x73B0): $DiscoveryTarget`:$DiscoveryPort")
     [Console]::WriteLine("$(U 0x6A21,0x5F0F): $ControlMode    $(U 0x65B9,0x5F0F): $automation")
-    [Console]::WriteLine("$(U 0x5E7F,0x64AD): $beaconCount    $(U 0x6307,0x4EE4): $commandCount    $(U 0x6700,0x540E): $lastCommandText")
+    [Console]::WriteLine("$(U 0x5E7F,0x64AD): $beaconCount    $(U 0x63A2,0x6D4B): $probeCount    $(U 0x6307,0x4EE4): $commandCount")
+    [Console]::WriteLine("$(U 0x6700,0x540E): $lastCommandText")
     if (-not [string]::IsNullOrEmpty($automationNotice)) {
         [Console]::WriteLine("$(U 0x63D0,0x793A): $automationNotice")
     }
@@ -126,6 +128,8 @@ function Initialize-AutomationTool {
 }
 
 function Send-DiscoveryBeacon {
+    param([System.Net.IPEndPoint]$TargetEndPoint = $null)
+
     $message = @{
         service = "XR_PLT_PPT_REMOTE"
         port = $Port
@@ -134,7 +138,8 @@ function Send-DiscoveryBeacon {
     } | ConvertTo-Json -Compress
 
     $bytes = [Text.Encoding]::UTF8.GetBytes($message)
-    [void]$beaconUdp.Send($bytes, $bytes.Length, $beaconEndPoint)
+    $target = if ($TargetEndPoint) { $TargetEndPoint } else { $beaconEndPoint }
+    [void]$beaconUdp.Send($bytes, $bytes.Length, $target)
     $script:beaconCount++
 }
 
@@ -306,6 +311,16 @@ while ($true) {
         $message = $json | ConvertFrom-Json
 
         $command = if ($message.command) { [string]$message.command } else { "next" }
+        if ($message.service -eq "XR_PLT_PPT_REMOTE" -and $command.ToLowerInvariant() -eq "discover") {
+            $replyPort = if ($message.replyPort) { [int]$message.replyPort } else { $DiscoveryPort }
+            $replyEndPoint = [System.Net.IPEndPoint]::new($remote.Address, $replyPort)
+            $lastClientAddress = $remote.Address.ToString()
+            $script:probeCount++
+            Send-DiscoveryBeacon -TargetEndPoint $replyEndPoint
+            Write-ServerStatus
+            continue
+        }
+
         $slideNumber = if ($message.slideNumber) { [int]$message.slideNumber } else { -1 }
         $lastClientAddress = $remote.Address.ToString()
         $lastCommand = "$command $slideNumber"
