@@ -142,15 +142,14 @@ public class SMPLController : BaseController, ITickerUpdate
             }
 
             // 设置语音驱动头部
-            var head = avatarModel.transform.FindDeep("avaturn_body");
+            var head = avatarModel.transform.FindDeep("Head_Mesh");
             if (!head)
             {
                 head = avatarModel.transform.FindDeep("AvatarHead");
-            }
-            
-            if (ControllerRefer.SpeechManager.speech2BlendshapeController != null)
-            {
-                ControllerRefer.SpeechManager.speech2BlendshapeController.SetGuideHead(head.gameObject);
+                if (ControllerRefer.SpeechManager.speech2BlendshapeController != null)
+                {
+                    ControllerRefer.SpeechManager.speech2BlendshapeController.SetGuideHead(head.gameObject);
+                }
             }
         }
         

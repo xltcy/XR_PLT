@@ -494,7 +494,7 @@ public class EventManager : BaseManager
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[EventManager] 事件处理异常: {eventName}, 错误: {e.Message}");
+                    Debug.LogError($"[EventManager] 事件处理异常: {eventName}, 错误: {e.Message}, 堆栈：{e.StackTrace}");
                 }
             }
         }
