@@ -162,6 +162,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     {
         OnBtnHideModelClick();
         
+        btnRefreshLink.SetVisible(false);
+        
         var sceneData = ControllerRefer.SceneController.SceneData;
         if (sceneData == null)
         {

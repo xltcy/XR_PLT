@@ -76,12 +76,23 @@ public class Speech2BlendshapeController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        smr = guideHead.GetComponent<SkinnedMeshRenderer>();
+        SetGuideHead(guideHead);
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    public void SetGuideHead(GameObject head)
+    {
+        if (!head)
+        {
+            return;
+        }
+        
+        guideHead = head;
+        smr = guideHead.GetComponent<SkinnedMeshRenderer>();
     }
 }

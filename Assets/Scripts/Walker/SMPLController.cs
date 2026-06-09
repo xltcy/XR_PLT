@@ -131,13 +131,26 @@ public class SMPLController : BaseController, ITickerUpdate
         avatarModel = ManagerRefer.GameObjectPoolManager.Instantiate($"Prefab/Avatar/{avatarModelName}", avatarRoot);
         
         
-        // 设置寻路目标
         if (avatarModel)
         {
+            // 设置寻路目标
+
             var aiDestinationSetter = avatarModel.transform.GetComponent<AIDestinationSetter>();
             if (aiDestinationSetter)
             {
                 aiDestinationSetter.target = destination.transform;
+            }
+
+            // 设置语音驱动头部
+            var head = avatarModel.transform.FindDeep("avaturn_body");
+            if (!head)
+            {
+                head = avatarModel.transform.FindDeep("AvatarHead");
+            }
+            
+            if (ControllerRefer.SpeechManager.speech2BlendshapeController != null)
+            {
+                ControllerRefer.SpeechManager.speech2BlendshapeController.SetGuideHead(head.gameObject);
             }
         }
         
