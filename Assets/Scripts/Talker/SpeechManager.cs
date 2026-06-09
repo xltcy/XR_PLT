@@ -16,6 +16,7 @@ public class SpeechManager : BaseController
     private static readonly bool ShouldLoop = true;
     private static readonly int MaxLength = 10;
     private static readonly int Frequency = 44100;
+    private const int StopSpeakingTimeoutMs = 1000;
     string _microphone = null;
     private AudioClip recordingClip = null;
     private AudioSource _audioSource;
@@ -137,14 +138,7 @@ public class SpeechManager : BaseController
             return;
         }
 
-        try
-        {
-            synthesizer.StopSpeakingAsync();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Message}");
-        }
+        StopSynthesizerNow(synthesizer);
 
         try
         {
@@ -157,6 +151,31 @@ public class SpeechManager : BaseController
         finally
         {
             synthesizer = null;
+        }
+    }
+
+    private void StopSynthesizerNow(SpeechSynthesizer target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var stopTask = target.StopSpeakingAsync();
+            if (!stopTask.Wait(StopSpeakingTimeoutMs))
+            {
+                Debug.LogWarning("[SpeechManager] Stop speaking timed out during shutdown.");
+            }
+        }
+        catch (AggregateException e)
+        {
+            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Flatten().InnerException?.Message}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Message}");
         }
     }
 
@@ -357,7 +376,8 @@ public class SpeechManager : BaseController
         {
             await synthesizer.StopSpeakingAsync().ConfigureAwait(false);
         }
-        //isSpeaking = false;
+        isSpeaking = false;
+        MainThreadDispatcher.InvokeOnMainThread(() => TextBubble.SetGlobalText(string.Empty));
     }
 
     private AudioClip MakeClip(byte[] data)
@@ -375,6 +395,11 @@ public class SpeechManager : BaseController
     }
 
     private void OnDestroy()
+    {
+        ShutdownSpeechSynthesizer();
+    }
+
+    private void OnDisable()
     {
         ShutdownSpeechSynthesizer();
     }
