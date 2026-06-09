@@ -103,6 +103,20 @@ public class SpeechManager : BaseController
         };
     }
 
+    public void SetSynthesisVoice(string voiceName)
+    {
+        if (string.IsNullOrEmpty(voiceName) || voiceName == AzureAuth.SpeechSynthesisVoiceName)
+        {
+            return;
+        }
+
+        AzureAuth.SetSpeechSynthesisVoiceName(voiceName);
+        ShutdownSpeechSynthesizer();
+        isShuttingDown = false;
+        Instance = this;
+        InitSpeechSynthesizer();
+    }
+
     private void ShutdownSpeechSynthesizer()
     {
         if (isShuttingDown)

@@ -45,10 +45,22 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     private bool initSMPL = false;
 
     // 虚拟人的prefab名字
-    private List<string> avatarNames = new List<string>
+    private class AvatarConfig
     {
-        "prefab_yz",
-        "prefab_yl"
+        public string PrefabName;
+        public string VoiceName;
+
+        public AvatarConfig(string prefabName, string voiceName)
+        {
+            PrefabName = prefabName;
+            VoiceName = voiceName;
+        }
+    }
+
+    private List<AvatarConfig> avatarNames = new List<AvatarConfig>
+    {
+        new AvatarConfig("prefab_yz", AzureAuth.MaleVoiceName),
+        new AvatarConfig("prefab_yl", AzureAuth.FemaleVoiceName),
     };
     
 
@@ -106,10 +118,16 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     
     private string GetAvatarName(int index)
     {
+        return GetAvatarConfig(index).PrefabName;
+    }
+
+    private AvatarConfig GetAvatarConfig(int index)
+    {
         if (index >= 0 && index < avatarNames.Count)
         {
             return avatarNames[index];
         }
+
         return avatarNames[0];
     }
     
@@ -268,7 +286,7 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         OnSceneSelectChanged(dropdownSceneSelect.value);
         
         dropdownAvatarSelect.ClearOptions();
-        dropdownAvatarSelect.AddOptions(avatarNames);
+        dropdownAvatarSelect.AddOptions(avatarNames.ConvertAll(item => item.PrefabName));
         OnAvatarSelectChanged(dropdownAvatarSelect.value);
     }
 
@@ -291,7 +309,9 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     private void OnAvatarSelectChanged(int index)
     {
-        ControllerRefer.SMPLController.SelectedAvatarName = GetAvatarName(index);
+        AvatarConfig avatarConfig = GetAvatarConfig(index);
+        ControllerRefer.SMPLController.SelectedAvatarName = avatarConfig.PrefabName;
+        ControllerRefer.SpeechManager?.SetSynthesisVoice(avatarConfig.VoiceName);
     }
     #endregion callback
     
