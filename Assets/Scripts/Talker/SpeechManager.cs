@@ -75,16 +75,40 @@ public class SpeechManager : BaseController
         {
             Debug.Log("text SynthesisStarted: Synthesis completed: {args.Result.Reason}");
             isSpeaking = true;
+            // Azure 的 AudioOffset 是相对本次语音开始的时间，需要在语音开始时建立本地时间基准。
+            MainThreadDispatcher.InvokeOnMainThread(() =>
+            {
+                if (!isShuttingDown && speech2BlendshapeController != null)
+                {
+                    speech2BlendshapeController.BeginVisemeSchedule();
+                }
+            });
         };
         synthesizer.SynthesisCompleted += (self, args) =>
         {
             Debug.Log("text SynthesisCompleted: Synthesis completed: " + args.Result.Reason);
             isSpeaking = false;
+            // 语音结束后清空尚未触发的口型，避免残留口型影响下一句。
+            MainThreadDispatcher.InvokeOnMainThread(() =>
+            {
+                if (speech2BlendshapeController != null)
+                {
+                    speech2BlendshapeController.EndVisemeSchedule();
+                }
+            });
         };
         synthesizer.SynthesisCanceled += (self, args) =>
         {
             Debug.Log("text SynthesisCanceled: Synthesis completed: " + args.Result.Reason);
             isSpeaking = false;
+            // 语音被打断时也要清空口型队列，避免旧 viseme 延迟触发。
+            MainThreadDispatcher.InvokeOnMainThread(() =>
+            {
+                if (speech2BlendshapeController != null)
+                {
+                    speech2BlendshapeController.EndVisemeSchedule();
+                }
+            });
         };
 
         synthesizer.VisemeReceived += (sender, e) =>
@@ -93,12 +117,12 @@ public class SpeechManager : BaseController
             Debug.Log($"[Viseme] ID: {e.VisemeId}, Time: {e.AudioOffset / 10000} ms, Animation Length: {e.Animation.Length}");
             string animationJson = e.Animation;
 
-            // 必须在主线程设置 BlendShape（Unity 限制）
+            // 必须回到主线程访问 Unity 对象；具体口型由 AudioOffset 决定触发时机。
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
                 if (!isShuttingDown && speech2BlendshapeController != null)
                 {
-                    speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId);
+                    speech2BlendshapeController.ScheduleViseme(e.VisemeId, e.AudioOffset / 10000000f);
                 }
             });
         };

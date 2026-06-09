@@ -8,15 +8,23 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     public GameObject guideHead;
     [SerializeField] private float openSpeed = 14f;
     [SerializeField] private float closeSpeed = 8f;
-    [SerializeField] private float holdTime = 0.06f;
     [SerializeField] private float blendWeight = 50f;
 
     private SkinnedMeshRenderer smr;
     private readonly Dictionary<string, int> blendShapeIndexCache = new Dictionary<string, int>();
     private readonly HashSet<string> warnedMissingBlendShapes = new HashSet<string>();
+    // Azure viseme 回调可能提前到达，先缓存到队列里，Tick 到对应音频时间再执行。
+    private readonly Queue<ScheduledViseme> scheduledVisemes = new Queue<ScheduledViseme>();
     private int activeBlendShapeIndex = -1;
     private float activeTargetWeight;
-    private float holdTimer;
+    private float speechStartTime;
+    private bool hasSpeechStartTime;
+
+    private struct ScheduledViseme
+    {
+        public uint VisemeId;
+        public float TargetTime;
+    }
 
     private Dictionary<uint, string[]> visemeToBlendShape = new Dictionary<uint, string[]>
     {
@@ -68,14 +76,12 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             return;
         }
 
-        if (holdTimer > 0f)
-        {
-            holdTimer -= Time.deltaTime;
-        }
+        ProcessScheduledVisemes();
 
         for (int i = 0; i < smr.sharedMesh.blendShapeCount; i++)
         {
-            float targetWeight = i == activeBlendShapeIndex && holdTimer > 0f ? activeTargetWeight : 0f;
+            float targetWeight = i == activeBlendShapeIndex ? activeTargetWeight : 0f;
+            // AudioOffset 决定口型节奏；这里的插值只负责视觉过渡，避免 BlendShape 硬切。
             float speed = targetWeight > smr.GetBlendShapeWeight(i) ? openSpeed : closeSpeed;
             float weight = Mathf.Lerp(smr.GetBlendShapeWeight(i), targetWeight, 1f - Mathf.Exp(-speed * Time.deltaTime));
             if (weight < 0.001f)
@@ -108,7 +114,38 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     /// 根据 Azure 返回的 visemeId 设置口型 BlendShape 权重。
     /// 会先清空当前模型所有 BlendShape，再按别名缓存查找目标口型。
     /// </summary>
-    public void SetVisemeBlendShapeWeight(uint visemeId)
+    public void BeginVisemeSchedule()
+    {
+        scheduledVisemes.Clear();
+        // Time.realtimeSinceStartup 不受 timeScale 影响，更适合作为语音播放时间轴。
+        speechStartTime = Time.realtimeSinceStartup;
+        hasSpeechStartTime = true;
+        ClearVisemeTarget();
+    }
+
+    public void EndVisemeSchedule()
+    {
+        scheduledVisemes.Clear();
+        hasSpeechStartTime = false;
+        ClearVisemeTarget();
+    }
+
+    public void ScheduleViseme(uint visemeId, float audioOffsetSeconds)
+    {
+        if (!hasSpeechStartTime)
+        {
+            BeginVisemeSchedule();
+        }
+
+        // audioOffsetSeconds 是 Azure 返回的音频时间偏移，换算成本地绝对触发时间。
+        scheduledVisemes.Enqueue(new ScheduledViseme
+        {
+            VisemeId = visemeId,
+            TargetTime = speechStartTime + audioOffsetSeconds,
+        });
+    }
+
+    private void ApplyViseme(uint visemeId)
     {
         if (!smr || !smr.sharedMesh)
         {
@@ -151,6 +188,7 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             smr.SetBlendShapeWeight(i, 0f);
         }
 
+        scheduledVisemes.Clear();
         ClearVisemeTarget();
     }
 
@@ -254,14 +292,22 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     {
         activeBlendShapeIndex = index;
         activeTargetWeight = GetScaledBlendShapeWeight(index, percent);
-        holdTimer = holdTime;
     }
 
     private void ClearVisemeTarget()
     {
         activeBlendShapeIndex = -1;
         activeTargetWeight = 0f;
-        holdTimer = 0f;
+    }
+
+    private void ProcessScheduledVisemes()
+    {
+        float now = Time.realtimeSinceStartup;
+        // 可能同一帧有多个已到点的 viseme，全部消费到最新口型。
+        while (scheduledVisemes.Count > 0 && scheduledVisemes.Peek().TargetTime <= now)
+        {
+            ApplyViseme(scheduledVisemes.Dequeue().VisemeId);
+        }
     }
 
     private float GetBlendShapeMaxWeight(int index)
