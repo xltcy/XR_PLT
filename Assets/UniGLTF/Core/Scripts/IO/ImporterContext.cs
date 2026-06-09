@@ -805,6 +805,17 @@ namespace UniGLTF
             }
 
             // Create or upate Main Asset
+#if UNITY_2018_3_OR_NEWER
+            if (prefabPath.IsFileExists)
+            {
+                Debug.LogFormat("replace prefab: {0}", prefabPath);
+            }
+            else
+            {
+                Debug.LogFormat("create prefab: {0}", prefabPath);
+            }
+            PrefabUtility.SaveAsPrefabAsset(Root, prefabPath.Value);
+#else
             if (prefabPath.IsFileExists)
             {
                 Debug.LogFormat("replace prefab: {0}", prefabPath);
@@ -816,6 +827,7 @@ namespace UniGLTF
                 Debug.LogFormat("create prefab: {0}", prefabPath);
                 PrefabUtility.CreatePrefab(prefabPath.Value, Root);
             }
+#endif
             foreach (var x in paths)
             {
                 x.ImportAsset();

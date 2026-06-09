@@ -24,6 +24,15 @@ namespace UniGLTF
         }
     }
 
+    [Serializable, StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct UByte4
+    {
+        public byte x;
+        public byte y;
+        public byte z;
+        public byte w;
+    }
+
     public static class glTFExtensions
     {
         struct ComponentVec
@@ -43,6 +52,7 @@ namespace UniGLTF
             { typeof(Vector2), new ComponentVec(glComponentType.FLOAT, 2) },
             { typeof(Vector3), new ComponentVec(glComponentType.FLOAT, 3) },
             { typeof(Vector4), new ComponentVec(glComponentType.FLOAT, 4) },
+            { typeof(UByte4), new ComponentVec(glComponentType.UNSIGNED_BYTE, 4) },
             { typeof(UShort4), new ComponentVec(glComponentType.UNSIGNED_SHORT, 4) },
             { typeof(Matrix4x4), new ComponentVec(glComponentType.FLOAT, 16) },
             { typeof(Color), new ComponentVec(glComponentType.FLOAT, 4) },

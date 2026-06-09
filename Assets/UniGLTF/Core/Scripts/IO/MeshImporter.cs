@@ -11,6 +11,25 @@ namespace UniGLTF
     {
         const float FRAME_WEIGHT = 100.0f;
 
+        static UShort4[] GetJoints(ImporterContext ctx, int accessorIndex)
+        {
+            var accessor = ctx.GLTF.accessors[accessorIndex];
+            switch ((glComponentType)accessor.componentType)
+            {
+                case glComponentType.UNSIGNED_BYTE:
+                    return ctx.GLTF.GetArrayFromAccessor<UByte4>(accessorIndex)
+                        .Select(x => new UShort4(x.x, x.y, x.z, x.w))
+                        .ToArray();
+
+                case glComponentType.UNSIGNED_SHORT:
+                    return ctx.GLTF.GetArrayFromAccessor<UShort4>(accessorIndex);
+
+                default:
+                    throw new NotSupportedException(string.Format(
+                        "JOINTS_0 component type {0} is not supported",
+                        accessor.componentType));
+            }
+        }
 
         // multiple submMesh is not sharing a VertexBuffer.
         // each subMesh use a independent VertexBuffer.
@@ -85,7 +104,7 @@ namespace UniGLTF
                 // skin
                 if (prim.attributes.JOINTS_0 != -1 && prim.attributes.WEIGHTS_0 != -1)
                 {
-                    var joints0 = ctx.GLTF.GetArrayFromAccessor<UShort4>(prim.attributes.JOINTS_0); // uint4
+                    var joints0 = GetJoints(ctx, prim.attributes.JOINTS_0);
                     var weights0 = ctx.GLTF.GetArrayFromAccessor<Float4>(prim.attributes.WEIGHTS_0).Select(x => x.One()).ToArray();
 
                     for (int j = 0; j < joints0.Length; ++j)
@@ -214,7 +233,7 @@ namespace UniGLTF
                 // skin
                 if (prim.attributes.JOINTS_0 != -1 && prim.attributes.WEIGHTS_0 != -1)
                 {
-                    var joints0 = ctx.GLTF.GetArrayFromAccessor<UShort4>(prim.attributes.JOINTS_0); // uint4
+                    var joints0 = GetJoints(ctx, prim.attributes.JOINTS_0);
                     var weights0 = ctx.GLTF.GetArrayFromAccessor<Float4>(prim.attributes.WEIGHTS_0);
                     for (int i = 0; i < weights0.Length; ++i)
                     {
