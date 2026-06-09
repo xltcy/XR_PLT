@@ -97,7 +97,7 @@ public class SpeechManager : BaseController
             {
                 if (!isShuttingDown && speech2BlendshapeController != null)
                 {
-                    speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId, 80f);
+                    speech2BlendshapeController.SetVisemeBlendShapeWeight(e.VisemeId);
                 }
             });
         };

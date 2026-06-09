@@ -1,14 +1,22 @@
 using System.Collections.Generic;
 using System.Text;
+using TickSystem;
 using UnityEngine;
 
-public class Speech2BlendshapeController : MonoBehaviour
+public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 {
     public GameObject guideHead;
+    [SerializeField] private float openSpeed = 14f;
+    [SerializeField] private float closeSpeed = 8f;
+    [SerializeField] private float holdTime = 0.06f;
+    [SerializeField] private float blendWeight = 50f;
 
     private SkinnedMeshRenderer smr;
     private readonly Dictionary<string, int> blendShapeIndexCache = new Dictionary<string, int>();
     private readonly HashSet<string> warnedMissingBlendShapes = new HashSet<string>();
+    private int activeBlendShapeIndex = -1;
+    private float activeTargetWeight;
+    private float holdTimer;
 
     private Dictionary<uint, string[]> visemeToBlendShape = new Dictionary<uint, string[]>
     {
@@ -43,6 +51,42 @@ public class Speech2BlendshapeController : MonoBehaviour
         SetGuideHead(guideHead);
     }
 
+    private void OnEnable()
+    {
+        TickController.RegisterTick(this);
+    }
+
+    private void OnDisable()
+    {
+        TickController.UnRegisterTick(this);
+    }
+
+    public void Tick()
+    {
+        if (!smr || !smr.sharedMesh)
+        {
+            return;
+        }
+
+        if (holdTimer > 0f)
+        {
+            holdTimer -= Time.deltaTime;
+        }
+
+        for (int i = 0; i < smr.sharedMesh.blendShapeCount; i++)
+        {
+            float targetWeight = i == activeBlendShapeIndex && holdTimer > 0f ? activeTargetWeight : 0f;
+            float speed = targetWeight > smr.GetBlendShapeWeight(i) ? openSpeed : closeSpeed;
+            float weight = Mathf.Lerp(smr.GetBlendShapeWeight(i), targetWeight, 1f - Mathf.Exp(-speed * Time.deltaTime));
+            if (weight < 0.001f)
+            {
+                weight = 0f;
+            }
+
+            smr.SetBlendShapeWeight(i, weight);
+        }
+    }
+
     #endregion
 
     #region 公开接口
@@ -64,17 +108,16 @@ public class Speech2BlendshapeController : MonoBehaviour
     /// 根据 Azure 返回的 visemeId 设置口型 BlendShape 权重。
     /// 会先清空当前模型所有 BlendShape，再按别名缓存查找目标口型。
     /// </summary>
-    public void SetVisemeBlendShapeWeight(uint visemeId, float weight)
+    public void SetVisemeBlendShapeWeight(uint visemeId)
     {
         if (!smr || !smr.sharedMesh)
         {
             return;
         }
 
-        ResetAllBlendShapes();
-
         if (!visemeToBlendShape.TryGetValue(visemeId, out string[] blendShapeNames) || blendShapeNames == null)
         {
+            ClearVisemeTarget();
             return;
         }
 
@@ -90,7 +133,7 @@ public class Speech2BlendshapeController : MonoBehaviour
             return;
         }
 
-        smr.SetBlendShapeWeight(index, weight);
+        SetVisemeTarget(index, blendWeight);
     }
 
     /// <summary>
@@ -107,6 +150,8 @@ public class Speech2BlendshapeController : MonoBehaviour
         {
             smr.SetBlendShapeWeight(i, 0f);
         }
+
+        ClearVisemeTarget();
     }
 
     /// <summary>
@@ -198,6 +243,37 @@ public class Speech2BlendshapeController : MonoBehaviour
         {
             blendShapeIndexCache.Add(normalizedName, index);
         }
+    }
+
+    private float GetScaledBlendShapeWeight(int index, float percent)
+    {
+        return Mathf.Clamp01(percent / 100f) * GetBlendShapeMaxWeight(index);
+    }
+
+    private void SetVisemeTarget(int index, float percent)
+    {
+        activeBlendShapeIndex = index;
+        activeTargetWeight = GetScaledBlendShapeWeight(index, percent);
+        holdTimer = holdTime;
+    }
+
+    private void ClearVisemeTarget()
+    {
+        activeBlendShapeIndex = -1;
+        activeTargetWeight = 0f;
+        holdTimer = 0f;
+    }
+
+    private float GetBlendShapeMaxWeight(int index)
+    {
+        Mesh mesh = smr.sharedMesh;
+        int frameCount = mesh.GetBlendShapeFrameCount(index);
+        if (frameCount <= 0)
+        {
+            return 100f;
+        }
+
+        return mesh.GetBlendShapeFrameWeight(index, frameCount - 1);
     }
 
     /// <summary>

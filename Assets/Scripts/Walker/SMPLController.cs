@@ -146,6 +146,10 @@ public class SMPLController : BaseController, ITickerUpdate
             if (!head)
             {
                 head = avatarModel.transform.FindDeep("AvatarHead");
+            }
+
+            if (head)
+            {
                 if (ControllerRefer.SpeechManager.speech2BlendshapeController != null)
                 {
                     ControllerRefer.SpeechManager.speech2BlendshapeController.SetGuideHead(head.gameObject);
