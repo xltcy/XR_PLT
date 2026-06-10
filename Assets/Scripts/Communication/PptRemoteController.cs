@@ -66,6 +66,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
     private readonly object discoveryLock = new object();
     private IPEndPoint pendingDiscoveredEndPoint;
     private DateTime lastDiscoveryTimeUtc = DateTime.MinValue;
+    private DateTime searchStartTimeUtc = DateTime.MinValue;
     private bool isSearching;
     private bool hasNotifiedConnectionState;
     private PptRemoteConnectionState notifiedConnectionState = PptRemoteConnectionState.Disconnected;
@@ -113,6 +114,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
         if (discoveredEndPoint != null)
         {
             lastDiscoveryTimeUtc = DateTime.UtcNow;
+            searchStartTimeUtc = DateTime.MinValue;
             isSearching = false;
             SetRemoteEndPoint(discoveredEndPoint.Address.ToString(), discoveredEndPoint.Port, true);
         }
@@ -123,6 +125,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
     public void RefreshConnection()
     {
         lastDiscoveryTimeUtc = DateTime.MinValue;
+        searchStartTimeUtc = DateTime.UtcNow;
         isSearching = true;
 
         if (enableDiscovery && discoveryClient == null)
@@ -168,6 +171,26 @@ public class PptRemoteController : BaseController, ITickerUpdate
         return isSearching ? PptRemoteConnectionState.Searching : PptRemoteConnectionState.Disconnected;
     }
 
+    private void UpdateSearchTimeout()
+    {
+        if (!isSearching || lastDiscoveryTimeUtc != DateTime.MinValue)
+        {
+            return;
+        }
+
+        if (searchStartTimeUtc == DateTime.MinValue)
+        {
+            searchStartTimeUtc = DateTime.UtcNow;
+            return;
+        }
+
+        if ((DateTime.UtcNow - searchStartTimeUtc).TotalSeconds > connectionTimeoutSeconds)
+        {
+            isSearching = false;
+            searchStartTimeUtc = DateTime.MinValue;
+        }
+    }
+
     public bool IsConnected()
     {
         return GetConnectionState() == PptRemoteConnectionState.Connected;
@@ -181,6 +204,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
 
     private void NotifyConnectionStateChanged()
     {
+        UpdateSearchTimeout();
         PptRemoteConnectionState state = GetConnectionState();
         if (hasNotifiedConnectionState && notifiedConnectionState == state)
         {
@@ -235,6 +259,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
         {
             discoveryClient = new UdpClient(discoveryPort);
             discoveryClient.BeginReceive(OnDiscoveryReceived, null);
+            searchStartTimeUtc = DateTime.UtcNow;
             isSearching = true;
             Debug.Log($"[PptRemoteController] Listening for PPT receiver discovery on UDP port {discoveryPort}.");
         }
