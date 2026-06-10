@@ -73,6 +73,7 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
         this.AddEventListener(EventConstant.COMPLETE_GET_SCENE_DATA, OnCompleteGetSceneData);
         this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SCENE, OnCompleteRelocateScene);
+        this.AddEventListener(EventConstant.PPT_REMOTE_CONNECTION_CHANGED, OnPptRemoteConnectionChanged);
 
         meshController = ControllerRefer.MeshController;
         relocateController = ControllerRefer.RelocateController;
@@ -133,15 +134,24 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     
     private void SetRefreshLinkState()
     {
-        string text = "未连接 PPT 控制端，请先在电脑上启动脚本，再点击刷新按钮";
-        if (ControllerRefer.PptRemoteController.IsConnected())
+        PptRemoteConnectionState state = ControllerRefer.PptRemoteController.GetConnectionState();
+        string stateText;
+        switch (state)
         {
-            text = ControllerRefer.PptRemoteController.GetConnectionDescription();
+            case PptRemoteConnectionState.Connected:
+                stateText = ControllerRefer.PptRemoteController.GetConnectionDescription();
+                break;
+            case PptRemoteConnectionState.Searching:
+                stateText = "正在搜索 PPT 控制端...";
+                break;
+            default:
+                stateText = "未连接 PPT 控制端，请先在电脑上启动脚本，再点击刷新按钮";
+                break;
         }
 
         if (inputFieldRefreshLinkState)
         {
-            inputFieldRefreshLinkState.text = text;
+            inputFieldRefreshLinkState.text = stateText;
         }
     }
     
@@ -226,6 +236,11 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
             ControllerRefer.PptRemoteController.RefreshConnection(host);
         }
 
+        SetRefreshLinkState();
+    }
+
+    private void OnPptRemoteConnectionChanged(EventData eventData)
+    {
         SetRefreshLinkState();
     }
 

@@ -67,6 +67,8 @@ public class PptRemoteController : BaseController, ITickerUpdate
     private IPEndPoint pendingDiscoveredEndPoint;
     private DateTime lastDiscoveryTimeUtc = DateTime.MinValue;
     private bool isSearching;
+    private bool hasNotifiedConnectionState;
+    private PptRemoteConnectionState notifiedConnectionState = PptRemoteConnectionState.Disconnected;
 
     public override void OnRegister()
     {
@@ -110,10 +112,12 @@ public class PptRemoteController : BaseController, ITickerUpdate
 
         if (discoveredEndPoint != null)
         {
-            SetRemoteEndPoint(discoveredEndPoint.Address.ToString(), discoveredEndPoint.Port, true);
             lastDiscoveryTimeUtc = DateTime.UtcNow;
             isSearching = false;
+            SetRemoteEndPoint(discoveredEndPoint.Address.ToString(), discoveredEndPoint.Port, true);
         }
+
+        NotifyConnectionStateChanged();
     }
 
     public void RefreshConnection()
@@ -127,6 +131,7 @@ public class PptRemoteController : BaseController, ITickerUpdate
         }
 
         SendDiscoveryProbe();
+        NotifyConnectionStateChanged();
         Debug.Log($"[PptRemoteController] Refresh PPT connection. State: {GetConnectionState()}, target: {GetConnectionDescription()}");
     }
 
@@ -172,6 +177,19 @@ public class PptRemoteController : BaseController, ITickerUpdate
     {
         string endpoint = remoteEndPoint != null ? $"{remoteEndPoint.Address}:{remoteEndPoint.Port}" : "none";
         return $"{GetConnectionState()} ({endpoint})";
+    }
+
+    private void NotifyConnectionStateChanged()
+    {
+        PptRemoteConnectionState state = GetConnectionState();
+        if (hasNotifiedConnectionState && notifiedConnectionState == state)
+        {
+            return;
+        }
+
+        hasNotifiedConnectionState = true;
+        notifiedConnectionState = state;
+        this.TriggerEvent(EventConstant.PPT_REMOTE_CONNECTION_CHANGED, state);
     }
 
     public void SendNext()

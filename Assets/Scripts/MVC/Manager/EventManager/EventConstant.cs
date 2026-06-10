@@ -9,4 +9,5 @@ public class EventConstant
     public static string COMPLETE_RELOCATE_SONAR = "COMPLETE_RELOCATE_SONAR";
     public static string VOICE_RECOGNITION_END = "VOICE_RECOGNITION_END";
     public static string PPT_CONTROL = "PPT_CONTROL";
+    public static string PPT_REMOTE_CONNECTION_CHANGED = "PPT_REMOTE_CONNECTION_CHANGED";
 }

@@ -56,7 +56,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 1,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -101,7 +101,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 3,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -146,7 +146,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 5,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -191,7 +191,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 7,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -236,7 +236,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 9,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -281,7 +281,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 11,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -326,7 +326,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 13,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -371,7 +371,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 15,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -416,7 +416,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 17,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -461,7 +461,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 19,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -506,7 +506,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 21,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -551,7 +551,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 23,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -596,7 +596,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 25,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",
@@ -641,7 +641,7 @@
           "startTrigger": {
             "mode": "AfterAction",
             "afterActionId": 27,
-            "delay": 0
+            "delay": 2
           },
           "stopTrigger": {
             "mode": "Never",

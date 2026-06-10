@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: G717
-  productName: ARView
+  productName: "VR\u5B9E\u9A8C\u5BA4\u8BB2\u89E3"
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -133,10 +133,8 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 3.0
-  preloadedAssets:
-  - {fileID: 4800000, guid: c9f956787b1d945e7b36e0516201fc76, type: 3}
-  - {fileID: -1200355507087839417, guid: 58f40b12bbc864f3c96c6505a9a1e1e3, type: 2}
+  bundleVersion: 1.0
+  preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -154,7 +152,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.G717.ARView
+    Android: com.G717.VR
     Standalone: com.tcluanTest.GXL
   buildNumber:
     Standalone: 0
@@ -270,7 +268,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 0ee7df920b3e9974e9816fca4eb967b3, type: 3}
+      m_Icon: {fileID: 2800000, guid: befaaf3e19cb3a846a6ee9d38af80f59, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0

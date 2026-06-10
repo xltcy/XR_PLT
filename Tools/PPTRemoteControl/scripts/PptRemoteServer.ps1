@@ -70,23 +70,32 @@ function Write-ServerStatus {
         $localIpText = U 0x672A,0x83B7,0x53D6
     }
 
+    $lines = @(
+        "$(U 0x72B6,0x6001): $status",
+        "$(U 0x672C,0x673A): $localIpText",
+        "$(U 0x63A7,0x5236)$([char]0x7AEF)$([char]0x53E3): $Port    $(U 0x53D1,0x73B0): $DiscoveryTarget`:$DiscoveryPort",
+        "$(U 0x6A21,0x5F0F): $ControlMode    $(U 0x65B9,0x5F0F): $automation",
+        "$(U 0x5E7F,0x64AD): $beaconCount    $(U 0x63A2,0x6D4B): $probeCount    $(U 0x6307,0x4EE4): $commandCount",
+        "$(U 0x6700,0x540E): $lastCommandText"
+    )
+    if (-not [string]::IsNullOrEmpty($automationNotice)) {
+        $lines += "$(U 0x63D0,0x793A): $automationNotice"
+    }
+    $lines += ""
+    $lines += "Ctrl+C $(U 0x9000,0x51FA)"
+
+    $statusText = ($lines -join [Environment]::NewLine) + [Environment]::NewLine
+    if ($statusText.Length -lt $lastStatusTextLength) {
+        $statusText += " " * ($lastStatusTextLength - $statusText.Length)
+    }
+
     try {
-        [Console]::Clear()
+        [Console]::SetCursorPosition(0, 0)
     }
     catch {
     }
-
-    [Console]::WriteLine("$(U 0x72B6,0x6001): $status")
-    [Console]::WriteLine("$(U 0x672C,0x673A): $localIpText")
-    [Console]::WriteLine("$(U 0x63A7,0x5236)$([char]0x7AEF)$([char]0x53E3): $Port    $(U 0x53D1,0x73B0): $DiscoveryTarget`:$DiscoveryPort")
-    [Console]::WriteLine("$(U 0x6A21,0x5F0F): $ControlMode    $(U 0x65B9,0x5F0F): $automation")
-    [Console]::WriteLine("$(U 0x5E7F,0x64AD): $beaconCount    $(U 0x63A2,0x6D4B): $probeCount    $(U 0x6307,0x4EE4): $commandCount")
-    [Console]::WriteLine("$(U 0x6700,0x540E): $lastCommandText")
-    if (-not [string]::IsNullOrEmpty($automationNotice)) {
-        [Console]::WriteLine("$(U 0x63D0,0x793A): $automationNotice")
-    }
-    [Console]::WriteLine("")
-    [Console]::WriteLine("Ctrl+C $(U 0x9000,0x51FA)")
+    [Console]::Write($statusText)
+    $script:lastStatusTextLength = $statusText.Length
 }
 function Find-AutoHotkey {
     $candidates = @(
