@@ -36,6 +36,9 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     
     [BindChild("p_dropdown_avatar_select")]
     private Dropdown dropdownAvatarSelect;
+
+    [BindChild("p_dropdown_voice_model")]
+    private Dropdown dropdownVoiceModel;
     
     private List<SummaryItemData> summaryItemDataList;
     
@@ -62,6 +65,26 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         new AvatarConfig("prefab_yz", AzureAuth.MaleVoiceName),
         new AvatarConfig("prefab_yl", AzureAuth.FemaleVoiceName),
     };
+
+    // 语音模型下拉框只暴露当前讲解流程需要的模型。
+    // MimoTTS 仍保留在 SpeechSynthesizerController 中用于调试或后续扩展，但不显示在这个正式讲解入口里。
+    private class VoiceModelOption
+    {
+        public string DisplayName;
+        public SpeechManager.SpeechSynthesisMode Mode;
+
+        public VoiceModelOption(string displayName, SpeechManager.SpeechSynthesisMode mode)
+        {
+            DisplayName = displayName;
+            Mode = mode;
+        }
+    }
+
+    private readonly List<VoiceModelOption> voiceModelOptions = new List<VoiceModelOption>
+    {
+        new VoiceModelOption("azure", SpeechManager.SpeechSynthesisMode.Azure),
+        new VoiceModelOption("cosyvoice", SpeechManager.SpeechSynthesisMode.CosyVoice),
+    };
     
 
     public override void OnOpen(UIParams uiParams = null)
@@ -70,6 +93,7 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         dropdownSceneSelect.SetVisible(false);
         dropdownSceneSelect.onValueChanged.AddListener(OnSceneSelectChanged);
         dropdownAvatarSelect.onValueChanged.AddListener(OnAvatarSelectChanged);
+        dropdownVoiceModel.onValueChanged.AddListener(OnVoiceModelSelectChanged);
         this.AddEventListener(EventConstant.COMPLETE_INIT_SUMMARY, OnCompleteInitSummary);
         this.AddEventListener(EventConstant.COMPLETE_GET_SCENE_DATA, OnCompleteGetSceneData);
         this.AddEventListener(EventConstant.COMPLETE_RELOCATE_SCENE, OnCompleteRelocateScene);
@@ -90,6 +114,7 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     {
         dropdownSceneSelect.onValueChanged.RemoveListener(OnSceneSelectChanged);
         dropdownAvatarSelect.onValueChanged.RemoveListener(OnAvatarSelectChanged);
+        dropdownVoiceModel.onValueChanged.RemoveListener(OnVoiceModelSelectChanged);
         this.RemoveAllEventListener();
     }
 
@@ -130,6 +155,53 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         }
 
         return avatarNames[0];
+    }
+
+    /// <summary>
+    /// 根据下拉框索引获取语音模型配置。
+    /// 下拉框索引来自 UI，因此这里做边界兜底，避免 prefab 选项数量和代码列表暂时不同步时抛异常。
+    /// </summary>
+    private VoiceModelOption GetVoiceModelOption(int index)
+    {
+        if (index >= 0 && index < voiceModelOptions.Count)
+        {
+            return voiceModelOptions[index];
+        }
+
+        return voiceModelOptions[0];
+    }
+
+    /// <summary>
+    /// 将当前 SpeechManager 的语音模式映射回下拉框索引。
+    /// 这个 UI 只展示 Azure 和 CosyVoice，如果当前模式是隐藏的 MimoTTS，会返回 0 并在初始化时回退到 Azure。
+    /// </summary>
+    private int GetVoiceModelOptionIndex(SpeechManager.SpeechSynthesisMode mode)
+    {
+        for (int i = 0; i < voiceModelOptions.Count; i++)
+        {
+            if (voiceModelOptions[i].Mode == mode)
+            {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// 初始化语音模型下拉框。
+    /// 选项由代码生成，不依赖 prefab 内预填内容，确保界面始终只出现 azure 和 cosyvoice。
+    /// </summary>
+    private void InitializeVoiceModelDropdown()
+    {
+        dropdownVoiceModel.ClearOptions();
+        dropdownVoiceModel.AddOptions(voiceModelOptions.ConvertAll(item => item.DisplayName));
+
+        // 下拉框只提供 Azure 和 CosyVoice。若当前模式来自调试菜单且不在列表内，回退到 Azure，
+        // 保证正式讲解入口不会停留在隐藏模型上。
+        int selectedIndex = GetVoiceModelOptionIndex(SpeechManager.GetSynthesisMode());
+        dropdownVoiceModel.SetValueWithoutNotify(selectedIndex);
+        OnVoiceModelSelectChanged(selectedIndex);
     }
     
     private void SetRefreshLinkState()
@@ -303,6 +375,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         dropdownAvatarSelect.ClearOptions();
         dropdownAvatarSelect.AddOptions(avatarNames.ConvertAll(item => item.PrefabName));
         OnAvatarSelectChanged(dropdownAvatarSelect.value);
+
+        InitializeVoiceModelDropdown();
     }
 
     private void OnCompleteGetSceneData(EventData eventData)
@@ -327,6 +401,16 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
         AvatarConfig avatarConfig = GetAvatarConfig(index);
         ControllerRefer.SMPLController.SelectedAvatarName = avatarConfig.PrefabName;
         ControllerRefer.SpeechManager?.SetSynthesisVoice(avatarConfig.VoiceName);
+    }
+
+    /// <summary>
+    /// 响应语音模型下拉框变化。
+    /// 这里只切换合成 provider，不改变虚拟人形象和男女声；男女声仍由上面的 avatar 下拉框决定。
+    /// </summary>
+    private void OnVoiceModelSelectChanged(int index)
+    {
+        VoiceModelOption option = GetVoiceModelOption(index);
+        SpeechManager.SetSynthesisMode(option.Mode);
     }
     #endregion callback
     

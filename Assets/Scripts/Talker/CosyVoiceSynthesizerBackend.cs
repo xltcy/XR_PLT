@@ -105,9 +105,15 @@ public class CosyVoiceSynthesizerBackend : ISpeechSynthesizerBackend
         }
 
         string streamError = null;
-        var streamPlayer = new StreamingPcmAudioPlayer(audioSource, sampleRate);
+        var streamPlayer = new StreamingPcmAudioPlayer(
+            audioSource,
+            sampleRate,
+            (samples, sampleCount) => host.speech2BlendshapeController?.PushPcmSamplesForLipSync(samples, sampleCount, sampleRate));
         var downloadHandler = new CosyVoiceSseDownloadHandler(
-            pcmData => streamPlayer.EnqueuePcm16(pcmData),
+            pcmData =>
+            {
+                streamPlayer.EnqueuePcm16(pcmData);
+            },
             error => streamError = error);
         activeStreamPlayer = streamPlayer;
 
@@ -131,6 +137,7 @@ public class CosyVoiceSynthesizerBackend : ISpeechSynthesizerBackend
 
             if (!playbackStarted && streamPlayer.BufferedSampleCount >= startBufferSamples)
             {
+                host.speech2BlendshapeController?.BeginAudioDrivenLipSync(sampleRate);
                 streamPlayer.Play();
                 playbackStarted = true;
             }
@@ -184,6 +191,7 @@ public class CosyVoiceSynthesizerBackend : ISpeechSynthesizerBackend
                 yield break;
             }
 
+            host.speech2BlendshapeController?.BeginAudioDrivenLipSync(sampleRate);
             streamPlayer.Play();
             playbackStarted = true;
         }
@@ -425,14 +433,16 @@ public class CosyVoiceSynthesizerBackend : ISpeechSynthesizerBackend
     {
         private readonly AudioSource audioSource;
         private readonly int sampleRate;
+        private readonly Action<float[], int> onPlayedSamples;
         private readonly Queue<float> sampleQueue = new Queue<float>();
         private readonly object queueLock = new object();
         private AudioClip clip;
 
-        public StreamingPcmAudioPlayer(AudioSource audioSource, int sampleRate)
+        public StreamingPcmAudioPlayer(AudioSource audioSource, int sampleRate, Action<float[], int> onPlayedSamples)
         {
             this.audioSource = audioSource;
             this.sampleRate = sampleRate;
+            this.onPlayedSamples = onPlayedSamples;
         }
 
         public int BufferedSampleCount
@@ -510,12 +520,26 @@ public class CosyVoiceSynthesizerBackend : ISpeechSynthesizerBackend
 
         private void OnAudioRead(float[] data)
         {
+            int sampleCount = 0;
             lock (queueLock)
             {
                 for (int i = 0; i < data.Length; i++)
                 {
-                    data[i] = sampleQueue.Count > 0 ? sampleQueue.Dequeue() : 0f;
+                    if (sampleQueue.Count > 0)
+                    {
+                        data[i] = sampleQueue.Dequeue();
+                        sampleCount++;
+                    }
+                    else
+                    {
+                        data[i] = 0f;
+                    }
                 }
+            }
+
+            if (sampleCount > 0)
+            {
+                onPlayedSamples?.Invoke(data, sampleCount);
             }
         }
     }
