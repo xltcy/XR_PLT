@@ -9,7 +9,7 @@ namespace Network.RequestParam
     {
         public class RequestParam : BaseRequestParam
         {
-            public RequestParam(LLMModelConfig.CosyVoiceTTSConfig config, string text, string voiceName)
+            public RequestParam(LLMModelConfig.CosyVoiceTTSConfig config, string text, string voiceName, bool stream = false)
             {
                 url = config.BaseUrl;
                 method = "POST";
@@ -17,7 +17,12 @@ namespace Network.RequestParam
                 timeout = 60;
                 headers["Authorization"] = $"Bearer {NormalizeApiKey(config.APIKey)}";
                 headers["Content-Type"] = "application/json";
-                // Non-streaming CosyVoice requests must not set X-DashScope-SSE.
+                if (stream)
+                {
+                    headers["X-DashScope-SSE"] = "enable";
+                    headers["Accept"] = "text/event-stream";
+                }
+
                 requestData = new RequestBody
                 {
                     model = config.ModelName,
@@ -25,7 +30,7 @@ namespace Network.RequestParam
                     {
                         text = text,
                         voice = voiceName,
-                        format = string.IsNullOrEmpty(config.AudioFormat) ? "wav" : config.AudioFormat,
+                        format = stream ? "pcm" : string.IsNullOrEmpty(config.AudioFormat) ? "wav" : config.AudioFormat,
                         sample_rate = config.SampleRate <= 0 ? 24000 : config.SampleRate
                     }
                 };
