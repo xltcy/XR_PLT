@@ -423,7 +423,7 @@ public class SpeechManager : BaseController
                 }
             });
         };
-        var result = await synthesis.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
+        var result = await synthesis.SpeakSsmlAsync(AzureSpeechSynthesizerBackend.BuildAzureSsml(CleanSpeechText(text), true)).ConfigureAwait(false);
         //var result = await synthesis.SpeakTextAsync(text).ConfigureAwait(false);
         MainThreadDispatcher.InvokeOnMainThread(() =>
         {
@@ -469,7 +469,7 @@ public class SpeechManager : BaseController
             }
 
             Debug.Log("Msg: " + text + "prepare");
-            var result = await synthesizer.SpeakTextAsync(text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "")).ConfigureAwait(false);
+            var result = await synthesizer.SpeakSsmlAsync(AzureSpeechSynthesizerBackend.BuildAzureSsml(CleanSpeechText(text), true)).ConfigureAwait(false);
             if (isShuttingDown)
             {
                 return;

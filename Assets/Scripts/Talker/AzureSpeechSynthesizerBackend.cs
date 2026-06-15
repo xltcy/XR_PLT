@@ -1,4 +1,5 @@
 using System;
+using System.Security;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using UnityEngine;
@@ -6,6 +7,11 @@ using UnityEngine;
 public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 {
     private const int StopSpeakingTimeoutMs = 1000;
+    // 面向领导做 PPT/实验室介绍时使用正式、沉稳但不过度严肃的讲解风格。
+    private const string AzurePresentationStyle = "serious";
+    private const string AzurePresentationStyleDegree = "0.7";
+    // Azure 中文神经音色默认语速偏快，-25% 约接近 180 字/分钟。
+    private const string AzureTargetRate = "-25%";
     private SpeechSynthesizer synthesizer;
     private SpeechManager host;
     private TaskCompletionSource<bool> activeSpeakTask;
@@ -65,7 +71,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 
             string cleanText = SpeechManager.CleanSpeechText(text);
             Debug.Log("Msg: " + text + "prepare");
-            var result = await synthesizer.SpeakTextAsync(cleanText).ConfigureAwait(false);
+            var result = await SpeakWithAzureSsml(synthesizer, cleanText).ConfigureAwait(false);
             if (isDisposed || speechHost.IsSpeechShuttingDown)
             {
                 tcs.TrySetResult(false);
@@ -124,16 +130,9 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
             return;
         }
 
-        try
-        {
-            synthesizer.Dispose();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[SpeechSynthesizerController] Dispose Azure synthesizer failed: {e.Message}");
-        }
-
+        SpeechSynthesizer target = synthesizer;
         synthesizer = null;
+        _ = StopAndDisposeSynthesizer(target);
     }
 
     private void EnsureSynthesizer()
@@ -213,5 +212,54 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
         {
             Debug.LogWarning($"[SpeechSynthesizerController] Stop Azure speaking failed: {e.Message}");
         }
+    }
+
+    private static async Task StopAndDisposeSynthesizer(SpeechSynthesizer target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        try
+        {
+            await StopSynthesizerWithTimeout(target).ConfigureAwait(false);
+        }
+        finally
+        {
+            try
+            {
+                target.Dispose();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[SpeechSynthesizerController] Dispose Azure synthesizer failed: {e.Message}");
+            }
+        }
+    }
+
+    private static async Task<SpeechSynthesisResult> SpeakWithAzureSsml(SpeechSynthesizer target, string text)
+    {
+        string styledSsml = BuildAzureSsml(text, includeHumanLikeStyle: true);
+        var result = await target.SpeakSsmlAsync(styledSsml).ConfigureAwait(false);
+        if (result.Reason != ResultReason.Canceled)
+        {
+            return result;
+        }
+
+        string plainSsml = BuildAzureSsml(text, includeHumanLikeStyle: false);
+        return await target.SpeakSsmlAsync(plainSsml).ConfigureAwait(false);
+    }
+
+    public static string BuildAzureSsml(string text, bool includeHumanLikeStyle)
+    {
+        string escapedText = SecurityElement.Escape(text) ?? string.Empty;
+        string voiceName = AzureAuth.SpeechSynthesisVoiceName;
+        string prosody = $"<prosody rate=\"{AzureTargetRate}\">{escapedText}</prosody>";
+        string body = includeHumanLikeStyle
+            ? $"<mstts:express-as style=\"{AzurePresentationStyle}\" styledegree=\"{AzurePresentationStyleDegree}\">{prosody}</mstts:express-as>"
+            : prosody;
+
+        return $"<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"zh-CN\"><voice name=\"{voiceName}\">{body}</voice></speak>";
     }
 }
