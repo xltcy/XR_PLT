@@ -1,5 +1,6 @@
 using System;
 using System.Security;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using UnityEngine;
@@ -7,11 +8,15 @@ using UnityEngine;
 public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 {
     private const int StopSpeakingTimeoutMs = 1000;
-    // 面向领导做 PPT/实验室介绍时使用正式、沉稳但不过度严肃的讲解风格。
-    private const string AzurePresentationStyle = "serious";
-    private const string AzurePresentationStyleDegree = "0.7";
-    // Azure 中文神经音色默认语速偏快，-25% 约接近 180 字/分钟。
-    private const string AzureTargetRate = "-25%";
+    // Keep Azure formal but less stiff for PPT-style lab introductions.
+    private const string AzureFemalePresentationStyle = "calm";
+    private const string AzureMalePresentationStyle = "narration-professional";
+    private const string AzureFemaleStyleDegree = "0.45";
+    private const string AzureMaleStyleDegree = "0.65";
+    private const string AzureTargetRate = "-20%";
+    private const string ShortPause = "180ms";
+    private const string LongPause = "420ms";
+    private const string ParagraphPause = "650ms";
     private SpeechSynthesizer synthesizer;
     private SpeechManager host;
     private TaskCompletionSource<bool> activeSpeakTask;
@@ -69,9 +74,8 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
                 return;
             }
 
-            string cleanText = SpeechManager.CleanSpeechText(text);
             Debug.Log("Msg: " + text + "prepare");
-            var result = await SpeakWithAzureSsml(synthesizer, cleanText).ConfigureAwait(false);
+            var result = await SpeakWithAzureSsml(synthesizer, text).ConfigureAwait(false);
             if (isDisposed || speechHost.IsSpeechShuttingDown)
             {
                 tcs.TrySetResult(false);
@@ -253,13 +257,111 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 
     public static string BuildAzureSsml(string text, bool includeHumanLikeStyle)
     {
-        string escapedText = SecurityElement.Escape(text) ?? string.Empty;
         string voiceName = AzureAuth.SpeechSynthesisVoiceName;
-        string prosody = $"<prosody rate=\"{AzureTargetRate}\">{escapedText}</prosody>";
+        string naturalText = BuildNaturalTextSsml(text);
+        string prosody = $"<prosody rate=\"{AzureTargetRate}\">{naturalText}</prosody>";
         string body = includeHumanLikeStyle
-            ? $"<mstts:express-as style=\"{AzurePresentationStyle}\" styledegree=\"{AzurePresentationStyleDegree}\">{prosody}</mstts:express-as>"
+            ? $"<mstts:express-as style=\"{GetAzurePresentationStyle(voiceName)}\" styledegree=\"{GetAzureStyleDegree(voiceName)}\">{prosody}</mstts:express-as>"
             : prosody;
 
         return $"<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:mstts=\"https://www.w3.org/2001/mstts\" xml:lang=\"zh-CN\"><voice name=\"{voiceName}\">{body}</voice></speak>";
+    }
+
+    private static string GetAzurePresentationStyle(string voiceName)
+    {
+        return voiceName == AzureAuth.FemaleVoiceName ? AzureFemalePresentationStyle : AzureMalePresentationStyle;
+    }
+
+    private static string GetAzureStyleDegree(string voiceName)
+    {
+        return voiceName == AzureAuth.FemaleVoiceName ? AzureFemaleStyleDegree : AzureMaleStyleDegree;
+    }
+
+    private static string BuildNaturalTextSsml(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder(text.Length + 128);
+        bool previousWasBreak = false;
+        for (int i = 0; i < text.Length; i++)
+        {
+            char character = text[i];
+            if (character == '\r')
+            {
+                continue;
+            }
+
+            if (character == '\n')
+            {
+                AppendBreak(builder, ParagraphPause, ref previousWasBreak);
+                continue;
+            }
+
+            if (char.IsWhiteSpace(character))
+            {
+                continue;
+            }
+
+            if (IsDecimalPoint(text, i))
+            {
+                builder.Append('\u70B9');
+                previousWasBreak = false;
+                continue;
+            }
+
+            builder.Append(SecurityElement.Escape(character.ToString()) ?? string.Empty);
+            previousWasBreak = false;
+
+            if (IsLongPausePunctuation(character))
+            {
+                AppendBreak(builder, LongPause, ref previousWasBreak);
+            }
+            else if (IsShortPausePunctuation(character))
+            {
+                AppendBreak(builder, ShortPause, ref previousWasBreak);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static void AppendBreak(StringBuilder builder, string time, ref bool previousWasBreak)
+    {
+        if (previousWasBreak)
+        {
+            return;
+        }
+
+        builder.Append("<break time=\"");
+        builder.Append(time);
+        builder.Append("\"/>");
+        previousWasBreak = true;
+    }
+
+    private static bool IsShortPausePunctuation(char character)
+    {
+        return character == ',' || character == ':' || character == ';'
+            || character == '\uFF0C' || character == '\u3001' || character == '\uFF1A' || character == '\uFF1B';
+    }
+
+    private static bool IsLongPausePunctuation(char character)
+    {
+        return character == '\u3002' || character == '\uFF1F' || character == '\uFF01';
+    }
+
+    private static bool IsDecimalPoint(string text, int index)
+    {
+        if (index <= 0 || index >= text.Length - 1)
+        {
+            return false;
+        }
+
+        char character = text[index];
+        return (character == '.' || character == '\uFF0E')
+            && char.IsDigit(text[index - 1])
+            && char.IsDigit(text[index + 1]);
     }
 }

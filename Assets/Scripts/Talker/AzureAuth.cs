@@ -21,7 +21,7 @@ using Microsoft.CognitiveServices.Speech;
 
 public static class AzureAuth
 {
-    public const string MaleVoiceName = "zh-CN-YunfengNeural";
+    public const string MaleVoiceName = "zh-CN-YunyangNeural";
     public const string FemaleVoiceName = "zh-CN-XiaoxiaoNeural";
 
     private static SpeechConfig _speechConfig;
