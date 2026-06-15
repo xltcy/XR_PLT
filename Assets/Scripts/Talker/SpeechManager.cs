@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Threading.Tasks;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
@@ -10,13 +11,30 @@ using System;
  * Use SayFromStr to speak a sentence from string param.
  * Function SpeakText & OnlySpeakText will be set private in future versions.
  */
+[RequireComponent(typeof(AudioSource))]
 public class SpeechManager : BaseController
 {
+    // 兼容旧调用方保留的模式枚举；实际合成器由 SpeechSynthesizerController 管理。
+    public enum SpeechSynthesisMode
+    {
+        Azure,
+        MimoTTS,
+        CosyVoice
+    }
+
+    public enum SpeechVoiceGender
+    {
+        Male,
+        Female
+    }
+
+    public static SpeechSynthesisMode SynthesisMode { get; private set; } = SpeechSynthesisMode.Azure;
+    public static SpeechVoiceGender VoiceGender { get; private set; } = SpeechVoiceGender.Male;
+
     // public VirtualManController controller;
     private static readonly bool ShouldLoop = true;
     private static readonly int MaxLength = 10;
     private static readonly int Frequency = 44100;
-    private const int StopSpeakingTimeoutMs = 1000;
     string _microphone = null;
     private AudioClip recordingClip = null;
     private AudioSource _audioSource;
@@ -31,6 +49,77 @@ public class SpeechManager : BaseController
     public Speech2BlendshapeController speech2BlendshapeController;
 
     private bool IsRecognizing;
+
+    // 供 SpeechSynthesizerController 判断宿主生命周期，避免卸载时继续回调 Unity 对象。
+    public bool IsSpeechShuttingDown => isShuttingDown;
+    // 非 Azure 合成器生成本地 AudioClip 后复用 SpeechManager 上的 AudioSource 播放。
+    public AudioSource SpeechAudioSource => _audioSource;
+
+    public static void SetSynthesisMode(SpeechSynthesisMode mode)
+    {
+        SynthesisMode = mode;
+        var controller = ControllerRefer.Get<SpeechSynthesizerController>();
+        controller?.SetSynthesisMode(ToControllerMode(mode));
+        Debug.Log($"[SpeechManager] Speech synthesis mode: {SynthesisMode}");
+    }
+
+    public static void SetVoiceGender(SpeechVoiceGender gender)
+    {
+        VoiceGender = gender;
+        var controller = ControllerRefer.Get<SpeechSynthesizerController>();
+        controller?.SetVoiceGender(ToControllerGender(gender));
+        Debug.Log($"[SpeechManager] Speech voice gender: {VoiceGender}");
+    }
+
+    public static SpeechSynthesisMode GetSynthesisMode()
+    {
+        // 从新 Controller 回读状态，保证旧的 SpeechManager.SynthesisMode 查询仍然可用。
+        var controller = ControllerRefer.Get<SpeechSynthesizerController>();
+        if (controller == null)
+        {
+            return SynthesisMode;
+        }
+
+        SynthesisMode = FromControllerMode(controller.SynthesisMode);
+        return SynthesisMode;
+    }
+
+    private static SpeechSynthesizerController.SpeechSynthesisMode ToControllerMode(SpeechSynthesisMode mode)
+    {
+        return mode switch
+        {
+            SpeechSynthesisMode.MimoTTS => SpeechSynthesizerController.SpeechSynthesisMode.MimoTTS,
+            SpeechSynthesisMode.CosyVoice => SpeechSynthesizerController.SpeechSynthesisMode.CosyVoice,
+            _ => SpeechSynthesizerController.SpeechSynthesisMode.Azure
+        };
+    }
+
+    private static SpeechSynthesisMode FromControllerMode(SpeechSynthesizerController.SpeechSynthesisMode mode)
+    {
+        return mode switch
+        {
+            SpeechSynthesizerController.SpeechSynthesisMode.MimoTTS => SpeechSynthesisMode.MimoTTS,
+            SpeechSynthesizerController.SpeechSynthesisMode.CosyVoice => SpeechSynthesisMode.CosyVoice,
+            _ => SpeechSynthesisMode.Azure
+        };
+    }
+
+    private static SpeechSynthesizerController.SpeechVoiceGender ToControllerGender(SpeechVoiceGender gender)
+    {
+        return gender == SpeechVoiceGender.Female
+            ? SpeechSynthesizerController.SpeechVoiceGender.Female
+            : SpeechSynthesizerController.SpeechVoiceGender.Male;
+    }
+
+    private static string GetAzureVoiceNameByGender(SpeechVoiceGender gender)
+    {
+        return gender == SpeechVoiceGender.Female ? AzureAuth.FemaleVoiceName : AzureAuth.MaleVoiceName;
+    }
+
+    private static SpeechVoiceGender GetGenderByAzureVoiceName(string voiceName)
+    {
+        return voiceName == AzureAuth.FemaleVoiceName ? SpeechVoiceGender.Female : SpeechVoiceGender.Male;
+    }
 
     public override void OnRegister()
     {
@@ -48,8 +137,15 @@ public class SpeechManager : BaseController
     {
         isShuttingDown = false;
         Instance = this;
-        InitSpeechSynthesizer();
+        // 提前创建统一合成 Controller；旧 Azure 初始化逻辑作为兜底保留在本类中。
+        ControllerRefer.Get<SpeechSynthesizerController>();
         _audioSource = GetComponent<AudioSource>();
+        if (_audioSource == null)
+        {
+            _audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        _audioSource.playOnAwake = false;
         if (Microphone.devices.IsEmpty())
         {
             TextBubble.SetGlobalText("未找到麦克风");
@@ -130,16 +226,21 @@ public class SpeechManager : BaseController
 
     public void SetSynthesisVoice(string voiceName)
     {
-        if (string.IsNullOrEmpty(voiceName) || voiceName == AzureAuth.SpeechSynthesisVoiceName)
+        if (string.IsNullOrEmpty(voiceName))
+        {
+            return;
+        }
+
+        // introduce UI 仍传 Azure voice name；这里把它转换为统一的男女声信息。
+        VoiceGender = GetGenderByAzureVoiceName(voiceName);
+        var controller = ControllerRefer.Get<SpeechSynthesizerController>();
+        controller?.SetVoiceByAzureVoiceName(voiceName);
+        if (voiceName == AzureAuth.SpeechSynthesisVoiceName)
         {
             return;
         }
 
         AzureAuth.SetSpeechSynthesisVoiceName(voiceName);
-        ShutdownSpeechSynthesizer();
-        isShuttingDown = false;
-        Instance = this;
-        InitSpeechSynthesizer();
     }
 
     private void ShutdownSpeechSynthesizer()
@@ -157,12 +258,12 @@ public class SpeechManager : BaseController
             Instance = null;
         }
 
+        StopLocalSpeechPlayback();
+
         if (synthesizer == null)
         {
             return;
         }
-
-        StopSynthesizerNow(synthesizer);
 
         try
         {
@@ -178,29 +279,19 @@ public class SpeechManager : BaseController
         }
     }
 
-    private void StopSynthesizerNow(SpeechSynthesizer target)
+    private void StopLocalSpeechPlayback()
     {
-        if (target == null)
+        if (_audioSource != null && _audioSource.isPlaying)
         {
-            return;
+            _audioSource.Stop();
         }
 
-        try
+        if (speech2BlendshapeController != null)
         {
-            var stopTask = target.StopSpeakingAsync();
-            if (!stopTask.Wait(StopSpeakingTimeoutMs))
-            {
-                Debug.LogWarning("[SpeechManager] Stop speaking timed out during shutdown.");
-            }
+            speech2BlendshapeController.EndVisemeSchedule();
         }
-        catch (AggregateException e)
-        {
-            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Flatten().InnerException?.Message}");
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning($"[SpeechManager] Stop speaking failed during shutdown: {e.Message}");
-        }
+
+        TextBubble.SetGlobalText(string.Empty);
     }
 
     AudioClip StartRecording()
@@ -355,6 +446,15 @@ public class SpeechManager : BaseController
             Debug.Log("Msg: Empty String");
             return;
         }
+
+        // 新路径：SpeechManager 只负责对外入口、字幕和音频宿主，具体 TTS provider 交给 Controller。
+        var speechSynthesizerController = ControllerRefer.Get<SpeechSynthesizerController>();
+        if (speechSynthesizerController != null)
+        {
+            await speechSynthesizerController.SpeakText(this, text, onSpeakComplete).ConfigureAwait(false);
+            return;
+        }
+
         if (isShuttingDown || synthesizer == null)
         {
             return;
@@ -394,14 +494,81 @@ public class SpeechManager : BaseController
         }
     }
 
+    public static string CleanSpeechText(string text)
+    {
+        return text.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
+    }
+
+    // 外部合成器开始播放前统一设置字幕、说话状态和口型调度基准。
+    public void BeginExternalSpeech(string text)
+    {
+        isSpeaking = true;
+        if (!string.IsNullOrEmpty(text))
+        {
+            TextBubble.SetGlobalText(text);
+        }
+        BeginLocalSpeechSchedule();
+    }
+
+    // Azure 自带播放结束事件会走这里，只结束口型和说话状态，不触发业务完成回调。
+    public void EndExternalSpeechSchedule()
+    {
+        isSpeaking = false;
+        if (speech2BlendshapeController != null)
+        {
+            speech2BlendshapeController.EndVisemeSchedule();
+        }
+    }
+
+    // 非 Azure 合成器完整播放结束或被中断时走这里，统一清理字幕、音频和口型状态。
+    public void FinishExternalSpeech(Action onSpeakComplete)
+    {
+        isSpeaking = false;
+        TextBubble.SetGlobalText(string.Empty);
+        if (_audioSource != null && _audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+        }
+        if (speech2BlendshapeController != null)
+        {
+            speech2BlendshapeController.EndVisemeSchedule();
+        }
+        onSpeakComplete?.Invoke();
+    }
+
+    private void BeginLocalSpeechSchedule()
+    {
+        if (speech2BlendshapeController != null)
+        {
+            speech2BlendshapeController.BeginVisemeSchedule();
+        }
+    }
+
     public async Task ForceStopSpeak()
     {
+        var speechSynthesizerController = ControllerRefer.Get<SpeechSynthesizerController>();
+        if (speechSynthesizerController != null)
+        {
+            await speechSynthesizerController.StopSpeaking(this).ConfigureAwait(false);
+        }
+
         if (synthesizer != null)
         {
-            await synthesizer.StopSpeakingAsync().ConfigureAwait(false);
+            _ = synthesizer.StopSpeakingAsync();
         }
         isSpeaking = false;
-        MainThreadDispatcher.InvokeOnMainThread(() => TextBubble.SetGlobalText(string.Empty));
+        MainThreadDispatcher.InvokeOnMainThread(() =>
+        {
+            if (_audioSource != null && _audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
+            if (speech2BlendshapeController != null)
+            {
+                speech2BlendshapeController.EndVisemeSchedule();
+            }
+            TextBubble.SetGlobalText(string.Empty);
+        });
     }
 
     private AudioClip MakeClip(byte[] data)
