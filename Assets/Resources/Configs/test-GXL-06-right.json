@@ -1,10 +1,10 @@
 {
   "sceneModelPath": "prefab-GXL-introduce",
-  "sceneName": "工训楼-介绍-屏幕左侧",
+  "sceneName": "工训楼-介绍-屏幕右侧",
   "initPosition": {
-    "x": 2.686,
-    "y": -1.38,
-    "z": -4.014
+    "x": -3.52,
+    "y": -1.461,
+    "z": -3.853
   },
   "timestampMs": 123,
   "explanationPoints": [
@@ -12,9 +12,9 @@
       "id": "讲解",
       "title": "讲解",
       "position": {
-        "x": 2.16,
-        "y": -1.38,
-        "z": -3.589
+        "x": -3.12,
+        "y": -1.361,
+        "z": -3.753
       },
       "initialIntroduction": "大家好，欢迎来到北京航空航天大学虚拟现实技术与系统全国重点实验室，我是小薇。下面由我为您讲解。",
       "arriveIntroduction": "",
@@ -62,7 +62,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -107,7 +107,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -152,7 +152,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -197,7 +197,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -242,7 +242,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -287,7 +287,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -332,7 +332,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -377,7 +377,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -422,7 +422,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -467,7 +467,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -512,7 +512,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -557,7 +557,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -602,7 +602,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         },
         {
           "type": "ProgramEvent",
@@ -647,7 +647,7 @@
             "mode": "Never",
             "delay": 0
           },
-          "animTrigger": "LeftHandUp"
+          "animTrigger": "RightHandUp"
         }
       ]
     }

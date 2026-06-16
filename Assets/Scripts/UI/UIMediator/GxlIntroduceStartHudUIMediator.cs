@@ -90,7 +90,6 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     public override void OnOpen(UIParams uiParams = null)
     {
         textDataset.text = "开始";
-        dropdownSceneSelect.SetVisible(false);
         dropdownSceneSelect.onValueChanged.AddListener(OnSceneSelectChanged);
         dropdownAvatarSelect.onValueChanged.AddListener(OnAvatarSelectChanged);
         dropdownVoiceModel.onValueChanged.AddListener(OnVoiceModelSelectChanged);
@@ -365,7 +364,14 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     {
         var options = new List<string>();
         summaryItemDataList = sceneController.Summary;
-        summaryItemDataList.ForEach(item => options.Add(item.sceneName));
+
+        int needShowCnt = 2;
+        for (int i = 0; i < needShowCnt; i++)
+        {
+            options.Add(summaryItemDataList[i].sceneName);
+        }
+        
+        //summaryItemDataList.ForEach(item => options.Add(item.sceneName));
         dropdownSceneSelect.ClearOptions();
         dropdownSceneSelect.AddOptions(options);
         

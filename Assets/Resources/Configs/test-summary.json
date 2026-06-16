@@ -1,7 +1,13 @@
 {
   "items": [
     {
-      "sceneName": "北航工训楼-大屏幕展示",
+      "sceneName": "大屏幕右侧",
+      "sceneKey": "test-GXL-06-right",
+      "sceneRelocateAlgo":"request_NVLAD_redir",
+      "sceneDataSet": "gxl_06"
+    },
+    {
+      "sceneName": "大屏幕左侧",
       "sceneKey": "test-GXL-06",
       "sceneRelocateAlgo":"request_NVLAD_redir",
       "sceneDataSet": "gxl_06"
