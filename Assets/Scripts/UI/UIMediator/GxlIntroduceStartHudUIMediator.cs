@@ -50,11 +50,13 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
     // 虚拟人的prefab名字
     private class AvatarConfig
     {
+        public string DisplayName;
         public string PrefabName;
         public string VoiceName;
 
-        public AvatarConfig(string prefabName, string voiceName)
+        public AvatarConfig(string displayName, string prefabName, string voiceName)
         {
+            DisplayName = displayName;
             PrefabName = prefabName;
             VoiceName = voiceName;
         }
@@ -62,8 +64,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     private List<AvatarConfig> avatarNames = new List<AvatarConfig>
     {
-        new AvatarConfig("prefab_yz", AzureAuth.MaleVoiceName),
-        new AvatarConfig("prefab_yl", AzureAuth.FemaleVoiceName),
+        new AvatarConfig("yuze", "prefab_yz", AzureAuth.MaleVoiceName),
+        new AvatarConfig("yangluo", "prefab_yl", AzureAuth.FemaleVoiceName),
     };
 
     // 语音模型下拉框只暴露当前讲解流程需要的模型。
