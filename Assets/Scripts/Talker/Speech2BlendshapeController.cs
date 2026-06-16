@@ -26,13 +26,21 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     [SerializeField] private float blendWeight = 50f;
 
     // PCM 驱动口型的最小 RMS 阈值。低于该值的音频帧会被当作静音处理。
-    [SerializeField] private float audioLipMinRms = 0.012f;
+    // CosyVoice 的流式音频能量相对平稳，阈值偏高时会让口型变化不明显。
+    [SerializeField] private float audioLipMinRms = 0.006f;
 
     // PCM 驱动口型的最大 RMS 参考值。达到或超过该值时会使用最强的嘴部运动幅度。
-    [SerializeField] private float audioLipMaxRms = 0.12f;
+    // 这里保持比普通音频峰值更敏感的范围，让讲解类语音也能产生足够的嘴部开合。
+    [SerializeField] private float audioLipMaxRms = 0.065f;
 
     // PCM 分析窗口长度。20ms 能兼顾口型响应速度和逐帧抖动控制。
     [SerializeField] private int audioLipFrameMs = 20;
+
+    // PCM 驱动口型的最低可见权重百分比。避免轻声语音只产生很小的 BlendShape 变化。
+    [SerializeField] private float audioLipMinWeightPercent = 20f;
+
+    // PCM 驱动口型相对 Azure viseme 的额外放大系数，只影响没有 viseme 的 TTS 后端。
+    [SerializeField] private float audioLipWeightMultiplier = 1.0f;
 
     private SkinnedMeshRenderer smr;
 
@@ -53,6 +61,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     private int audioDrivenSampleRate = 24000;
     private float lastAudioDrivenSampleTime;
     private float nextAudioDrivenFrameTime;
+    private bool hasAudioDrivenPlaybackClock;
+    private bool pendingAudioDrivenSamplesReceived;
+    private bool pendingAudioDrivenPlaybackClockStart;
+    private const int MaxAudioDrivenFramesPerTick = 4;
 
     private struct ScheduledViseme
     {
@@ -153,6 +165,8 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 
     #region 公开接口
 
+    #region Azure Viseme方案入口
+
     /// <summary>
     /// 返回某个 Azure visemeId 的首选 BlendShape 别名。
     /// 实际运行时仍会按 visemeToBlendShape 中配置的所有别名依次尝试匹配。
@@ -175,12 +189,37 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     {
         audioDrivenLipSyncActive = false;
         ClearAudioDrivenSamples();
+        hasAudioDrivenPlaybackClock = false;
         scheduledVisemes.Clear();
         // Time.realtimeSinceStartup 不受 timeScale 影响，更适合作为语音播放时间轴。
         speechStartTime = Time.realtimeSinceStartup;
         hasSpeechStartTime = true;
         ClearVisemeTarget();
     }
+
+    /// <summary>
+    /// 向本地调度队列添加一个 Azure viseme 事件。
+    /// </summary>
+    /// <param name="visemeId">Azure visemeId，通常范围为 0..21。</param>
+    /// <param name="audioOffsetSeconds">相对合成音频起点的时间偏移，单位为秒。</param>
+    public void ScheduleViseme(uint visemeId, float audioOffsetSeconds)
+    {
+        if (!hasSpeechStartTime)
+        {
+            BeginVisemeSchedule();
+        }
+
+        // audioOffsetSeconds 是 Azure 返回的音频时间偏移，换算成本地绝对触发时间。
+        scheduledVisemes.Enqueue(new ScheduledViseme
+        {
+            VisemeId = visemeId,
+            TargetTime = speechStartTime + audioOffsetSeconds,
+        });
+    }
+
+    #endregion
+
+    #region 通用口型控制入口
 
     /// <summary>
     /// 停止当前所有口型输入，并让当前口型目标回到自然状态。
@@ -192,8 +231,14 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         audioDrivenLipSyncActive = false;
         ClearAudioDrivenSamples();
         hasSpeechStartTime = false;
+        hasAudioDrivenPlaybackClock = false;
+        ClearAudioDrivenPendingState();
         ClearVisemeTarget();
     }
+
+    #endregion
+
+    #region PCM音频驱动方案入口
 
     /// <summary>
     /// 开始 PCM/音频驱动口型，用于不提供 viseme 时间戳的 TTS 后端。
@@ -206,8 +251,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         audioDrivenSampleRate = sampleRate > 0 ? sampleRate : 24000;
         audioDrivenLipSyncActive = true;
         lastAudioDrivenSampleTime = Time.realtimeSinceStartup;
-        nextAudioDrivenFrameTime = lastAudioDrivenSampleTime;
+        nextAudioDrivenFrameTime = 0f;
+        hasAudioDrivenPlaybackClock = false;
         ClearAudioDrivenSamples();
+        ClearAudioDrivenPendingState();
         ClearVisemeTarget();
     }
 
@@ -230,9 +277,11 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         }
 
         audioDrivenSampleRate = sampleRate > 0 ? sampleRate : audioDrivenSampleRate;
-        int maxBufferedSamples = Mathf.Max(audioDrivenSampleRate, audioDrivenSampleRate * 2);
+        int maxBufferedSamples = System.Math.Max(audioDrivenSampleRate, audioDrivenSampleRate * 2);
+        bool shouldStartPlaybackClock = false;
         lock (audioDrivenLock)
         {
+            shouldStartPlaybackClock = !hasAudioDrivenPlaybackClock && audioDrivenSamples.Count == 0;
             int evenLength = pcmData.Length - pcmData.Length % 2;
             for (int i = 0; i < evenLength; i += 2)
             {
@@ -244,9 +293,9 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             {
                 audioDrivenSamples.Dequeue();
             }
-        }
 
-        lastAudioDrivenSampleTime = Time.realtimeSinceStartup;
+            MarkAudioDrivenSamplesReceived(shouldStartPlaybackClock);
+        }
     }
 
     /// <summary>
@@ -264,11 +313,18 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             return;
         }
 
+        if (!audioDrivenLipSyncActive)
+        {
+            return;
+        }
+
         audioDrivenSampleRate = sampleRate > 0 ? sampleRate : audioDrivenSampleRate;
         int maxBufferedSamples = System.Math.Max(audioDrivenSampleRate, audioDrivenSampleRate * 2);
         int count = System.Math.Min(sampleCount, samples.Length);
+        bool shouldStartPlaybackClock = false;
         lock (audioDrivenLock)
         {
+            shouldStartPlaybackClock = !hasAudioDrivenPlaybackClock && audioDrivenSamples.Count == 0;
             for (int i = 0; i < count; i++)
             {
                 audioDrivenSamples.Enqueue(samples[i]);
@@ -278,28 +334,14 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             {
                 audioDrivenSamples.Dequeue();
             }
+
+            MarkAudioDrivenSamplesReceived(shouldStartPlaybackClock);
         }
     }
 
-    /// <summary>
-    /// 向本地调度队列添加一个 Azure viseme 事件。
-    /// </summary>
-    /// <param name="visemeId">Azure visemeId，通常范围为 0..21。</param>
-    /// <param name="audioOffsetSeconds">相对合成音频起点的时间偏移，单位为秒。</param>
-    public void ScheduleViseme(uint visemeId, float audioOffsetSeconds)
-    {
-        if (!hasSpeechStartTime)
-        {
-            BeginVisemeSchedule();
-        }
+    #endregion
 
-        // audioOffsetSeconds 是 Azure 返回的音频时间偏移，换算成本地绝对触发时间。
-        scheduledVisemes.Enqueue(new ScheduledViseme
-        {
-            VisemeId = visemeId,
-            TargetTime = speechStartTime + audioOffsetSeconds,
-        });
-    }
+    #region Azure Viseme方案内部
 
     /// <summary>
     /// 应用一个 Azure visemeId：先解析到当前模型上可用的第一个 BlendShape 别名，再设置为当前目标口型。
@@ -332,6 +374,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         SetVisemeTarget(index, blendWeight);
     }
 
+    #endregion
+
+    #region 通用模型控制入口
+
     /// <summary>
     /// 立即重置当前网格上的所有 BlendShape，并清空等待中的口型状态。
     /// 切换模型或强制停止语音时使用。
@@ -351,6 +397,8 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         scheduledVisemes.Clear();
         audioDrivenLipSyncActive = false;
         ClearAudioDrivenSamples();
+        hasAudioDrivenPlaybackClock = false;
+        ClearAudioDrivenPendingState();
         ClearVisemeTarget();
     }
 
@@ -374,6 +422,8 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 
         RebuildBlendShapeCache();
     }
+
+    #endregion
 
     #endregion
 
@@ -488,6 +538,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         activeTargetWeight = 0f;
     }
 
+    #endregion
+
+    #region Azure Viseme方案
+
     /// <summary>
     /// 处理已经到达触发时间的 Azure viseme 事件。
     /// 同一帧可能有多个事件到期，这里会全部消费，最终以最新的口型为准。
@@ -502,6 +556,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         }
     }
 
+    #endregion
+
+    #region PCM音频驱动方案
+
     /// <summary>
     /// 根据 PCM 音频帧近似生成口型。
     ///
@@ -515,6 +573,13 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     /// </summary>
     private void ProcessAudioDrivenLipSync()
     {
+        SyncAudioDrivenMainThreadClock();
+
+        if (!hasAudioDrivenPlaybackClock)
+        {
+            return;
+        }
+
         float now = Time.realtimeSinceStartup;
         float frameDuration = Mathf.Max(10, audioLipFrameMs) / 1000f;
         if (now < nextAudioDrivenFrameTime)
@@ -522,19 +587,80 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             return;
         }
 
-        nextAudioDrivenFrameTime = now + frameDuration;
         int frameSize = Mathf.Max(1, audioDrivenSampleRate * Mathf.Max(10, audioLipFrameMs) / 1000);
-        if (!TryDequeueAudioFrame(frameSize, out float[] frame))
+        int processedFrameCount = 0;
+
+        // Unity 的 Tick 帧率可能低于口型分析帧率。例如 30fps 时，一帧间隔约 33ms，
+        // 如果每次 Tick 只消费 20ms PCM，口型队列会持续积压，最终表现为口型比声音晚结束。
+        // 因此这里按真实时间补消费多帧，但设置上限，避免极端卡顿后一帧内做过多分析。
+        while (now >= nextAudioDrivenFrameTime && processedFrameCount < MaxAudioDrivenFramesPerTick)
         {
-            if (GetAudioDrivenBufferedSampleCount() <= 0 && now - lastAudioDrivenSampleTime > 0.35f)
+            if (!TryDequeueAudioFrame(frameSize, out float[] frame))
             {
-                ClearVisemeTarget();
+                if (GetAudioDrivenBufferedSampleCount() <= 0 && now - lastAudioDrivenSampleTime > 0.18f)
+                {
+                    ClearVisemeTarget();
+                }
+
+                return;
             }
 
+            ApplyAudioDrivenFrame(frame);
+            lastAudioDrivenSampleTime = now;
+            nextAudioDrivenFrameTime += frameDuration;
+            processedFrameCount++;
+        }
+
+        if (processedFrameCount >= MaxAudioDrivenFramesPerTick && now - nextAudioDrivenFrameTime > frameDuration * MaxAudioDrivenFramesPerTick)
+        {
+            nextAudioDrivenFrameTime = now + frameDuration;
+        }
+    }
+
+    /// <summary>
+    /// 记录音频驱动口型收到了新的已播放 PCM。
+    /// 口型时钟必须等第一批 PCM 真正进入队列后才启动，否则初始化到开始播放之间的等待时间
+    /// 会被误认为需要追帧，导致口型提前消费完。
+    /// </summary>
+    private void MarkAudioDrivenSamplesReceived(bool shouldStartPlaybackClock)
+    {
+        pendingAudioDrivenSamplesReceived = true;
+        pendingAudioDrivenPlaybackClockStart |= shouldStartPlaybackClock;
+    }
+
+    /// <summary>
+    /// 将音频线程提交的 PCM 状态同步到主线程时钟。
+    /// AudioClip.OnAudioRead 运行在 Unity 音频线程，不能调用 Time.realtimeSinceStartup 或操作 BlendShape；
+    /// 因此推送 PCM 时只记录 pending 标记，真正的时间戳更新和口型播放时钟启动都在 Tick 中完成。
+    /// </summary>
+    private void SyncAudioDrivenMainThreadClock()
+    {
+        bool hasNewSamples;
+        bool shouldStartPlaybackClock;
+        lock (audioDrivenLock)
+        {
+            hasNewSamples = pendingAudioDrivenSamplesReceived;
+            shouldStartPlaybackClock = pendingAudioDrivenPlaybackClockStart;
+            pendingAudioDrivenSamplesReceived = false;
+            pendingAudioDrivenPlaybackClockStart = false;
+        }
+
+        if (!hasNewSamples)
+        {
             return;
         }
 
+        float now = Time.realtimeSinceStartup;
         lastAudioDrivenSampleTime = now;
+        if (shouldStartPlaybackClock)
+        {
+            hasAudioDrivenPlaybackClock = true;
+            nextAudioDrivenFrameTime = now;
+        }
+    }
+
+    private void ApplyAudioDrivenFrame(float[] frame)
+    {
         float sumSquares = 0f;
         float sumAbsDelta = 0f;
         int zeroCrossings = 0;
@@ -556,24 +682,30 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         }
 
         float rms = Mathf.Sqrt(sumSquares / frame.Length);
-        if (rms < audioLipMinRms)
+        float minRms = Mathf.Max(0.0001f, audioLipMinRms);
+        float maxRms = Mathf.Max(minRms + 0.0001f, audioLipMaxRms);
+        if (rms < minRms)
         {
             ClearVisemeTarget();
             return;
         }
 
-        float level = Mathf.InverseLerp(audioLipMinRms, audioLipMaxRms, rms);
-        float targetWeight = Mathf.Lerp(blendWeight * 0.35f, blendWeight, level);
+        // 纯 PCM 口型没有 Azure viseme 那样的离散口型事件，变化天然会弱一些。
+        // 使用非线性曲线放大中低能量帧，并设置最低可见权重，让讲解类平稳语音也有清楚的开合。
+        float level = Mathf.Pow(Mathf.InverseLerp(minRms, maxRms, rms), 0.55f);
+        float maxAudioWeight = Mathf.Min(100f, blendWeight * audioLipWeightMultiplier);
+        float minAudioWeight = Mathf.Min(maxAudioWeight, audioLipMinWeightPercent);
+        float targetWeight = Mathf.Lerp(minAudioWeight, maxAudioWeight, level);
         float zeroCrossingRate = zeroCrossings / (float)frame.Length;
         float edgeDensity = sumAbsDelta / frame.Length;
 
         if (zeroCrossingRate > 0.18f)
         {
-            SetVisemeTargetByNames(Names("SS", "viseme_SS", "S"), targetWeight * 0.75f);
+            SetVisemeTargetByNames(Names("SS", "viseme_SS", "S"), targetWeight * 0.9f);
         }
         else if (edgeDensity > rms * 0.9f)
         {
-            SetVisemeTargetByNames(Names("E", "viseme_E", "ee"), targetWeight * 0.85f);
+            SetVisemeTargetByNames(Names("E", "viseme_E", "ee"), targetWeight);
         }
         else if (level > 0.65f)
         {
@@ -581,7 +713,7 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         }
         else
         {
-            SetVisemeTargetByNames(Names("oh", "viseme_oh", "O"), targetWeight * 0.8f);
+            SetVisemeTargetByNames(Names("oh", "viseme_oh", "O"), targetWeight * 0.95f);
         }
     }
 
@@ -621,6 +753,19 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     }
 
     /// <summary>
+    /// 清空音频线程提交、等待主线程处理的 PCM 状态。
+    /// 停止语音或重新开始语音时必须清理这些标记，避免上一段音频的 pending 状态启动下一段口型时钟。
+    /// </summary>
+    private void ClearAudioDrivenPendingState()
+    {
+        lock (audioDrivenLock)
+        {
+            pendingAudioDrivenSamplesReceived = false;
+            pendingAudioDrivenPlaybackClockStart = false;
+        }
+    }
+
+    /// <summary>
     /// 返回等待音频驱动口型分析的已播放 PCM 采样数量。
     /// </summary>
     private int GetAudioDrivenBufferedSampleCount()
@@ -630,6 +775,10 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             return audioDrivenSamples.Count;
         }
     }
+
+    #endregion
+
+    #region BlendShape权重和名称工具
 
     /// <summary>
     /// 读取 BlendShape 的最终帧权重。Unity 模型常见最大值是 100，但这里兼容自定义权重范围。
