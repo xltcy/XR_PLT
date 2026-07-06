@@ -81,3 +81,7 @@ crashlytics-build.properties
 .continue
 CLAUDE.md
 .vscode
+
+# Barrage server runtime files
+/Tools/BarrageServer/node_modules/
+/Tools/BarrageServer/logs/
