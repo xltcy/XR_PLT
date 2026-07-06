@@ -128,6 +128,15 @@ public class SpeechSynthesizerController : BaseController
         });
     }
 
+    /// <summary>
+    /// PlayMode 退出、场景销毁或宿主 SpeechManager 关闭时调用。
+    /// 这里不等待 provider 的网络/SDK stop 任务，避免 Unity 停止 Play 后仍有语音后台任务阻塞下一次 domain reload。
+    /// </summary>
+    public void ShutdownImmediately()
+    {
+        DisposeSynthesizers();
+    }
+
     private void ApplyGenderToSynthesizers()
     {
         // 性别由 introduce UI 的形象切换驱动；各 provider 在自己的 backend 中映射具体 voice。

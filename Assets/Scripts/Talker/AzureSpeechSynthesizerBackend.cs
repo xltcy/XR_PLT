@@ -20,6 +20,10 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
     private SpeechSynthesizer synthesizer;
     private SpeechManager host;
     private TaskCompletionSource<bool> activeSpeakTask;
+    private EventHandler<SpeechSynthesisEventArgs> synthesisStartedHandler;
+    private EventHandler<SpeechSynthesisEventArgs> synthesisCompletedHandler;
+    private EventHandler<SpeechSynthesisEventArgs> synthesisCanceledHandler;
+    private EventHandler<SpeechSynthesisVisemeEventArgs> visemeReceivedHandler;
     private bool isDisposed;
 
     public void SetVoiceGender(SpeechSynthesizerController.SpeechVoiceGender gender)
@@ -59,15 +63,16 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
             return;
         }
 
-        _ = RunSpeakTextAsync(speechHost, text, onSpeakComplete, tcs);
+        SpeechSynthesizer speakSynthesizer = synthesizer;
+        _ = RunSpeakTextAsync(speakSynthesizer, speechHost, text, onSpeakComplete, tcs);
         await tcs.Task.ConfigureAwait(false);
     }
 
-    private async Task RunSpeakTextAsync(SpeechManager speechHost, string text, Action onSpeakComplete, TaskCompletionSource<bool> tcs)
+    private async Task RunSpeakTextAsync(SpeechSynthesizer speakSynthesizer, SpeechManager speechHost, string text, Action onSpeakComplete, TaskCompletionSource<bool> tcs)
     {
         try
         {
-            await synthesizer.StopSpeakingAsync().ConfigureAwait(false);
+            await speakSynthesizer.StopSpeakingAsync().ConfigureAwait(false);
             if (isDisposed || speechHost.IsSpeechShuttingDown)
             {
                 tcs.TrySetResult(false);
@@ -75,7 +80,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
             }
 
             Debug.Log("Msg: " + text + "prepare");
-            var result = await SpeakWithAzureSsml(synthesizer, text).ConfigureAwait(false);
+            var result = await SpeakWithAzureSsml(speakSynthesizer, text).ConfigureAwait(false);
             if (isDisposed || speechHost.IsSpeechShuttingDown)
             {
                 tcs.TrySetResult(false);
@@ -136,7 +141,8 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 
         SpeechSynthesizer target = synthesizer;
         synthesizer = null;
-        _ = StopAndDisposeSynthesizer(target);
+        DetachSynthesizerEvents(target);
+        DisposeSynthesizerImmediately(target);
     }
 
     private void EnsureSynthesizer()
@@ -147,7 +153,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
         }
 
         synthesizer = new SpeechSynthesizer(AzureAuth.SpeechConfig);
-        synthesizer.SynthesisStarted += (self, args) =>
+        synthesisStartedHandler = (self, args) =>
         {
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
@@ -157,7 +163,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
                 }
             });
         };
-        synthesizer.SynthesisCompleted += (self, args) =>
+        synthesisCompletedHandler = (self, args) =>
         {
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
@@ -167,7 +173,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
                 }
             });
         };
-        synthesizer.SynthesisCanceled += (self, args) =>
+        synthesisCanceledHandler = (self, args) =>
         {
             MainThreadDispatcher.InvokeOnMainThread(() =>
             {
@@ -177,7 +183,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
                 }
             });
         };
-        synthesizer.VisemeReceived += (sender, e) =>
+        visemeReceivedHandler = (sender, e) =>
         {
             // Azure 会返回 viseme 时间线，可以驱动更精确的口型；HTTP TTS provider 只能用播放周期兜底。
             MainThreadDispatcher.InvokeOnMainThread(() =>
@@ -188,6 +194,10 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
                 }
             });
         };
+        synthesizer.SynthesisStarted += synthesisStartedHandler;
+        synthesizer.SynthesisCompleted += synthesisCompletedHandler;
+        synthesizer.SynthesisCanceled += synthesisCanceledHandler;
+        synthesizer.VisemeReceived += visemeReceivedHandler;
     }
 
     private void RebuildSynthesizer()
@@ -218,7 +228,7 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
         }
     }
 
-    private static async Task StopAndDisposeSynthesizer(SpeechSynthesizer target)
+    private void DetachSynthesizerEvents(SpeechSynthesizer target)
     {
         if (target == null)
         {
@@ -227,18 +237,53 @@ public class AzureSpeechSynthesizerBackend : ISpeechSynthesizerBackend
 
         try
         {
-            await StopSynthesizerWithTimeout(target).ConfigureAwait(false);
+            if (synthesisStartedHandler != null)
+            {
+                target.SynthesisStarted -= synthesisStartedHandler;
+            }
+
+            if (synthesisCompletedHandler != null)
+            {
+                target.SynthesisCompleted -= synthesisCompletedHandler;
+            }
+
+            if (synthesisCanceledHandler != null)
+            {
+                target.SynthesisCanceled -= synthesisCanceledHandler;
+            }
+
+            if (visemeReceivedHandler != null)
+            {
+                target.VisemeReceived -= visemeReceivedHandler;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SpeechSynthesizerController] Detach Azure synthesizer events failed: {e.Message}");
         }
         finally
         {
-            try
-            {
-                target.Dispose();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[SpeechSynthesizerController] Dispose Azure synthesizer failed: {e.Message}");
-            }
+            synthesisStartedHandler = null;
+            synthesisCompletedHandler = null;
+            synthesisCanceledHandler = null;
+            visemeReceivedHandler = null;
+        }
+    }
+
+    private static void DisposeSynthesizerImmediately(SpeechSynthesizer target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        try
+        {
+            target.Dispose();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SpeechSynthesizerController] Dispose Azure synthesizer failed: {e.Message}");
         }
     }
 

@@ -141,20 +141,8 @@ public class SMPLController : BaseController, ITickerUpdate
                 aiDestinationSetter.target = destination.transform;
             }
 
-            // 设置语音驱动头部
-            var head = avatarModel.transform.FindDeep("Head_Mesh");
-            if (!head)
-            {
-                head = avatarModel.transform.FindDeep("AvatarHead");
-            }
-
-            if (head)
-            {
-                if (ControllerRefer.SpeechManager.speech2BlendshapeController != null)
-                {
-                    ControllerRefer.SpeechManager.speech2BlendshapeController.SetGuideHead(head.gameObject);
-                }
-            }
+            // 设置语音驱动虚拟人。头部 Head_Mesh 和牙齿 Teeth_Mesh 的查找由 Speech2BlendshapeController 统一处理。
+            ControllerRefer.SpeechManager.speech2BlendshapeController?.SetGuideAvatar(avatarModel);
         }
         
         avatarAnimator = avatarModel.GetComponent<Animator>();

@@ -259,6 +259,7 @@ public class SpeechManager : BaseController
         }
 
         StopLocalSpeechPlayback();
+        ControllerRefer.Get<SpeechSynthesizerController>()?.ShutdownImmediately();
 
         if (synthesizer == null)
         {

@@ -14,8 +14,6 @@ using UnityEngine;
 /// </summary>
 public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 {
-    public GameObject guideHead;
-
     // 口型张开的插值速度。数值越大，BlendShape 越快接近目标张开值。
     [SerializeField] private float openSpeed = 14f;
 
@@ -42,10 +40,15 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     // PCM 驱动口型相对 Azure viseme 的额外放大系数，只影响没有 viseme 的 TTS 后端。
     [SerializeField] private float audioLipWeightMultiplier = 1.0f;
 
+    // 牙齿开合相对主口型的比例。Teeth_Mesh 单独控制牙齿，不能继续混在 head mesh 的 jawOpen 上处理。
+    [SerializeField] private float teethOpenWeightMultiplier = 0.35f;
+
     private SkinnedMeshRenderer smr;
+    private SkinnedMeshRenderer teethSmr;
 
     // 归一化后的 BlendShape 名称或别名 -> BlendShape 索引。
     private readonly Dictionary<string, int> blendShapeIndexCache = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> teethBlendShapeIndexCache = new Dictionary<string, int>();
 
     // 缺失的 BlendShape 别名只提示一次，避免长语音过程中重复刷日志。
     private readonly HashSet<string> warnedMissingBlendShapes = new HashSet<string>();
@@ -55,6 +58,8 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     private readonly object audioDrivenLock = new object();
     private int activeBlendShapeIndex = -1;
     private float activeTargetWeight;
+    private int activeTeethBlendShapeIndex = -1;
+    private float activeTeethTargetWeight;
     private float speechStartTime;
     private bool hasSpeechStartTime;
     private bool audioDrivenLipSyncActive;
@@ -111,11 +116,6 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 
     #region Unity生命周期
 
-    private void Start()
-    {
-        SetGuideHead(guideHead);
-    }
-
     private void OnEnable()
     {
         TickController.RegisterTick(this);
@@ -147,6 +147,7 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
         for (int i = 0; i < smr.sharedMesh.blendShapeCount; i++)
         {
             float targetWeight = i == activeBlendShapeIndex ? activeTargetWeight : 0f;
+
             // 口型时序已经决定了当前应该激活哪个 BlendShape；这里的逐帧插值只负责视觉过渡，
             // 避免口型在不同姿态之间硬切。
             // AudioOffset 决定口型节奏；这里的插值只负责视觉过渡，避免 BlendShape 硬切。
@@ -159,6 +160,8 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 
             smr.SetBlendShapeWeight(i, weight);
         }
+
+        ApplyTeethBlendShapes();
     }
 
     #endregion
@@ -394,6 +397,7 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
             smr.SetBlendShapeWeight(i, 0f);
         }
 
+        ResetTeethBlendShapes();
         scheduledVisemes.Clear();
         audioDrivenLipSyncActive = false;
         ClearAudioDrivenSamples();
@@ -403,24 +407,28 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     }
 
     /// <summary>
-    /// 绑定新的头部模型，并重建 BlendShape 别名缓存。
-    /// 如果根节点上没有 SkinnedMeshRenderer，会继续在子节点中查找。
+    /// 绑定新的虚拟人根节点，并自动查找头部网格和牙齿网格。
+    /// SMPLController 切换角色后只需要传入 avatar 根节点，头部和 Teeth_Mesh 的定位由本类统一维护。
     /// </summary>
-    public void SetGuideHead(GameObject head)
+    public void SetGuideAvatar(GameObject avatar)
     {
-        if (!head)
+        if (!avatar)
         {
             return;
         }
 
-        guideHead = head;
-        smr = guideHead.GetComponent<SkinnedMeshRenderer>();
-        if (!smr)
-        {
-            smr = guideHead.GetComponentInChildren<SkinnedMeshRenderer>();
-        }
+        BindRenderers(avatar);
+    }
 
+    /// <summary>
+    /// 根据指定根节点绑定 head mesh 和 Teeth_Mesh，并重建各自的 BlendShape 缓存。
+    /// </summary>
+    private void BindRenderers(GameObject root)
+    {
+        smr = FindHeadSkinnedMeshRenderer(root);
+        teethSmr = FindTeethSkinnedMeshRenderer(root);
         RebuildBlendShapeCache();
+        RebuildTeethBlendShapeCache();
     }
 
     #endregion
@@ -456,6 +464,37 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     }
 
     /// <summary>
+    /// 从 Teeth_Mesh 的 BlendShape 中解析开合目标。
+    /// 如果没有命中常见别名，但牙齿网格只有一个 BlendShape，则默认使用它作为开合通道。
+    /// </summary>
+    private int GetTeethBlendShapeIndex(string[] candidateNames)
+    {
+        if (!teethSmr || !teethSmr.sharedMesh)
+        {
+            return -1;
+        }
+
+        foreach (string candidateName in candidateNames)
+        {
+            if (string.IsNullOrEmpty(candidateName)) continue;
+
+            int exactIndex = teethSmr.sharedMesh.GetBlendShapeIndex(candidateName);
+            if (exactIndex >= 0)
+            {
+                return exactIndex;
+            }
+
+            string normalizedName = NormalizeBlendShapeName(candidateName);
+            if (teethBlendShapeIndexCache.TryGetValue(normalizedName, out int cachedIndex))
+            {
+                return cachedIndex;
+            }
+        }
+
+        return teethSmr.sharedMesh.blendShapeCount == 1 ? 0 : -1;
+    }
+
+    /// <summary>
     /// 为当前绑定的模型重建 BlendShape 别名查询表。
     /// 名称会按原始形式缓存；如果名称带有 viseme_ 前缀，也会额外缓存去掉前缀后的别名，
     /// 因此模型里的 viseme_aa 也可以被 aa 命中。
@@ -484,6 +523,25 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     }
 
     /// <summary>
+    /// 为 Teeth_Mesh 重建 BlendShape 查询表。
+    /// 牙齿网格通常只有少量开合 BlendShape，独立缓存可以避免误用 head mesh 的同名索引。
+    /// </summary>
+    private void RebuildTeethBlendShapeCache()
+    {
+        teethBlendShapeIndexCache.Clear();
+
+        if (!teethSmr || !teethSmr.sharedMesh)
+        {
+            return;
+        }
+
+        for (int i = 0; i < teethSmr.sharedMesh.blendShapeCount; i++)
+        {
+            AddTeethBlendShapeAlias(teethSmr.sharedMesh.GetBlendShapeName(i), i);
+        }
+    }
+
+    /// <summary>
     /// 向缓存中添加一个归一化后的 BlendShape 别名。
     /// 如果出现重复别名，保留第一次出现的索引，避免覆盖模型原始顺序。
     /// </summary>
@@ -497,12 +555,32 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     }
 
     /// <summary>
+    /// 向 Teeth_Mesh 的 BlendShape 缓存中添加别名。
+    /// </summary>
+    private void AddTeethBlendShapeAlias(string name, int index)
+    {
+        string normalizedName = NormalizeBlendShapeName(name);
+        if (!string.IsNullOrEmpty(normalizedName) && !teethBlendShapeIndexCache.ContainsKey(normalizedName))
+        {
+            teethBlendShapeIndexCache.Add(normalizedName, index);
+        }
+    }
+
+    /// <summary>
     /// 将 0..100 的百分比转换成当前网格实际使用的 BlendShape 帧权重。
     /// 有些模型最大值是 100，也有模型会使用自定义的最终帧权重。
     /// </summary>
     private float GetScaledBlendShapeWeight(int index, float percent)
     {
-        return Mathf.Clamp01(percent / 100f) * GetBlendShapeMaxWeight(index);
+        return GetScaledBlendShapeWeight(smr, index, percent);
+    }
+
+    /// <summary>
+    /// 将 0..100 的百分比转换成指定网格实际使用的 BlendShape 帧权重。
+    /// </summary>
+    private float GetScaledBlendShapeWeight(SkinnedMeshRenderer renderer, int index, float percent)
+    {
+        return Mathf.Clamp01(percent / 100f) * GetBlendShapeMaxWeight(renderer, index);
     }
 
     /// <summary>
@@ -512,6 +590,7 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     {
         activeBlendShapeIndex = index;
         activeTargetWeight = GetScaledBlendShapeWeight(index, percent);
+        SetTeethOpenTarget(percent * teethOpenWeightMultiplier);
     }
 
     /// <summary>
@@ -536,6 +615,28 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     {
         activeBlendShapeIndex = -1;
         activeTargetWeight = 0f;
+        ClearTeethTarget();
+    }
+
+    /// <summary>
+    /// 设置 Teeth_Mesh 的开合目标。
+    /// 牙齿开合使用独立的 Teeth_Mesh，而不是继续占用 head mesh 上的 jawOpen/mouthOpen。
+    /// </summary>
+    private void SetTeethOpenTarget(float percent)
+    {
+        if (!teethSmr || !teethSmr.sharedMesh)
+        {
+            return;
+        }
+
+        int index = GetTeethBlendShapeIndex(Names("jawOpen", "mouthOpen", "teethOpen", "Teeth_Mesh", "aa", "viseme_aa"));
+        if (index < 0)
+        {
+            return;
+        }
+
+        activeTeethBlendShapeIndex = index;
+        activeTeethTargetWeight = GetScaledBlendShapeWeight(teethSmr, index, percent);
     }
 
     #endregion
@@ -778,6 +879,121 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
 
     #endregion
 
+    #region Teeth_Mesh控制
+
+    /// <summary>
+    /// 逐帧更新 Teeth_Mesh 的 BlendShape。
+    /// Teeth_Mesh 和 head mesh 是两个独立 renderer，因此必须分开设置权重，否则只动嘴唇不会带动牙齿开合。
+    /// </summary>
+    private void ApplyTeethBlendShapes()
+    {
+        if (!teethSmr || !teethSmr.sharedMesh)
+        {
+            return;
+        }
+
+        for (int i = 0; i < teethSmr.sharedMesh.blendShapeCount; i++)
+        {
+            float targetWeight = i == activeTeethBlendShapeIndex ? activeTeethTargetWeight : 0f;
+            float currentWeight = teethSmr.GetBlendShapeWeight(i);
+            float speed = targetWeight > currentWeight ? openSpeed : closeSpeed;
+            float weight = Mathf.Lerp(currentWeight, targetWeight, 1f - Mathf.Exp(-speed * Time.deltaTime));
+            if (weight < 0.001f)
+            {
+                weight = 0f;
+            }
+
+            teethSmr.SetBlendShapeWeight(i, weight);
+        }
+    }
+
+    /// <summary>
+    /// 立即清空 Teeth_Mesh 上的所有 BlendShape。
+    /// </summary>
+    private void ResetTeethBlendShapes()
+    {
+        if (!teethSmr || !teethSmr.sharedMesh)
+        {
+            return;
+        }
+
+        for (int i = 0; i < teethSmr.sharedMesh.blendShapeCount; i++)
+        {
+            teethSmr.SetBlendShapeWeight(i, 0f);
+        }
+    }
+
+    /// <summary>
+    /// 清空牙齿开合目标。实际权重会在 Tick 中按 closeSpeed 平滑回到 0。
+    /// </summary>
+    private void ClearTeethTarget()
+    {
+        activeTeethBlendShapeIndex = -1;
+        activeTeethTargetWeight = 0f;
+    }
+
+    #endregion
+
+    #region 模型Renderer查找
+
+    /// <summary>
+    /// 查找负责嘴唇/viseme 的 head mesh。这里会排除 Teeth_Mesh，避免把牙齿 renderer 误当成头部 renderer。
+    /// </summary>
+    private static SkinnedMeshRenderer FindHeadSkinnedMeshRenderer(GameObject root)
+    {
+        SkinnedMeshRenderer[] renderers = root.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        SkinnedMeshRenderer firstNonTeeth = null;
+        foreach (SkinnedMeshRenderer renderer in renderers)
+        {
+            if (!renderer) continue;
+
+            string normalizedName = NormalizeBlendShapeName(renderer.name);
+            if (IsTeethRendererName(normalizedName))
+            {
+                continue;
+            }
+
+            firstNonTeeth ??= renderer;
+            if (normalizedName.Contains("headmesh") || normalizedName.Contains("head") || normalizedName.Contains("face"))
+            {
+                return renderer;
+            }
+        }
+
+        return firstNonTeeth ?? (renderers.Length > 0 ? renderers[0] : null);
+    }
+
+    /// <summary>
+    /// 查找负责牙齿开合的 Teeth_Mesh。
+    /// </summary>
+    private static SkinnedMeshRenderer FindTeethSkinnedMeshRenderer(GameObject root)
+    {
+        Transform current = root.transform;
+        while (current != null)
+        {
+            foreach (SkinnedMeshRenderer renderer in current.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                if (!renderer) continue;
+
+                if (IsTeethRendererName(NormalizeBlendShapeName(renderer.name)))
+                {
+                    return renderer;
+                }
+            }
+
+            current = current.parent;
+        }
+
+        return null;
+    }
+
+    private static bool IsTeethRendererName(string normalizedName)
+    {
+        return normalizedName == "teethmesh" || normalizedName.Contains("teeth");
+    }
+
+    #endregion
+
     #region BlendShape权重和名称工具
 
     /// <summary>
@@ -785,7 +1001,15 @@ public class Speech2BlendshapeController : MonoBehaviour, ITickerUpdate
     /// </summary>
     private float GetBlendShapeMaxWeight(int index)
     {
-        Mesh mesh = smr.sharedMesh;
+        return GetBlendShapeMaxWeight(smr, index);
+    }
+
+    /// <summary>
+    /// 读取指定 renderer 上 BlendShape 的最终帧权重。
+    /// </summary>
+    private float GetBlendShapeMaxWeight(SkinnedMeshRenderer renderer, int index)
+    {
+        Mesh mesh = renderer.sharedMesh;
         int frameCount = mesh.GetBlendShapeFrameCount(index);
         if (frameCount <= 0)
         {
