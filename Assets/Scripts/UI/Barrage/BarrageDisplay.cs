@@ -11,11 +11,12 @@ public class BarrageDisplay : MonoBehaviour
 {
     [Header("UI 引用")]
     [SerializeField] private RectTransform barrageRoot;
-    [SerializeField] private TextMeshProUGUI itemTemplate;
+    [SerializeField] private Graphic itemTemplate;
 
     [Header("布局")]
     [SerializeField] private int laneCount = 8;
     [SerializeField] private float laneHeight = 48f;
+    [SerializeField] private float laneVerticalGap = 8f;
     [SerializeField] private float paddingTop = 32f;
     [SerializeField] private float minHorizontalGap = 80f;
     [SerializeField] private int maxPendingMessages = 200;
@@ -26,22 +27,33 @@ public class BarrageDisplay : MonoBehaviour
     [SerializeField] private float spawnInterval = 0.12f;
     [SerializeField] private TMP_FontAsset barrageFontAsset;
     [SerializeField] private string defaultFontResourcePath = "Fonts/simhei SDF";
+    [SerializeField] private Font legacyTextFont;
     [SerializeField] private float fontSize = 30f;
     [SerializeField] private Color textColor = Color.white;
     [SerializeField] private Color outlineColor = new Color(0f, 0f, 0f, 0.75f);
     [SerializeField] private float outlineWidth = 0.18f;
 
     private readonly Queue<InteractiveBarrageMessage> pendingMessages = new Queue<InteractiveBarrageMessage>();
-    private readonly Queue<TextMeshProUGUI> itemPool = new Queue<TextMeshProUGUI>();
+    private readonly Queue<BarrageTextItem> itemPool = new Queue<BarrageTextItem>();
     private readonly List<ActiveBarrageItem> activeItems = new List<ActiveBarrageItem>();
     private float[] nextLaneAvailableTimes;
     private float nextSpawnTime;
 
     private class ActiveBarrageItem
     {
-        public TextMeshProUGUI Text;
+        public BarrageTextItem TextItem;
         public RectTransform RectTransform;
         public float EndX;
+    }
+
+    private class BarrageTextItem
+    {
+        public GameObject GameObject;
+        public RectTransform RectTransform;
+        public TMP_Text TmpText;
+        public Text LegacyText;
+
+        public bool IsValid => GameObject && RectTransform && (TmpText || LegacyText);
     }
 
     private void Awake()
@@ -113,14 +125,18 @@ public class BarrageDisplay : MonoBehaviour
         }
 
         InteractiveBarrageMessage message = pendingMessages.Dequeue();
-        TextMeshProUGUI text = GetItem();
-        RectTransform rectTransform = text.rectTransform;
+        BarrageTextItem textItem = GetItem();
+        if (textItem == null || !textItem.IsValid)
+        {
+            return;
+        }
 
-        text.text = FormatMessage(message);
-        ApplyTextStyle(text);
-        text.ForceMeshUpdate();
+        RectTransform rectTransform = textItem.RectTransform;
 
-        Vector2 preferredValues = text.GetPreferredValues(text.text);
+        SetItemText(textItem, FormatMessage(message));
+        ApplyTextStyle(textItem);
+
+        Vector2 preferredValues = GetPreferredValues(textItem);
         float width = Mathf.Max(120f, preferredValues.x + 48f);
         float height = Mathf.Max(laneHeight, preferredValues.y + 12f);
         rectTransform.sizeDelta = new Vector2(width, height);
@@ -129,14 +145,15 @@ public class BarrageDisplay : MonoBehaviour
         float rootHeight = GetRootHeight();
         float startX = rootWidth * 0.5f + width * 0.5f;
         float endX = -rootWidth * 0.5f - width * 0.5f;
-        float y = rootHeight * 0.5f - paddingTop - laneHeight * 0.5f - lane * laneHeight;
+        float laneStep = laneHeight + laneVerticalGap;
+        float y = rootHeight * 0.5f - paddingTop - laneHeight * 0.5f - lane * laneStep;
 
         rectTransform.anchoredPosition = new Vector2(startX, y);
-        text.gameObject.SetActive(true);
+        textItem.GameObject.SetActive(true);
 
         activeItems.Add(new ActiveBarrageItem
         {
-            Text = text,
+            TextItem = textItem,
             RectTransform = rectTransform,
             EndX = endX
         });
@@ -187,27 +204,27 @@ public class BarrageDisplay : MonoBehaviour
         return bestTime - now < 0.25f ? bestLane : -1;
     }
 
-    private TextMeshProUGUI GetItem()
+    private BarrageTextItem GetItem()
     {
         if (itemPool.Count > 0)
         {
             return itemPool.Dequeue();
         }
 
-        TextMeshProUGUI text = Instantiate(itemTemplate, barrageRoot);
+        Graphic text = Instantiate(itemTemplate, barrageRoot);
         text.name = "BarrageItem";
-        return text;
+        return CreateTextItem(text);
     }
 
     private void RecycleItem(ActiveBarrageItem item)
     {
-        if (item == null || !item.Text)
+        if (item == null || item.TextItem == null || !item.TextItem.IsValid)
         {
             return;
         }
 
-        item.Text.gameObject.SetActive(false);
-        itemPool.Enqueue(item.Text);
+        item.TextItem.GameObject.SetActive(false);
+        itemPool.Enqueue(item.TextItem);
     }
 
     private string FormatMessage(InteractiveBarrageMessage message)
@@ -255,14 +272,15 @@ public class BarrageDisplay : MonoBehaviour
         if (itemTemplate)
         {
             itemTemplate.gameObject.SetActive(false);
+            ApplyTextStyle(CreateTextItem(itemTemplate));
             return;
         }
 
         GameObject templateObject = new GameObject("BarrageItemTemplate");
         templateObject.transform.SetParent(barrageRoot, false);
-        itemTemplate = templateObject.AddComponent<TextMeshProUGUI>();
+        itemTemplate = templateObject.AddComponent<Text>();
         itemTemplate.raycastTarget = false;
-        ApplyTextStyle(itemTemplate);
+        ApplyTextStyle(CreateTextItem(itemTemplate));
 
         RectTransform rectTransform = itemTemplate.rectTransform;
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -273,31 +291,144 @@ public class BarrageDisplay : MonoBehaviour
         itemTemplate.gameObject.SetActive(false);
     }
 
-    private void ApplyTextStyle(TextMeshProUGUI text)
+    private BarrageTextItem CreateTextItem(Graphic graphic)
+    {
+        if (!graphic)
+        {
+            return null;
+        }
+
+        return new BarrageTextItem
+        {
+            GameObject = graphic.gameObject,
+            RectTransform = graphic.rectTransform,
+            TmpText = graphic.GetComponent<TMP_Text>(),
+            LegacyText = graphic.GetComponent<Text>()
+        };
+    }
+
+    private void SetItemText(BarrageTextItem item, string content)
+    {
+        if (item == null)
+        {
+            return;
+        }
+
+        if (item.TmpText)
+        {
+            item.TmpText.text = content;
+        }
+
+        if (item.LegacyText)
+        {
+            item.LegacyText.text = content;
+        }
+    }
+
+    private Vector2 GetPreferredValues(BarrageTextItem item)
+    {
+        if (item == null)
+        {
+            return Vector2.zero;
+        }
+
+        if (item.TmpText)
+        {
+            item.TmpText.ForceMeshUpdate();
+            return item.TmpText.GetPreferredValues(item.TmpText.text);
+        }
+
+        if (item.LegacyText)
+        {
+            return new Vector2(item.LegacyText.preferredWidth, item.LegacyText.preferredHeight);
+        }
+
+        return Vector2.zero;
+    }
+
+    private void ApplyTextStyle(BarrageTextItem item)
+    {
+        if (item == null)
+        {
+            return;
+        }
+
+        if (item.TmpText)
+        {
+            if (!barrageFontAsset && !string.IsNullOrWhiteSpace(defaultFontResourcePath))
+            {
+                barrageFontAsset = Resources.Load<TMP_FontAsset>(defaultFontResourcePath);
+            }
+
+            if (barrageFontAsset)
+            {
+                item.TmpText.font = barrageFontAsset;
+            }
+
+            item.TmpText.raycastTarget = false;
+            item.TmpText.alignment = TextAlignmentOptions.MidlineLeft;
+            item.TmpText.fontSize = fontSize;
+            item.TmpText.color = textColor;
+            item.TmpText.outlineColor = outlineColor;
+            item.TmpText.outlineWidth = outlineWidth;
+            item.TmpText.enableWordWrapping = false;
+            item.TmpText.overflowMode = TextOverflowModes.Overflow;
+        }
+
+        if (item.LegacyText)
+        {
+            EnsureLegacyTextFont(item.LegacyText);
+            item.LegacyText.raycastTarget = false;
+            item.LegacyText.alignment = TextAnchor.MiddleLeft;
+            item.LegacyText.fontSize = Mathf.RoundToInt(fontSize);
+            item.LegacyText.color = textColor;
+            item.LegacyText.horizontalOverflow = HorizontalWrapMode.Overflow;
+            item.LegacyText.verticalOverflow = VerticalWrapMode.Overflow;
+            item.LegacyText.supportRichText = true;
+
+            UnityEngine.UI.Outline outline = item.LegacyText.GetComponent<UnityEngine.UI.Outline>();
+            if (outlineWidth > 0f)
+            {
+                if (!outline)
+                {
+                    outline = item.LegacyText.gameObject.AddComponent<UnityEngine.UI.Outline>();
+                }
+
+                outline.enabled = true;
+                outline.effectColor = outlineColor;
+                outline.effectDistance = Vector2.one * outlineWidth * 8f;
+            }
+            else if (outline)
+            {
+                outline.enabled = false;
+            }
+        }
+    }
+
+    private void EnsureLegacyTextFont(Text text)
     {
         if (!text)
         {
             return;
         }
 
-        if (!barrageFontAsset && !string.IsNullOrWhiteSpace(defaultFontResourcePath))
+        if (legacyTextFont)
         {
-            barrageFontAsset = Resources.Load<TMP_FontAsset>(defaultFontResourcePath);
+            text.font = legacyTextFont;
+            return;
         }
 
-        if (barrageFontAsset)
+        if (text.font)
         {
-            text.font = barrageFontAsset;
+            legacyTextFont = text.font;
+            return;
         }
 
-        text.raycastTarget = false;
-        text.alignment = TextAlignmentOptions.MidlineLeft;
-        text.fontSize = fontSize;
-        text.color = textColor;
-        text.outlineColor = outlineColor;
-        text.outlineWidth = outlineWidth;
-        text.enableWordWrapping = false;
-        text.overflowMode = TextOverflowModes.Overflow;
+        legacyTextFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        if (legacyTextFont)
+        {
+            text.font = legacyTextFont;
+        }
     }
 
     private void EnsureLaneState()
