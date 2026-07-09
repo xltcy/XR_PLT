@@ -597,8 +597,8 @@ public class UIManager : BaseManager
             return;
         }
         // 初始化Hud
-        Open(UINameConstant.DebugUIMediator);
         Open(UINameConstant.GxlIntroduceStartHudUIMediator);
+        Open(UINameConstant.DebugUIMediator);
     }
     
     #endregion

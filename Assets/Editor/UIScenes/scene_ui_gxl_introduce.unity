@@ -5698,7 +5698,7 @@ MonoBehaviour:
   logBindResults: 0
   searchInactiveNodes: 1
   componentListCache: []
-  serverIp: 10.243.57.216
+  serverIp: 1.92.83.226
   serverPort: 37621
   useHttps: 0
   sessionId: default
@@ -5731,6 +5731,7 @@ MonoBehaviour:
   itemTemplate: {fileID: 0}
   laneCount: 8
   laneHeight: 48
+  laneVerticalGap: 8
   paddingTop: 32
   minHorizontalGap: 80
   maxPendingMessages: 200

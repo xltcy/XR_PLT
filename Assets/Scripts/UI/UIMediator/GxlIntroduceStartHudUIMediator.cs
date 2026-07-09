@@ -84,8 +84,8 @@ public class GxlIntroduceStartHudUIMediator : BaseUIMediator
 
     private readonly List<VoiceModelOption> voiceModelOptions = new List<VoiceModelOption>
     {
-        new VoiceModelOption("azure", SpeechManager.SpeechSynthesisMode.Azure),
         new VoiceModelOption("cosyvoice", SpeechManager.SpeechSynthesisMode.CosyVoice),
+        new VoiceModelOption("azure", SpeechManager.SpeechSynthesisMode.Azure),
     };
     
 

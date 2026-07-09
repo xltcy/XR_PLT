@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.WebSockets;
@@ -11,38 +10,134 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 互动弹幕 WebSocket 客户端。
-/// 手机网页向 Ubuntu 弹幕服务器发送消息后，服务器会把同一 session 的消息广播给 role=unity 的连接。
-/// 本组件负责连接服务器、解析消息、保存最近收到的记录，并把消息推给 BarrageDisplay 播放。
+/// 互动弹幕 Unity WebSocket 客户端。
+/// 
+/// 整条弹幕链路分为三段：
+/// 1. 手机网页连接后端服务器，发送弹幕文本。
+/// 2. 后端服务器按 session 把弹幕广播给 role=unity 的 WebSocket 连接。
+/// 3. 本组件接收服务器推送，保存本地记录，并把消息交给 <see cref="BarrageDisplay"/> 播放。
+/// 
+/// 本组件负责：
+/// - 维护 WebSocket 连接和自动重连。
+/// - 解析服务器推送的 JSON 消息。
+/// - 保存最近收到的弹幕记录。
+/// - 生成手机网页二维码并控制 p_qr_code 节点显示。
+/// - 提供 Debug 面板可调用的 Configure 方法，用于运行时切换服务器 IP。
 /// </summary>
 public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
 {
     [Header("连接配置")]
-    [SerializeField] private string serverIp = "10.243.57.216";
+    /// <summary>
+    /// 弹幕后端服务器 IP 或域名。
+    /// DebugBarrageComponent 会读取和修改这个值。
+    /// </summary>
+    [SerializeField] private string serverIp = "1.92.83.226";
+
+    /// <summary>
+    /// 弹幕后端监听端口。当前后端默认端口是 37621。
+    /// </summary>
     [SerializeField] private int serverPort = 37621;
+
+    /// <summary>
+    /// 是否使用 HTTPS/WSS。
+    /// false 时使用 http/ws，true 时使用 https/wss。
+    /// </summary>
     [SerializeField] private bool useHttps;
+
+    /// <summary>
+    /// 会话 ID。手机网页和 Unity 必须使用相同 session，服务器才会把弹幕转发到当前 Unity。
+    /// </summary>
     [SerializeField] private string sessionId = "default";
+
+    /// <summary>
+    /// 是否在 Start 时自动连接弹幕后端。
+    /// </summary>
     [SerializeField] private bool connectOnStart = true;
+
+    /// <summary>
+    /// 断线或连接失败后的重连间隔。
+    /// </summary>
     [SerializeField] private float reconnectDelay = 3f;
+
+    /// <summary>
+    /// TickController 调用 TickInterval 的间隔。
+    /// 这个组件没有使用 Update，而是通过项目统一 TickSystem 做周期性处理。
+    /// </summary>
     [SerializeField] private float tickInterval = 1f;
 
     [Header("显示与记录")]
+    /// <summary>
+    /// 实际显示弹幕的组件。未绑定时会在当前物体上查找。
+    /// </summary>
     [SerializeField] private BarrageDisplay barrageDisplay;
+
+    /// <summary>
+    /// Unity 本地保存的最近弹幕记录上限。
+    /// 记录用于调试、统计或后续扩展，不影响屏幕显示队列。
+    /// </summary>
     [SerializeField] private int maxLocalRecords = 500;
+
+    /// <summary>
+    /// 每次 Tick 最多处理多少条服务器消息。
+    /// 避免一次性处理大量消息导致单帧卡顿。
+    /// </summary>
     [SerializeField] private int maxMessagesPerFrame = 20;
 
     [Header("二维码")]
+    /// <summary>
+    /// 二维码根节点。需求是“连接上服务器后显示 p_qr_code”。
+    /// 该字段通过 ComponentBinder 按节点名自动绑定。
+    /// </summary>
     [BindChild("p_qr_code")]
     [SerializeField] private GameObject qrCodeRoot;
+
+    /// <summary>
+    /// 显示二维码贴图的 RawImage。
+    /// 如果根节点下没有 RawImage，且允许自动创建，则会运行时创建。
+    /// </summary>
     [SerializeField] private RawImage qrCodeImage;
+
+    /// <summary>
+    /// 连接成功后是否自动生成二维码。
+    /// </summary>
     [SerializeField] private bool loadQrCodeOnStart = true;
+
+    /// <summary>
+    /// p_qr_code 节点没有 RawImage 时，是否自动创建一个 RawImage 子节点。
+    /// </summary>
     [SerializeField] private bool createQrCodeImageIfMissing = true;
+
+    /// <summary>
+    /// 自动创建二维码节点时使用的默认尺寸。
+    /// 如果 prefab 中已有 p_qr_code 布局，则不会强行覆盖现有布局。
+    /// </summary>
     [SerializeField] private Vector2 qrCodeSize = new Vector2(220f, 220f);
+
+    /// <summary>
+    /// 自动创建二维码节点时使用的默认锚点位置。
+    /// </summary>
     [SerializeField] private Vector2 qrCodeAnchoredPosition = new Vector2(-140f, -140f);
+
+    /// <summary>
+    /// 可选的手机网页 URL 覆盖。
+    /// 为空时由 serverIp/serverPort/sessionId 拼接；不为空时可以使用 {session} 占位符。
+    /// </summary>
     [SerializeField] private string webPageUrlOverride;
 
+    /// <summary>
+    /// 后台接收线程写入的原始 JSON 消息队列。
+    /// 队列内容只在主线程 Tick 中消费，避免在后台线程直接操作 Unity 对象。
+    /// </summary>
     private readonly Queue<string> pendingPayloads = new Queue<string>();
+
+    /// <summary>
+    /// 本地保存的最近弹幕记录。
+    /// </summary>
     private readonly List<InteractiveBarrageMessage> localRecords = new List<InteractiveBarrageMessage>();
+
+    /// <summary>
+    /// pendingPayloads 会被后台 ReceiveLoop 和主线程 Tick 同时访问，因此需要加锁。
+    /// </summary>
     private readonly object pendingLock = new object();
 
     private ClientWebSocket webSocket;
@@ -52,12 +147,18 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
     private bool isQuitting;
     private Texture2D qrCodeTexture;
     private bool qrCodeLoaded;
+
+    /// <summary>
+    /// 后台线程不能直接操作 Unity UI，因此用这些标志让主线程 Tick 执行 UI 操作。
+    /// </summary>
     private volatile bool pendingQrCodeRefresh;
     private volatile bool pendingQrCodeHide;
     private volatile bool pendingReconnectSchedule;
 
     public IReadOnlyList<InteractiveBarrageMessage> LocalRecords => localRecords;
     public string SessionId => sessionId;
+    public string ServerIp => GetServerHost();
+    public int ServerPort => serverPort;
     public bool IsConnected => webSocket != null && webSocket.State == WebSocketState.Open;
     public float TickIntervalTime => Mathf.Max(0.5f, tickInterval);
 
@@ -83,6 +184,10 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 由 TickController 按 tickInterval 周期调用。
+    /// 这里集中处理主线程任务：二维码显示、重连调度、消息派发。
+    /// </summary>
     public void TickInterval()
     {
         if (pendingQrCodeHide)
@@ -125,7 +230,8 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
     }
 
     /// <summary>
-    /// 修改服务器 IP、端口和 session 后重新连接。
+    /// 修改服务器地址、端口和 session，并按需立即重连。
+    /// DebugBarrageComponent 的刷新 IP 按钮会调用这个方法。
     /// </summary>
     public void Configure(string ip, int port, string newSessionId, bool reconnectImmediately = true)
     {
@@ -143,8 +249,8 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
     }
 
     /// <summary>
-    /// 重新从服务器下载二维码图片。
-    /// 二维码内容由服务端生成，指向当前 session 的手机弹幕网页。
+    /// 本地生成二维码贴图并显示到 p_qr_code。
+    /// 二维码内容是手机网页 URL，手机扫码后进入当前 session 的弹幕页面。
     /// </summary>
     public void RefreshQrCode()
     {
@@ -180,7 +286,8 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
     }
 
     /// <summary>
-    /// 主动建立 WebSocket 连接。连接成功后后台任务会持续接收服务器推送。
+    /// 主动建立 WebSocket 连接。
+    /// 连接成功后启动后台 ReceiveLoop 持续接收服务器推送。
     /// </summary>
     public async void Connect()
     {
@@ -214,7 +321,7 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
     }
 
     /// <summary>
-    /// 立即断开连接并停止后台接收任务。
+    /// 立即断开 WebSocket 连接并停止接收任务。
     /// </summary>
     public void Disconnect()
     {
@@ -237,6 +344,10 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 构造 Unity 端 WebSocket 地址。
+    /// role=unity 表示当前连接是屏幕接收端，服务器只会把弹幕广播给同 session 的 unity 连接。
+    /// </summary>
     private Uri BuildUnityWebSocketUri()
     {
         string scheme = useHttps ? "wss" : "ws";
@@ -244,6 +355,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         return new Uri(url);
     }
 
+    /// <summary>
+    /// 构造手机访问网页地址，用于二维码生成。
+    /// </summary>
     private string BuildWebPageUrl()
     {
         if (!string.IsNullOrWhiteSpace(webPageUrlOverride))
@@ -255,11 +369,18 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         return $"{scheme}://{GetServerHost()}:{serverPort}/?session={Uri.EscapeDataString(sessionId)}";
     }
 
+    /// <summary>
+    /// 获取服务器主机名。serverIp 为空时使用本机地址兜底。
+    /// </summary>
     private string GetServerHost()
     {
         return string.IsNullOrWhiteSpace(serverIp) ? "127.0.0.1" : serverIp.Trim();
     }
 
+    /// <summary>
+    /// 确保二维码根节点和 RawImage 存在。
+    /// 优先使用 prefab 中的 p_qr_code；缺少 RawImage 时可自动创建子节点。
+    /// </summary>
     private void EnsureQrCodeRootAndImage()
     {
         if (qrCodeRoot)
@@ -315,6 +436,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         SetQrCodeVisible(false);
     }
 
+    /// <summary>
+    /// 在指定根节点下创建一个铺满父节点的 RawImage，用于承载二维码贴图。
+    /// </summary>
     private RawImage CreateQrCodeImageUnderRoot(Transform root)
     {
         GameObject imageObject = new GameObject("p_qr_code_image");
@@ -331,6 +455,10 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         return image;
     }
 
+    /// <summary>
+    /// 配置二维码 RawImage 的通用显示属性。
+    /// 如果是 prefab 已有布局，不强制覆盖 RectTransform；如果是自动创建节点，则应用默认布局。
+    /// </summary>
     private void ConfigureQrCodeImage(bool applyDefaultLayout)
     {
         if (!qrCodeImage)
@@ -354,6 +482,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         rectTransform.anchoredPosition = qrCodeAnchoredPosition;
     }
 
+    /// <summary>
+    /// 清理当前二维码贴图，防止重复生成时纹理泄漏。
+    /// </summary>
     private void ClearQrCodeTexture()
     {
         if (qrCodeImage)
@@ -370,6 +501,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 控制二维码节点显示隐藏。
+    /// </summary>
     private void SetQrCodeVisible(bool visible)
     {
         if (qrCodeRoot)
@@ -382,6 +516,11 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// WebSocket 后台接收循环。
+    /// 注意：这个方法不直接操作 Unity UI，只把收到的 JSON 放入 pendingPayloads，
+    /// 后续由主线程 TickInterval 调用 ProcessPendingPayloads 处理。
+    /// </summary>
     private async Task ReceiveLoop(ClientWebSocket socket, CancellationToken token)
     {
         byte[] buffer = new byte[4096];
@@ -424,6 +563,10 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 主线程处理后台收到的服务器消息。
+    /// 每次最多处理 maxMessagesPerFrame 条，避免单帧处理过多 JSON 导致卡顿。
+    /// </summary>
     private void ProcessPendingPayloads()
     {
         int count = 0;
@@ -445,6 +588,14 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 解析服务器推送包并按 type 分发。
+    /// 当前支持：
+    /// - barrage：新增弹幕。
+    /// - clear：清屏。
+    /// - hello：服务器握手确认。
+    /// - error：服务器错误提示。
+    /// </summary>
     private void HandleServerPayload(string payload)
     {
         InteractiveBarrageEnvelope envelope;
@@ -482,6 +633,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 把弹幕消息加入本地记录，并按 maxLocalRecords 裁剪旧记录。
+    /// </summary>
     private void AddRecord(InteractiveBarrageMessage message)
     {
         if (message == null || string.IsNullOrEmpty(message.content))
@@ -496,6 +650,10 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         }
     }
 
+    /// <summary>
+    /// 安排下一次重连。
+    /// 该方法可能从后台接收循环触发，所以只设置标志，具体时间计算放在主线程 Tick 中执行。
+    /// </summary>
     private void ScheduleReconnect()
     {
         DisposeSocket();
@@ -504,6 +662,9 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
         pendingReconnectSchedule = true;
     }
 
+    /// <summary>
+    /// 释放 WebSocket 和取消令牌资源。
+    /// </summary>
     private void DisposeSocket()
     {
         try
@@ -529,7 +690,8 @@ public class InteractiveBarrageClient : BaseStateComponent, ITickerInterval
 }
 
 /// <summary>
-/// Unity 本地记录的弹幕消息。字段名与服务器 JSON 保持一致，便于 JsonUtility 直接反序列化。
+/// Unity 本地使用的弹幕消息结构。
+/// 字段名与后端 JSON 保持一致，方便 JsonUtility 直接反序列化。
 /// </summary>
 [Serializable]
 public class InteractiveBarrageMessage
@@ -543,7 +705,8 @@ public class InteractiveBarrageMessage
 }
 
 /// <summary>
-/// 服务器推送包。type=barrage 时 message 有效，type=clear 时用于清屏。
+/// 后端 WebSocket 推送包。
+/// type 决定消息语义；type=barrage 时 message 有效，type=clear 时用于清屏。
 /// </summary>
 [Serializable]
 public class InteractiveBarrageEnvelope
