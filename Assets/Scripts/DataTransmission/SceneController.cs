@@ -962,7 +962,7 @@ public class SceneController : BaseController
         {
             desAction.stopTrigger.delay = 0;
         }
-        desAction.startTrigger.nextActionIds.Add(desAction.id, isActionStart);
+        desAction.startTrigger.nextActionIds[desAction.id] = isActionStart;
     }
     
     #region 处理函数调用
