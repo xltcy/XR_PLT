@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Manager 引用类
-// 生成时间: 2026-07-06 20:01:12
-// 包含 6 个继承 BaseManager 的类
+// 生成时间: 2026-07-14 16:33:37
+// 包含 7 个继承 BaseManager 的类
 // =====================================================
 
 using UnityEngine;
@@ -57,6 +57,15 @@ public static class ManagerRefer
         }
     }
 
+    private static SettingManager _settingManager;
+    public static SettingManager SettingManager
+    {
+        get
+        {
+            return _settingManager ??= ManagerRegister.Instance?.GetManager<SettingManager>();
+        }
+    }
+
     private static UIManager _uIManager;
     public static UIManager UIManager
     {
@@ -100,6 +109,8 @@ public static class ManagerRefer
                 return NetworkServiceManager;
             case "QrCodeManager":
                 return QrCodeManager;
+            case "SettingManager":
+                return SettingManager;
             case "UIManager":
                 return UIManager;
             default:
@@ -118,6 +129,7 @@ public static class ManagerRefer
         _gameObjectPoolManager = null;
         _networkServiceManager = null;
         _qrCodeManager = null;
+        _settingManager = null;
         _uIManager = null;
     }
 }

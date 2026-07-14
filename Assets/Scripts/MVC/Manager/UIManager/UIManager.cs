@@ -598,6 +598,7 @@ public class UIManager : BaseManager
         }
         // 初始化Hud
         Open(UINameConstant.GxlIntroduceStartHudUIMediator);
+        Open(UINameConstant.InteractUIMediator);
         Open(UINameConstant.DebugUIMediator);
     }
     
