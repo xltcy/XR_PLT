@@ -28,7 +28,7 @@ public class SpeechManager : BaseController
         Female
     }
 
-    public static SpeechSynthesisMode SynthesisMode { get; private set; } = SpeechSynthesisMode.Azure;
+    public static SpeechSynthesisMode SynthesisMode { get; private set; } = SpeechSynthesisMode.CosyVoice;
     public static SpeechVoiceGender VoiceGender { get; private set; } = SpeechVoiceGender.Male;
 
     // public VirtualManController controller;

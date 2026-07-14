@@ -175,7 +175,7 @@ MonoBehaviour:
   minHorizontalGap: 80
   maxPendingMessages: 200
   maxActiveItems: 40
-  moveSpeed: 420
+  moveSpeed: 210
   spawnInterval: 0.12
   barrageFontAsset: {fileID: 0}
   defaultFontResourcePath: Fonts/simhei SDF

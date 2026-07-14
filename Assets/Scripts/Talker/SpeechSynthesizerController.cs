@@ -25,7 +25,7 @@ public class SpeechSynthesizerController : BaseController
     private readonly Dictionary<SpeechSynthesisMode, ISpeechSynthesizerBackend> synthesizers = new Dictionary<SpeechSynthesisMode, ISpeechSynthesizerBackend>();
     private bool isDisposing;
 
-    public SpeechSynthesisMode SynthesisMode { get; private set; } = SpeechSynthesisMode.Azure;
+    public SpeechSynthesisMode SynthesisMode { get; private set; } = SpeechSynthesisMode.CosyVoice;
     public SpeechVoiceGender VoiceGender { get; private set; } = SpeechVoiceGender.Male;
 
     public override void OnRegister()

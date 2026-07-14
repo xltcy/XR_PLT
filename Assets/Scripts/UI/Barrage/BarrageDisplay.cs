@@ -60,7 +60,7 @@ public class BarrageDisplay : MonoBehaviour
 
     [Header("动画")]
     /// <summary>弹幕移动速度，单位是 UI 像素/秒。</summary>
-    [SerializeField] private float moveSpeed = 420f;
+    [SerializeField] private float moveSpeed = 210f;
 
     /// <summary>全局弹幕生成间隔，避免同一帧创建过多 UI 对象。</summary>
     [SerializeField] private float spawnInterval = 0.12f;

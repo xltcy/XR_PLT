@@ -1,7 +1,7 @@
 ﻿// =====================================================
 // 自动生成的 Controller 引用类
-// 生成时间: 2026-06-08 19:55:19
-// 包含 19 个继承 BaseController 的类
+// 生成时间: 2026-07-14 17:04:50
+// 包含 20 个继承 BaseController 的类
 // =====================================================
 
 using UnityEngine;
@@ -138,6 +138,15 @@ public static class ControllerRefer
         }
     }
 
+    private static SpeechSynthesizerController _speechSynthesizerController;
+    public static SpeechSynthesizerController SpeechSynthesizerController
+    {
+        get
+        {
+            return _speechSynthesizerController ??= ControllerRegister.Instance?.GetController<SpeechSynthesizerController>();
+        }
+    }
+
     private static SwipeManager _swipeManager;
     public static SwipeManager SwipeManager
     {
@@ -235,6 +244,8 @@ public static class ControllerRefer
                 return SMPLController;
             case "SpeechManager":
                 return SpeechManager;
+            case "SpeechSynthesizerController":
+                return SpeechSynthesizerController;
             case "SwipeManager":
                 return SwipeManager;
             case "TickController":
@@ -270,6 +281,7 @@ public static class ControllerRefer
         _selectDesController = null;
         _sMPLController = null;
         _speechManager = null;
+        _speechSynthesizerController = null;
         _swipeManager = null;
         _tickController = null;
         _trackingImageManager = null;
